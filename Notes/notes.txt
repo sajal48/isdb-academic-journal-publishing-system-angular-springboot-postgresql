@@ -3,3 +3,6 @@
 
 2. Shabab Ahmed
    https://github.com/shabab239
+
+3. DB Diagram
+   https://dbdiagram.io/d/academic-journal-publishing-system-67faa04a4f7afba1845bbf05
