@@ -1,0 +1,14 @@
+.navbar-style {
+    background-color: #ffffff;
+    /* box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px; */
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-ul-li {
+    display: flex;
+    width: 270px;
+    justify-content: flex-end;
+}
+.modal-ul-li li:hover {
+    color: #ff8482;
+}
