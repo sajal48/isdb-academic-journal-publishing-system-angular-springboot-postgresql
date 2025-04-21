@@ -6,7 +6,7 @@
 
 .modal-ul-li {
     display: flex;
-    width: 270px;
+    max-width: 270px;
     justify-content: flex-end;
 }
 .modal-ul-li li:hover {
