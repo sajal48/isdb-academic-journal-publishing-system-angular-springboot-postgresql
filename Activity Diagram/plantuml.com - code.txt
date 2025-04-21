@@ -1,0 +1,54 @@
+@startuml
+start
+
+:User registers;
+:User logs in;
+
+if (Is user role 'author'?) then (yes)
+  :Submit article;
+  :Upload article version;
+  :Assign article to a journal;
+  :System sets status = 'submitted';
+  
+  :Editor is assigned;
+  :Editor assigns reviewers;
+  :Reviewers review article;
+  :Submit reviews with recommendations;
+
+  if (Editor decision) then
+    -->[Accept] :Status = 'accepted';
+    --> :Publish article in issue;
+    :Status = 'published';
+
+    :Assign to issue;
+    :Editor schedules publication;
+  else
+    if (Minor revision) then
+      :Send back to author;
+      :Author resubmits version;
+      :Status = 'revision';
+      --> Back to reviewer assignment;
+    else
+      if (Major revision) then
+        :Send back to author;
+        :Author resubmits version;
+        :Status = 'revision';
+        --> Back to reviewer assignment;
+      else
+        -->[Reject] :Status = 'rejected';
+      endif
+    endif
+  endif
+
+elseif (Is user role 'editor' or 'reviewer'?) then
+  :View assigned articles;
+  :Submit review or decision;
+
+elseif (Is user role 'admin'?) then
+  :Manage users;
+  :Manage journals and issues;
+
+endif
+
+stop
+@enduml
