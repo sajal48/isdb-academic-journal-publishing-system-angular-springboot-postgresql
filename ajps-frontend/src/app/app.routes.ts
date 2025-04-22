@@ -1,10 +1,44 @@
 import { Routes } from '@angular/router';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ErrorpageComponent } from './errorpage/errorpage.component';
+import { PublisherViewComponent } from './settings-views/publisher-view/publisher-view.component';
+import { JournalsComponent } from './journals/journals.component';
+import { ServicesComponent } from './services/services.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 
 export const routes: Routes = [
-    {path: '', pathMatch: 'full', redirectTo: 'home'},
-    {path: 'home', pathMatch: 'full', component: HomepageComponent},
+    {
+        path: '',
+        component: PublisherViewComponent,
+        children: [
+          {
+            path: '',
+            redirectTo: 'home',
+            pathMatch: 'full'
+          },
+          {
+            path: 'home',
+            component: HomepageComponent
+          },
+          {
+            path: 'journals',
+            component: JournalsComponent
+          },
+          {
+            path: 'services',
+            component: ServicesComponent
+          },
+          {
+            path: 'login',
+            component: LoginComponent
+          },
+          {
+            path: 'register',
+            component: RegisterComponent
+          }
+        ]
+    },
 
     {path: '**', component: ErrorpageComponent}
 ];
