@@ -1,0 +1,23 @@
+
+  h2, h4 {
+    color: #1A237E;
+  }
+  .service-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+  }
+  .service-card:hover {
+    transform: translateY(-5px);
+  }
+  .section-title {
+    border-bottom: 3px solid #ff6f6c;
+    display: inline-block;
+    padding-bottom: 0.25rem;
+    margin-bottom: 1rem;
+  }
+  ul li::marker {
+    color: #ff6f6c;
+  }

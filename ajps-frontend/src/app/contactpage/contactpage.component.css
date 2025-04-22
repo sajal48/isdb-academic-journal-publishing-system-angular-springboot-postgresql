@@ -1,0 +1,29 @@
+.contact-section {
+    padding: 4rem 0;
+  }
+
+  .form-control, .form-label {
+    font-size: 0.95rem;
+  }
+
+  .card {
+    border: none;
+    border-radius: 1rem;
+    padding: 2rem;
+    background-color: #ffffff;
+    /* box-shadow: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.05); */
+  }
+
+  .contact-info h4 {
+    color: #1A237E;
+  }
+
+  .btn-custom {
+    background-color: #ff6f6c;
+    color: #fff;
+    border: none;
+  }
+
+  .btn-custom:hover {
+    background-color: #e55e5a;
+  }

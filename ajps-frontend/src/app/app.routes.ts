@@ -6,6 +6,7 @@ import { JournalsComponent } from './journals/journals.component';
 import { ServicesComponent } from './services/services.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { ContactpageComponent } from './contactpage/contactpage.component';
 
 export const routes: Routes = [
     {
@@ -28,6 +29,10 @@ export const routes: Routes = [
           {
             path: 'services',
             component: ServicesComponent
+          },
+          {
+            path: 'contact',
+            component: ContactpageComponent
           },
           {
             path: 'login',
