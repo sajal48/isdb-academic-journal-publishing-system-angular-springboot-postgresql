@@ -10,39 +10,51 @@ import { ContactpageComponent } from './contactpage/contactpage.component';
 
 export const routes: Routes = [
     {
-        path: '',
-        component: PublisherViewComponent,
-        children: [
-          {
-            path: '',
-            redirectTo: 'home',
-            pathMatch: 'full'
-          },
-          {
-            path: 'home',
-            component: HomepageComponent
-          },
-          {
-            path: 'journals',
-            component: JournalsComponent
-          },
-          {
-            path: 'services',
-            component: ServicesComponent
-          },
-          {
-            path: 'contact',
-            component: ContactpageComponent
-          },
-          {
-            path: 'login',
-            component: LoginComponent
-          },
-          {
-            path: 'register',
-            component: RegisterComponent
-          }
-        ]
+      path: '',
+      component: PublisherViewComponent,
+      children: [
+        {
+          path: '',
+          redirectTo: 'home',
+          pathMatch: 'full'
+        },
+        {
+          path: 'home',
+          component: HomepageComponent
+        },
+        {
+          path: 'journals',
+          component: JournalsComponent,
+          children: [
+            {
+              path: '',
+              // component: AllJournalsComponent
+            },
+            {
+              path: ':journalName',
+              component: ServicesComponent
+            }
+          ]
+          
+        },
+        {
+          path: 'services',
+          component: ServicesComponent
+        },
+        {
+          path: 'contact',
+          component: ContactpageComponent
+        },
+        {
+          path: 'login',
+          component: LoginComponent
+        },
+        {
+          path: 'register',
+          component: RegisterComponent
+        },
+        {path: '**', component: ErrorpageComponent}
+      ]
     },
 
     {path: '**', component: ErrorpageComponent}

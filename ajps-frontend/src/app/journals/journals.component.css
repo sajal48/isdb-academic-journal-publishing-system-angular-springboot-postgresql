@@ -21,3 +21,7 @@
   .btn-custom:hover {
     background-color: #e65d5a;
   }
+
+  h2, h4 {
+    color: #1A237E;
+  }
