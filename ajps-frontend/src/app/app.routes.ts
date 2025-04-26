@@ -7,6 +7,7 @@ import { ServicesComponent } from './services/services.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ContactpageComponent } from './contactpage/contactpage.component';
+import { JournalViewComponent } from './settings-views/journal-view/journal-view.component';
 
 export const routes: Routes = [
     {
@@ -24,15 +25,15 @@ export const routes: Routes = [
         },
         {
           path: 'journals',
-          component: JournalsComponent,
+          component: JournalsComponent
+        },
+        {
+          path: '',
+          component: JournalViewComponent,
           children: [
             {
-              path: '',
-              // component: AllJournalsComponent
-            },
-            {
-              path: ':journalName',
-              component: ServicesComponent
+              path: 'journals/:journalName',
+              component: JournalsComponent
             }
           ]
           
