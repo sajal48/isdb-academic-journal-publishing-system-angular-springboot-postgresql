@@ -8,6 +8,10 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ContactpageComponent } from './contactpage/contactpage.component';
 import { JournalViewComponent } from './settings-views/journal-view/journal-view.component';
+import { JournalAllIssuesComponent } from './journals/journal-all-issues/journal-all-issues.component';
+import { JournalAnnouncementComponent } from './journals/journal-announcement/journal-announcement.component';
+import { JournalEditorialComponent } from './journals/journal-editorial/journal-editorial.component';
+import { JournalArticleListComponent } from './journals/journal-article-list/journal-article-list.component';
 
 export const routes: Routes = [
     {
@@ -28,13 +32,30 @@ export const routes: Routes = [
           component: JournalsComponent
         },
         {
-          path: '',
+          path: 'journals/:journalName',
           component: JournalViewComponent,
           children: [
             {
-              path: 'journals/:journalName',
-              component: JournalsComponent
-            }
+              path: '',
+              redirectTo: 'all-issues',
+              pathMatch: 'full'
+            },
+            {
+              path: 'all-issues',
+              component: JournalAllIssuesComponent
+            },
+            {
+              path: 'announcement',
+              component: JournalAnnouncementComponent
+            },
+            {
+              path: 'editorial-board',
+              component: JournalEditorialComponent
+            },
+            {
+              path: ':issueNumber',
+              component: JournalArticleListComponent
+            },
           ]
           
         },

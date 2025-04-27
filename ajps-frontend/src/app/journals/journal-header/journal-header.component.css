@@ -1,0 +1,13 @@
+.journal-section {
+    background-color: #eee;
+    border-radius: 1rem;
+    padding: 2rem;
+    /* margin-bottom: 2rem; */
+    /* border: 1px solid #dee2e6; */
+  }
+
+  .journal-cover {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    width: 200px;
+  }
