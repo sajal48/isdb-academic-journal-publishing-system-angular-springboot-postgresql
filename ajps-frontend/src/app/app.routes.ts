@@ -13,6 +13,7 @@ import { JournalAnnouncementComponent } from './journals/journal-announcement/jo
 import { JournalEditorialComponent } from './journals/journal-editorial/journal-editorial.component';
 import { JournalArticleListComponent } from './journals/journal-article-list/journal-article-list.component';
 import { JournalArticleViewComponent } from './journals/journal-article-view/journal-article-view.component';
+import { RecoveryComponent } from './recovery/recovery.component';
 
 export const routes: Routes = [
     {
@@ -79,6 +80,10 @@ export const routes: Routes = [
         {
           path: 'register',
           component: RegisterComponent
+        },
+        {
+          path: 'recovery',
+          component: RecoveryComponent
         },
         {path: '**', component: ErrorpageComponent}
       ]
