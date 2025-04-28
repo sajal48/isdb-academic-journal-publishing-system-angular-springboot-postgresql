@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-journal-article-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './journal-article-list.component.html',
   styleUrl: './journal-article-list.component.css'
 })

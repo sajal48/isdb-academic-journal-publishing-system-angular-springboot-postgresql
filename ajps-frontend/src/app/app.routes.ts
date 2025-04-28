@@ -12,6 +12,7 @@ import { JournalAllIssuesComponent } from './journals/journal-all-issues/journal
 import { JournalAnnouncementComponent } from './journals/journal-announcement/journal-announcement.component';
 import { JournalEditorialComponent } from './journals/journal-editorial/journal-editorial.component';
 import { JournalArticleListComponent } from './journals/journal-article-list/journal-article-list.component';
+import { JournalArticleViewComponent } from './journals/journal-article-view/journal-article-view.component';
 
 export const routes: Routes = [
     {
@@ -56,6 +57,10 @@ export const routes: Routes = [
               path: ':issueNumber',
               component: JournalArticleListComponent
             },
+            {
+              path: ':issueNumber/:articleName',
+              component: JournalArticleViewComponent
+            }
           ]
           
         },
