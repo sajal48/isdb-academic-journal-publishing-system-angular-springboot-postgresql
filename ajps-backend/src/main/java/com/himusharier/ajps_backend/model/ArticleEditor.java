@@ -15,12 +15,12 @@ import java.sql.Timestamp;
 @IdClass(ArticleEditorId.class)
 public class ArticleEditor {
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "editor_id")
     private User editor;
 
