@@ -12,3 +12,46 @@
 .active-page {
     color: #DD9770 !important;
 }
+
+.close-search {
+    color: tomato;
+}
+
+.search-toggle {
+    cursor: pointer;
+}
+.search-container {
+    background: #f5f5f5;
+    border-bottom: 1px solid #e5e7eb;
+    /* padding: 10px 0; */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+.search-container.show {
+    min-height: 100px;
+}
+.search-form {
+    margin: 10px 0;
+}
+.form-control {
+    font-size: 0.95rem;
+    color: #4b5563;
+    border-radius: 6px 0 0 6px;
+}
+.btn-outline-secondary {
+    border-radius: 0 6px 6px 0;
+}
+
+
+@media (max-width: 991.98px) {
+    .navbar-toggler {
+        border: 1px solid #ffffff;
+    }
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    .search-container.show {
+        max-height: 200px;
+    }
+}

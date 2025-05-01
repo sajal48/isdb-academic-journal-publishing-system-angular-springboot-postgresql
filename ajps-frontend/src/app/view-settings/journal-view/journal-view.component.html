@@ -1,1 +1,11 @@
-<p>journal-view works!</p>
+<app-header></app-header>
+<app-journal-banner></app-journal-banner>
+<div class="d-flex container">
+    <div style="max-width: 250px; width: 100%; background-color: #F5F5F5; margin-top: 10px; border-radius: 7px; margin: 10px 10px 10px 0; padding: 0 10px 0 0; height: fit-content;">
+        <app-journal-sidebar></app-journal-sidebar>
+    </div>
+    <div class="flex-grow-1" style="background-color: #ffffff; margin: 10px 0 20px 0;">
+        <router-outlet></router-outlet>
+    </div>
+</div>
+<app-footer></app-footer>

@@ -9,6 +9,9 @@ import { ContactUsComponent } from './contact-us/contact-us.component';
 import { LoginComponent } from './login-register/login/login.component';
 import { RegisterComponent } from './login-register/register/register.component';
 import { RecoveryComponent } from './login-register/recovery/recovery.component';
+import { JournalViewComponent } from './view-settings/journal-view/journal-view.component';
+import { JournalHomepageComponent } from './journals/journal-homepage/journal-homepage.component';
+import { JournalEditorialBoardComponent } from './journals/journal-editorial-board/journal-editorial-board.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,
@@ -23,6 +26,13 @@ export const routes: Routes = [
             {path: 'register', component: RegisterComponent, title: 'Create an Account - ScholarPress'},
             {path: 'recovery', component: RecoveryComponent, title: 'Recover Your Account - ScholarPress'}
         ]
+    },
+    {path: 'journals/:journalName', component: JournalViewComponent,
+        children: [
+            {path: '', redirectTo: 'homepage', pathMatch: 'full'},
+            {path: 'homepage', component: JournalHomepageComponent, title: 'Homepage - ScholarPress'},
+            {path: 'editorial-board', component: JournalEditorialBoardComponent, title: 'Editorial Board - ScholarPress'},
+        ]        
     },
     {path: '**', component: ErrorpageComponent, title: 'Page Not Found - ScholarPress'}
 ];
