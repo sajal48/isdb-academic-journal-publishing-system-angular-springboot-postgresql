@@ -1,27 +1,96 @@
-.journal-section {
-    background-color: #fff;
-    border-radius: 1rem;
-    padding: 2rem;
-    /* margin-bottom: 2rem; */
-    /* border: 1px solid #dee2e6; */
-  }
+.container {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background: #ffffff;
+}
 
-  .journal-cover {
+/* .page-title-text h1 {
+    font-family: 'Poppins', sans-serif; */
+    /* font-weight: 700;
+    color: #1e3a8a;
+    position: relative;
+    padding-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 32px;
+}
+.page-title-text h1::after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(to right, #06b6d4, #3b82f6);
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+} */
+.page-title-text h1 {
+    /* font-family: 'Georgia', serif; */
+    color: #2c3e50;
+    position: relative;
+    padding-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 32px;
+}
+.page-title-text h1::after {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 4px;
+    background-color: #0d6efd;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* .section-heading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #1e3a8a;
+    border-left: 5px solid #06b6d4;
+    padding-left: 15px;
+    margin-bottom: 30px;
+} */
+.section-heading {
+    /* font-family: 'Arial', sans-serif; */
+    color: #34495e;
+    border-left: 5px solid #198754;
+    padding-left: 15px;
+    transition: color 0.3s ease;
+}
+
+.journal-card {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.journal-img {
     max-width: 100%;
-    border-radius: 0.5rem;
-    width: 180px;
-  }
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
-  .btn-custom {
-    background-color: #ff6f6c;
-    color: #fff;
+.card-body {
+    padding: 20px;
+    font-family: 'Poppins', sans-serif;
+    color: #1f2937;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #1e3a8a;
+}
+
+.card-text {
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+
+.journal-btn {
+    background: linear-gradient(to right, #06b6d4, #3b82f6);
     border: none;
-  }
-
-  .btn-custom:hover {
-    background-color: #e65d5a;
-  }
-
-  h2, h4 {
-    color: #1A237E;
-  }
+    padding: 8px 16px;
+    font-weight: 600;
+    color: white;
+}

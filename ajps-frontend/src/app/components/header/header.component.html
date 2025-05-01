@@ -1,7 +1,7 @@
-<div class="navbar-style container-fluid">
-    <nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-lg">
         <a class="navbar-brand" routerLink="/">
-            <img src="/logo.png" alt="logo" height="40">
+            <img src="/logo.png" alt="logo" height="35">
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -9,60 +9,33 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" routerLink="/home">
-                        <i class="bi bi-house-door"></i>
-                        Home
-                    </a>
+                    <a class="nav-link" aria-current="page" routerLink="/home" routerLinkActive="active-page"><i class="bi bi-house-door-fill"></i> Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" routerLink="/journals">
-                        <i class="bi bi-mortarboard"></i>
-                        Journals
-                    </a>
+                    <a class="nav-link" routerLink="/about-us" routerLinkActive="active-page"><i class="bi bi-info-circle-fill"></i> About Us</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" routerLink="/services">
-                        <i class="bi bi-boxes"></i>
-                        Services
-                    </a>
+                    <a class="nav-link active" routerLink="/journals" routerLinkActive="active-page"><i class="bi bi-journals"></i> Journals</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" routerLink="/contact">
-                        <i class="bi bi-telephone"></i>
-                        Contact Us
-                    </a>
+                    <a class="nav-link active" routerLink="/services" routerLinkActive="active-page"><i class="bi bi-tools"></i> Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" routerLink="/contact-us" routerLinkActive="active-page"><i class="bi bi-envelope-fill"></i> Contact Us</a>
+                </li>
+                <li class="nav-item" style="cursor: pointer;">
+                    <a class="nav-link active"><i class="bi bi-search"></i> Search</a>
                 </li>
             </ul>
-            <ul class="navbar-nav">
-                <div class="modal-ul-li">
-                    <li data-bs-toggle="modal" data-bs-target="#login-modal" style="cursor: pointer; margin-right: 5px;">
-                        <a routerLink="/login">
-                            <button class="btn btn-light">
-                                <i class="bi bi-person-add"></i>
-                                LogIn / Register
-                            </button>   
-                        </a>                                             
-                    </li>
-                    <!-- <li class="nav-item dropdown" style="margin-right: 5px;">
-                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person"></i> Sharier Himu
-                        </a>
-                        <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="#"><i class="bi bi-box"></i>&nbsp; Dashboard</a></li>
-                          <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"></i>&nbsp; Profile</a></li>
-                          <li><a class="dropdown-item" href="#"><i class="bi bi-cloud-arrow-up"></i>&nbsp; Submissions</a></li>
-                          <li><hr class="dropdown-divider"></li>
-                          <li><a class="dropdown-item" href="#" style="color: #d94553;"><i class="bi bi-power"></i>&nbsp; Logout</a></li>
-                        </ul>
-                    </li> -->
-                    <li data-bs-toggle="modal" data-bs-target="#register-modal" style="cursor: pointer;">
-                    <button class="btn btn-outline-dark">
-                        <i class="bi bi-journal-plus"></i>
-                        Submit
-                    </button>
-                    </li>
-                </div>                        
-            </ul>
+            <div class="d-flex" role="user">
+                <ul class="navbar-nav">
+                    <!-- Uncomment these if user is logged in
+                    <li class="nav-item"><a class="nav-link active" routerLink="#"><i class="bi bi-person-fill"></i> Sharier Himu</a></li>
+                    <li class="nav-item"><a class="nav-link active" routerLink="#"><i class="bi bi-box-arrow-right"></i> Logout</a></li> -->
+                    <li class="nav-item"><a class="nav-link active" routerLink="register" routerLinkActive="active-page"><i class="bi bi-person-plus-fill"></i> Register</a></li>
+                    <li class="nav-item"><a class="nav-link active" routerLink="login" routerLinkActive="active-page"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+                </ul>
+            </div>
         </div>
-    </nav>
-</div>
+    </div>
+</nav>
