@@ -1,0 +1,62 @@
+.card {
+    border: none;
+    border-radius: 10px;
+    /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #ccc;
+}
+.card-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+.issue-title a {
+    color: #2e7d32;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+/* .issue-title a:hover {
+    color: #4caf50;
+    text-decoration: underline;
+} */
+.issue-meta {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+.issue-meta span {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.btn-primary {
+    /* background-color: #2e7d32; */
+    background-color: #1E455E;
+    /* border-color: #2e7d32; */
+    border-color: #1E455E;
+    width: 100%;
+}
+.btn-primary:hover {
+    background-color: #355c75;
+    border-color: #355c75;
+}
+.container {
+    max-width: 1200px;
+}
+.row {
+    justify-content: center;
+}
+@media (max-width: 576px) {
+    h1 {
+        font-size: 2rem;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+    .card {
+        max-width: 100%;
+    }
+}

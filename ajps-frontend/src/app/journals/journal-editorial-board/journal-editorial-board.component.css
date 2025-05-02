@@ -1,7 +1,7 @@
 h3 {
     font-size: 22px;
     color: #2e7d32;
-    margin-top: 2rem;
+    margin-top: 1rem;
     /* margin-bottom: 1rem; */
     position: relative;
     padding: 0.5rem 1rem;
@@ -39,7 +39,7 @@ h3 {
     text-decoration: underline;
 }
 .container {
-    max-width: 1000px;
+    max-width: 1200px;
 }
 @media (max-width: 576px) {
     .card-body {
