@@ -21,6 +21,8 @@ import { JournalSubmissionComponent } from './journals/journal-submission/journa
 import { JournalIssueArticlesComponent } from './journals/journal-issue-articles/journal-issue-articles.component';
 import { JournalArticlePageComponent } from './journals/journal-article-page/journal-article-page.component';
 import { ErrorpageViewComponent } from './view-settings/errorpage-view/errorpage-view.component';
+import { UserpanelViewComponent } from './view-settings/userpanel-view/userpanel-view.component';
+import { UserDashboardComponent } from './user/user-dashboard/user-dashboard.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,
@@ -51,10 +53,15 @@ export const routes: Routes = [
             {path: ':issueNumber/:articleName', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'}
         ]        
     },
+    {path: 'user', component: UserpanelViewComponent,
+        children: [
+            {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
+            {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'}
+        ]
+    },
     {path: '**', component: ErrorpageViewComponent,
         children: [
             {path: '**', component: ErrorpageComponent, title: 'Page Not Found - ScholarPress'}
         ]
     }
-    
 ];
