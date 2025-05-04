@@ -20,6 +20,7 @@ import { JournalProcessingChargeComponent } from './journals/journal-processing-
 import { JournalSubmissionComponent } from './journals/journal-submission/journal-submission.component';
 import { JournalIssueArticlesComponent } from './journals/journal-issue-articles/journal-issue-articles.component';
 import { JournalArticlePageComponent } from './journals/journal-article-page/journal-article-page.component';
+import { ErrorpageViewComponent } from './view-settings/errorpage-view/errorpage-view.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,
@@ -50,5 +51,10 @@ export const routes: Routes = [
             {path: ':issueNumber/:articleName', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'}
         ]        
     },
-    {path: '**', component: ErrorpageComponent, title: 'Page Not Found - ScholarPress'}
+    {path: '**', component: ErrorpageViewComponent,
+        children: [
+            {path: '**', component: ErrorpageComponent, title: 'Page Not Found - ScholarPress'}
+        ]
+    }
+    
 ];
