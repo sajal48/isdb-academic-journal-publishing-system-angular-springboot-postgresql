@@ -2,27 +2,38 @@
     <div class="container">
         <div class="form-card card">
             <div class="card-body">
-                <form>
+                <form #form="ngForm">
                     <div class="page-title-text text-center mb-4">
                         <h3>Create an Account</h3>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" name="username" id="username">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName" id="firstName" [(ngModel)]="user.firstName">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName" id="lastName" [(ngModel)]="user.lastName">
+                        </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="useremail" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="useremail" id="useremail">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" id="email" [(ngModel)]="user.email">
                     </div>
 
                     <div class="mb-3">
-                        <label for="userpassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="userpassword" id="userpassword">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="user.password">
                     </div>
 
-                    <button type="submit" class="btn form-btn w-100 mb-3">
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" name="phone" id="phone" [(ngModel)]="user.phoneNumber">
+                    </div>
+
+                    <button type="submit" class="btn form-btn w-100 mb-3" (click)="onSubmit()">
                         <i class="bi bi-person-plus-fill"></i>Create Account
                     </button>
 

@@ -8,20 +8,20 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="useremail" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="useremail" id="useremail">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" id="email" [(ngModel)]="email">
                     </div>
 
                     <div class="mb-3">
-                        <label for="userpassword" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="userpassword" id="userpassword">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="password">
                     </div>
 
                     <div class="mb-3 text-end">
                         <a routerLink="/recovery" class="custom-link">Forgot Password?</a>
                     </div>
 
-                    <button type="submit" class="btn form-btn w-100 mb-3">
+                    <button type="submit" class="btn form-btn w-100 mb-3" (click)="onSubmit()">
                         <i class="bi bi-box-arrow-in-right"></i>Login
                     </button>
 

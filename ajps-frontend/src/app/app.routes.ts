@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { HomepageComponent } from './homepage/homepage.component';
-import { PublisherViewComponent } from './view-settings/publisher-view/publisher-view.component';
 import { ErrorpageComponent } from './errorpage/errorpage.component';
 import { AboutUsComponent } from './about-us/about-us.component';
 import { JournalsComponent } from './journals/journals.component';
@@ -9,7 +8,6 @@ import { ContactUsComponent } from './contact-us/contact-us.component';
 import { LoginComponent } from './login-register/login/login.component';
 import { RegisterComponent } from './login-register/register/register.component';
 import { RecoveryComponent } from './login-register/recovery/recovery.component';
-import { JournalViewComponent } from './view-settings/journal-view/journal-view.component';
 import { JournalHomepageComponent } from './journals/journal-homepage/journal-homepage.component';
 import { JournalEditorialBoardComponent } from './journals/journal-editorial-board/journal-editorial-board.component';
 import { JournalCurrentIssueComponent } from './journals/journal-current-issue/journal-current-issue.component';
@@ -20,9 +18,11 @@ import { JournalProcessingChargeComponent } from './journals/journal-processing-
 import { JournalSubmissionComponent } from './journals/journal-submission/journal-submission.component';
 import { JournalIssueArticlesComponent } from './journals/journal-issue-articles/journal-issue-articles.component';
 import { JournalArticlePageComponent } from './journals/journal-article-page/journal-article-page.component';
-import { ErrorpageViewComponent } from './view-settings/errorpage-view/errorpage-view.component';
-import { UserpanelViewComponent } from './view-settings/userpanel-view/userpanel-view.component';
 import { UserDashboardComponent } from './user/user-dashboard/user-dashboard.component';
+import { PublisherViewComponent } from './site-settings/view/publisher-view/publisher-view.component';
+import { JournalViewComponent } from './site-settings/view/journal-view/journal-view.component';
+import { UserpanelViewComponent } from './site-settings/view/userpanel-view/userpanel-view.component';
+import { ErrorpageViewComponent } from './site-settings/view/errorpage-view/errorpage-view.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,

@@ -12,14 +12,19 @@ public record RegisterRequest(
         String email,
 
         @NotBlank(message = "Password cannot be blank")
-        @Size(min = 5, message = "Password must be at least 5 characters")
+        @Size(min = 6, message = "Password must be at least 6 characters")
         String password,
 
         @ValidRole(message = "Role must be valid")
         Role role,
 
+        @NotBlank(message = "First name cannot be blank")
         String firstName,
+
+        @NotBlank(message = "Last name cannot be blank")
         String lastName,
+
+        @NotBlank(message = "Phone number cannot be blank")
         String phoneNumber
 ) {
 }
