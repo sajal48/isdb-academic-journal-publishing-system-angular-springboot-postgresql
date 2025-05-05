@@ -1,39 +1,64 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.himusharier.ajps_backend.constants.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
+@AllArgsConstructor
+@Table(name = "USERS")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
-    private String fullName;
-
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
-    private String passwordHash;
+    private String password;
 
-    private String affiliation;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
-    @Column(length = 20)
-    private String role;
-
-    private Boolean isActive = true;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 
     @Column(name = "created_at")
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
-    // Getters and setters
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    public User(String email, String password, Role role, String firstName, String lastName, String phoneNumber) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
