@@ -1,6 +1,6 @@
-/*
 package com.himusharier.ajps_backend.advice;
 
+import com.himusharier.ajps_backend.exception.RegisterRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,34 +26,13 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BookAddingException.class)
-    public Map<String, Object> handleBookAddingException(BookAddingException ex) {
+    @ExceptionHandler(RegisterRequestException.class)
+    public Map<String, Object> handleBookAddingException(RegisterRequestException ex) {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "error");
         response.put("code", HttpStatus.BAD_REQUEST.value());
-        response.put("message", ex.getMessage());
-        return response;
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(DuplicateEntryException.class)
-    public Map<String, Object> handleDuplicateEntryException(DuplicateEntryException ex) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", "error");
-        response.put("code", HttpStatus.BAD_REQUEST.value());
-        response.put("message", ex.getMessage());
-        return response;
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(BookNotFoundException.class)
-    public Map<String, Object> handleBookNotFoundException(BookNotFoundException ex) {
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("status", "error");
-        response.put("code", HttpStatus.NOT_FOUND.value());
         response.put("message", ex.getMessage());
         return response;
     }
 
 }
-*/

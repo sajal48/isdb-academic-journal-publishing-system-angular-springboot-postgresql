@@ -4,6 +4,7 @@ import com.himusharier.ajps_backend.config.JwtTokenProvider;
 import com.himusharier.ajps_backend.dto.LoginRequest;
 import com.himusharier.ajps_backend.dto.RegisterRequest;
 import com.himusharier.ajps_backend.dto.UserResponse;
+import com.himusharier.ajps_backend.exception.RegisterRequestException;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
 import com.himusharier.ajps_backend.model.User;
 import com.himusharier.ajps_backend.service.JwtUserService;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,8 +71,13 @@ public class AuthController {
             userResponse.setUpdatedAt(savedUser.getUpdatedAt());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+
+        } catch (MethodArgumentTypeMismatchException e) {
+            throw new RegisterRequestException(e.getMessage());
+
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+//            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new RegisterRequestException(e.getMessage());
         }
     }
 
