@@ -24,13 +24,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="user.password">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" name="phone" id="phone" [(ngModel)]="user.phoneNumber">
                     </div>
 
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Phone Number</label>
-                        <input type="tel" class="form-control" name="phone" id="phone" [(ngModel)]="user.phoneNumber">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="user.password">
                     </div>
 
                     <button type="submit" class="btn form-btn w-100 mb-3" (click)="onSubmit()">

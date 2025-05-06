@@ -27,7 +27,7 @@ export class LoginComponent {
         this.password = '';
 
         console.log('Login successful:', response);
-        alert('Login successful! Please log in.');
+        alert('Login successful!.');
 
         window.location.href="/user";
 
