@@ -27,7 +27,7 @@ public class ApplicationExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RegisterRequestException.class)
-    public Map<String, Object> handleBookAddingException(RegisterRequestException ex) {
+    public Map<String, Object> registerRequestException(RegisterRequestException ex) {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "error");
         response.put("code", HttpStatus.BAD_REQUEST.value());

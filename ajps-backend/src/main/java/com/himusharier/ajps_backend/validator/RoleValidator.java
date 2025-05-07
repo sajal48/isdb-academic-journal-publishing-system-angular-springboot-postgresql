@@ -14,7 +14,7 @@ public class RoleValidator implements ConstraintValidator<ValidRole, Role> {
         try {
             Role.valueOf(role.name());
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
