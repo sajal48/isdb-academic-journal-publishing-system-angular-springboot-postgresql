@@ -23,6 +23,10 @@ import { PublisherViewComponent } from './site-settings/view/publisher-view/publ
 import { JournalViewComponent } from './site-settings/view/journal-view/journal-view.component';
 import { UserpanelViewComponent } from './site-settings/view/userpanel-view/userpanel-view.component';
 import { ErrorpageViewComponent } from './site-settings/view/errorpage-view/errorpage-view.component';
+import { UserSubmissionComponent } from './user/user-submission/user-submission.component';
+import { UserProfileComponent } from './user/user-profile/user-profile.component';
+import { UserProfileEditComponent } from './user/user-profile-edit/user-profile-edit.component';
+import { UserSettingsComponent } from './user/user-settings/user-settings.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,
@@ -56,7 +60,11 @@ export const routes: Routes = [
     {path: 'user', component: UserpanelViewComponent,
         children: [
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-            {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'}
+            {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'},
+            {path: 'submission', component: UserSubmissionComponent, title: 'Online Submission - ScholarPress'},
+            {path: 'view-profile', component: UserProfileComponent, title: 'View Profile - ScholarPress'},
+            {path: 'edit-profile', component: UserProfileEditComponent, title: 'Edit Profile - ScholarPress'},
+            {path: 'settings', component: UserSettingsComponent, title: 'Settings - ScholarPress'}
         ]
     },
     {path: '**', component: ErrorpageViewComponent,
