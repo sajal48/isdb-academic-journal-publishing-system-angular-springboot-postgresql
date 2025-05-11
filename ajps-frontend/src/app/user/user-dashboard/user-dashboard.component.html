@@ -1,1 +1,100 @@
-<p>user-dashboard works!</p>
+<!-- Dashboard Content -->
+<h4 class="mb-4" style="color: #2e7d32;">User Dashboard</h4>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Submitted Papers</h6>
+            <h3>5</h3>
+            <small>All time</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Pending Reviews</h6>
+            <h3>2</h3>
+            <small>Assigned</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Accepted Papers</h6>
+            <h3>3</h3>
+            <small>Published</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6>Revision Requests</h6>
+            <h3>1</h3>
+            <small>Action needed</small>
+        </div>
+    </div>
+</div>
+
+<!-- My Submissions Table -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">My Submissions</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Journal</th>
+                    <th>Status</th>
+                    <th>Submitted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AI in Healthcare</td>
+                    <td>Journal of Medical Tech</td>
+                    <td><span class="badge bg-warning">Under Review</span></td>
+                    <td>2025-05-01</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> View</button>
+                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-upload"></i> Upload Revision</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Quantum Computing Advances</td>
+                    <td>Tech Advances</td>
+                    <td><span class="badge bg-success">Accepted</span></td>
+                    <td>2025-04-20</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> View</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Review Tasks -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Pending Review Tasks</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Journal</th>
+                    <th>Due Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Machine Learning Trends</td>
+                    <td>AI Journal</td>
+                    <td>2025-05-15</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Review</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

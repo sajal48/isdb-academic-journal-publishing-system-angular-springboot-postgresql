@@ -1,1 +1,59 @@
-<p>user-submission works!</p>
+<!-- Submission Form -->
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Submit New Article</h4>
+        <form id="submissionForm" enctype="multipart/form-data">
+            <!-- Article Details -->
+            <div class="mb-3">
+                <label for="articleTitle" class="form-label">Article Title</label>
+                <input type="text" class="form-control" id="articleTitle" name="articleTitle" required>
+            </div>
+            <div class="mb-3">
+                <label for="abstract" class="form-label">Abstract (max 300 words)</label>
+                <textarea class="form-control" id="abstract" name="abstract" rows="5" maxlength="2000" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="keywords" class="form-label">Keywords (comma-separated)</label>
+                <input type="text" class="form-control" id="keywords" name="keywords" placeholder="e.g., AI, machine learning, healthcare" required>
+            </div>
+
+            <!-- Author Details -->
+            <div class="mb-3">
+                <label for="authorName" class="form-label">Primary Author Name</label>
+                <input type="text" class="form-control" id="authorName" name="authorName" required>
+            </div>
+            <div class="mb-3">
+                <label for="authorEmail" class="form-label">Primary Author Email</label>
+                <input type="email" class="form-control" id="authorEmail" name="authorEmail" required>
+            </div>
+            <div class="mb-3">
+                <label for="coAuthors" class="form-label">Co-Authors (optional, one per line)</label>
+                <textarea class="form-control" id="coAuthors" name="coAuthors" rows="3"></textarea>
+            </div>
+
+            <!-- File Uploads -->
+            <div class="mb-3">
+                <label for="articleFile" class="form-label">Article File (PDF only)</label>
+                <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".pdf" required>
+            </div>
+            <div class="mb-3">
+                <label for="coverLetter" class="form-label">Cover Letter (optional, PDF only)</label>
+                <input type="file" class="form-control" id="coverLetter" name="coverLetter" accept=".pdf">
+            </div>
+
+            <!-- Terms Agreement -->
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
+                <label class="form-check-label" for="terms">
+                    I agree to the <a href="#" target="_blank">journal's submission terms</a> and confirm that this work is original and has not been published elsewhere.
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-upload me-2"></i>Submit Article</button>
+                <button type="reset" class="btn btn-outline-secondary">Clear Form</button>
+            </div>
+        </form>
+    </div>
+</div>
