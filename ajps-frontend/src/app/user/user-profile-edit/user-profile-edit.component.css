@@ -1,0 +1,27 @@
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.form-label {
+    font-weight: 500;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border: none;
+}
+.btn-primary:hover {
+    background: linear-gradient(135deg, #5a78e0, #9266cc);
+}
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    display: none;
+}

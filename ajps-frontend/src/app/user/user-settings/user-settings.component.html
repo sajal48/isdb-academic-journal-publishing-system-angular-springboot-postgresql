@@ -1,1 +1,48 @@
-<p>user-settings works!</p>
+<!-- Settings Card -->
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Settings</h4>
+
+                <!-- Change Email Section -->
+                <div class="mb-5">
+                    <h5 class="section-title">Change Email</h5>
+                    <form id="cngEmailForm">
+                        <div id="emailCngError-message" class="alert alert-danger d-none mb-3" role="alert"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Email</label>
+                            <p class="current-email">jane.doe&#64;university.edu</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newEmail" class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="newEmail" name="newEmail" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Email</button>
+                    </form>
+                </div>
+
+                <!-- Change Password Section -->
+                <div>
+                    <h5 class="section-title">Change Password</h5>
+                    <form id="cngPassForm">
+                        <div id="passCngError-message" class="alert alert-danger d-none mb-3" role="alert"></div>
+                        <div class="mb-3">
+                            <label for="currentPass" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="currentPass" name="currentPass" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="newPass" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="newPass" name="newPass" required>
+                                <small id="passwordError" class="error-message d-none">Password must be at least 8 characters.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="reNewPass" class="form-label">Retype New Password</label>
+                                <input type="password" class="form-control" id="reNewPass" name="reNewPass" required>
+                                <small id="confirmPasswordError" class="error-message d-none">Passwords do not match.</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>

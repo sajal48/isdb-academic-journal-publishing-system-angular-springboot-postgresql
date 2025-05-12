@@ -1,3 +1,17 @@
+.profile-notice {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.profile-notice a {
+    color: #6e8efb;
+    text-decoration: none;
+}
+.profile-notice a:hover {
+    text-decoration: underline;
+}
 .card {
     border: none;
     border-radius: 10px;
@@ -9,6 +23,7 @@
 }
 .form-label {
     font-weight: 500;
+    /* font-size: 14px; */
 }
 .btn-primary {
     background: linear-gradient(135deg, #6e8efb, #a777e3);

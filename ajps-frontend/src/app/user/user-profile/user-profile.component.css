@@ -1,0 +1,41 @@
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.profile-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.table td {
+    /* border: none; */
+    padding: 12px;
+    font-size: 16px;
+}
+.table th {
+    font-size: 16px;
+}
+.table td:first-child {
+    font-weight: 500;
+    width: 200px;
+}
+.social-link {
+    color: #6e8efb;
+    text-decoration: none;
+    margin-right: 15px;
+}
+.social-link:hover {
+    text-decoration: underline;
+}
+@media (max-width: 768px) {
+    .profile-img {
+        margin: 0 auto;
+    }
+}
