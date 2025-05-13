@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { apiConfig } from '../api-config';
+import { apiConfig } from '../configs/api-config';
 import { Observable } from 'rxjs';
 import { UserRegisterRequest } from '../interface/user-register-request';
 import { UserRegisterResponse } from '../interface/user-register-response';

@@ -27,6 +27,11 @@ import { UserSubmissionComponent } from './user/user-submission/user-submission.
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { UserProfileEditComponent } from './user/user-profile-edit/user-profile-edit.component';
 import { UserSettingsComponent } from './user/user-settings/user-settings.component';
+import { EditorOverviewComponent } from './user/editor-overview/editor-overview.component';
+import { EditorSubmissionsComponent } from './user/editor-submissions/editor-submissions.component';
+import { EditorReviewersComponent } from './user/editor-reviewers/editor-reviewers.component';
+import { EditorReportsComponent } from './user/editor-reports/editor-reports.component';
+import { EditorJournalSettingsComponent } from './user/editor-journal-settings/editor-journal-settings.component';
 
 export const routes: Routes = [
     {path: '', component: PublisherViewComponent,
@@ -59,12 +64,19 @@ export const routes: Routes = [
     },
     {path: 'user', component: UserpanelViewComponent,
         children: [
+            // general user:
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'},
             {path: 'submission', component: UserSubmissionComponent, title: 'Online Submission - ScholarPress'},
             {path: 'view-profile', component: UserProfileComponent, title: 'View Profile - ScholarPress'},
             {path: 'edit-profile', component: UserProfileEditComponent, title: 'Edit Profile - ScholarPress'},
-            {path: 'settings', component: UserSettingsComponent, title: 'Settings - ScholarPress'}
+            {path: 'settings', component: UserSettingsComponent, title: 'Profile Settings - ScholarPress'},
+            // editorial panel:
+            {path: 'journal-overview', component: EditorOverviewComponent, title: 'Journal Overview - ScholarPress'},
+            {path: 'journal-submissions', component: EditorSubmissionsComponent, title: 'Journal Submissions - ScholarPress'},
+            {path: 'journal-reviewers', component: EditorReviewersComponent, title: 'Journal Reviewers - ScholarPress'},
+            {path: 'journal-reports', component: EditorReportsComponent, title: 'Journal Reports - ScholarPress'},
+            {path: 'journal-settings', component: EditorJournalSettingsComponent, title: 'Journal Settings - ScholarPress'},
         ]
     },
     {path: '**', component: ErrorpageViewComponent,

@@ -1,0 +1,135 @@
+<main class="container">
+        <h3 class="mb-4 fw-bold">Editor Dashboard</h3>
+
+        <!-- Quick Actions -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card quick-action-card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">New Submissions</h5>
+                        <p class="card-text">View and assign newly submitted articles.</p>
+                        <a href="#" class="btn btn-primary">View Submissions</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card quick-action-card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">In Review</h5>
+                        <p class="card-text">Manage articles currently under review.</p>
+                        <a href="#" class="btn btn-warning">Manage Reviews</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card quick-action-card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Decision Queue</h5>
+                        <p class="card-text">Make editorial decisions on reviewed articles.</p>
+                        <a href="#" class="btn btn-success">View Decisions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Statistics -->
+        <div class="card mb-5">
+            <div class="card-header">
+                <h5>Submission Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 stat-item">
+                        <h6>Total Submissions</h6>
+                        <p>120</p>
+                    </div>
+                    <div class="col-md-3 stat-item">
+                        <h6>Unchecked Submissions</h6>
+                        <p>10</p>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <h6>Pending Review</h6>
+                        <p>30</p>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <h6>Accepted</h6>
+                        <p>50</p>
+                    </div>
+                    <div class="col-md-2 stat-item">
+                        <h6>Rejected</h6>
+                        <p>40</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Table -->
+        <div class="card mb-5">
+            <div class="card-header">
+                <h5>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Article Title</th>
+                                <th>Status</th>
+                                <th>Assigned Reviewer</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1012</td>
+                                <td>Exploring Plant Biodiversity</td>
+                                <td><span class="badge bg-warning text-dark">Under Review</span></td>
+                                <td>Dr. A. Smith</td>
+                                <td>2025-05-11</td>
+                            </tr>
+                            <tr>
+                                <td>1013</td>
+                                <td>Urban Ecology Review</td>
+                                <td><span class="badge bg-primary">Submitted</span></td>
+                                <td>—</td>
+                                <td>2025-05-12</td>
+                            </tr>
+                            <tr>
+                                <td>1014</td>
+                                <td>Soil Microbiome Studies</td>
+                                <td><span class="badge bg-success">Accepted</span></td>
+                                <td>Dr. L. Chen</td>
+                                <td>2025-05-10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Log -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Activity Log</h5>
+            </div>
+            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                <div class="activity-item">
+                    <span>Assigned reviewers to Manuscript #1234</span>
+                    <small class="text-muted">2025-05-12 10:30</small>
+                </div>
+                <div class="activity-item">
+                    <span>Accepted Manuscript #5678</span>
+                    <small class="text-muted">2025-05-11 15:45</small>
+                </div>
+                <div class="activity-item">
+                    <span>Rejected Manuscript #9012</span>
+                    <small class="text-muted">2025-05-10 09:20</small>
+                </div>
+                <div class="activity-item">
+                    <span>Updated Journal Settings</span>
+                    <small class="text-muted">2025-05-09 14:00</small>
+                </div>
+            </div>
+        </div>
+    </main>
