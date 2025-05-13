@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-submission',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './user-submission.component.html',
   styleUrl: './user-submission.component.css'
 })

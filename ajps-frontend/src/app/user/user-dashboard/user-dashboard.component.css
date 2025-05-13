@@ -19,3 +19,6 @@
 table, tr, th, td {
     font-size: 14px !important;
 }
+table > tbody > tr > td> button {
+    margin-right: 5px;
+}

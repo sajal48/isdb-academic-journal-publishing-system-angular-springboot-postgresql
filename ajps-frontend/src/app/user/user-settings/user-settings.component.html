@@ -1,12 +1,14 @@
-<!-- Settings Card -->
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title mb-4">Settings</h4>
-
-                <!-- Change Email Section -->
-                <div class="mb-5">
-                    <h5 class="section-title">Change Email</h5>
-                    <form id="cngEmailForm">
+<!-- Content Area -->
+<div class="content-area">
+    <!-- Change Email Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Change Email</h5>
+        </div>
+        <div class="card-body">
+            <form id="cngEmailForm">
+                <div class="row form-content">
+                    <div class="col-md-8">
                         <div id="emailCngError-message" class="alert alert-danger d-none mb-3" role="alert"></div>
                         <div class="mb-3">
                             <label class="form-label">Current Email</label>
@@ -16,14 +18,26 @@
                             <label for="newEmail" class="form-label">New Email</label>
                             <input type="email" class="form-control" id="newEmail" name="newEmail" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Change Email</button>
-                    </form>
+                    </div>
+                    <div class="col-md-4 button-column">
+                        <button type="submit" class="btn btn-green w-100">Change <i class="bi bi-arrow-right-circle"></i></button>
+                    </div>
                 </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- Change Password Section -->
-                <div>
-                    <h5 class="section-title">Change Password</h5>
-                    <form id="cngPassForm">
+    <!-- <hr> -->
+
+    <!-- Change Password Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Change Password</h5>
+        </div>
+        <div class="card-body">
+            <form id="cngPassForm">
+                <div class="row form-content">
+                    <div class="col-md-8">
                         <div id="passCngError-message" class="alert alert-danger d-none mb-3" role="alert"></div>
                         <div class="mb-3">
                             <label for="currentPass" class="form-label">Current Password</label>
@@ -41,8 +55,68 @@
                                 <small id="confirmPasswordError" class="error-message d-none">Passwords do not match.</small>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Change Password</button>
-                    </form>
+                    </div>
+                    <div class="col-md-4 button-column">
+                        <button type="submit" class="btn btn-green w-100">Change <i class="bi bi-arrow-right-circle"></i></button>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
+    </div>
+
+    <!-- <hr> -->
+
+    <!-- Email Notifications Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Email Notifications</h5>
+        </div>
+        <div class="card-body">
+            <form id="notificationsForm">
+                <div class="row form-content">
+                    <div class="col-md-8">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="submissionUpdates" name="submissionUpdates" checked>
+                            <label class="form-check-label" for="submissionUpdates">Submission Updates</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="reviewRequests" name="reviewRequests" checked>
+                            <label class="form-check-label" for="reviewRequests">Review Requests</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 button-column">
+                        <button type="submit" class="btn btn-green w-100"><i class="bi bi-floppy2-fill"></i> Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- <hr> -->
+
+    <!-- Profile Visibility Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Profile Visibility</h5>
+        </div>
+        <div class="card-body">
+            <form id="visibilityForm">
+                <div class="row form-content">
+                    <div class="col-md-8">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="profileVisibility" id="publicProfile" value="public" checked>
+                            <label class="form-check-label" for="publicProfile">Public (visible to all)</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="profileVisibility" id="privateProfile" value="private">
+                            <label class="form-check-label" for="privateProfile">Private (only you)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4 button-column">
+                        <button type="submit" class="btn btn-green w-100"><i class="bi bi-floppy2-fill"></i> Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
