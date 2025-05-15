@@ -40,7 +40,7 @@ h2, h4, h5 {
     margin: 0;
 }
 .card-body {
-    /* padding: 1.75rem; */
+    padding: 1rem;
 }
 .quick-action-card .card-body {
     text-align: center;
@@ -60,7 +60,7 @@ h2, h4, h5 {
     overflow: hidden;
     z-index: 1;
 }
-.quick-action-card .btn::after {
+/* .quick-action-card .btn::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -76,7 +76,7 @@ h2, h4, h5 {
 .quick-action-card .btn:hover::after {
     width: 300px;
     height: 300px;
-}
+} */
 .stat-item {
     text-align: center;
     padding: 1.25rem;
@@ -138,15 +138,15 @@ h2, h4, h5 {
     border-bottom: none;
 }
 .badge {
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.85rem;
-    transition: transform 0.2s ease;
+    /* padding: 0.6rem 1rem; */
+    border-radius: 2px;
+    font-weight: 400;
+    font-size: 12px;
+    /* transition: transform 0.2s ease; */
 }
-.badge:hover {
+/* .badge:hover {
     transform: scale(1.1);
-}
+} */
 .table {
     /* border-radius: 12px; */
     overflow: hidden;
@@ -211,6 +211,24 @@ h2, h4, h5 {
     width: 300px;
     height: 300px;
 }
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px; /* Fixed length for the underline */
+    height: 3px;
+    background: linear-gradient(to right, #2e7d32, #4caf50);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
 @media (max-width: 768px) {
     .stat-item {
         margin-bottom: 1.5rem;

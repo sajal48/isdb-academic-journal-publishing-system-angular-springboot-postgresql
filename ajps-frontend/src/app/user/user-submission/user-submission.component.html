@@ -1,62 +1,76 @@
 <!-- Profile Notice -->
-        <div class="profile-notice">
-            <p><strong>Notice:</strong> You have to update your profile before submission. Click <a routerLink="/user/edit-profile">here</a> to go to the profile update page.</p>
-            <p>Least required information:</p>
-            <ul>
-                <li>First Name</li>
-                <li>Last Name</li>
-                <li>Mobile or Telephone</li>
-                <li>Institute</li>
-                <li>Country</li>
-                <li>Address</li>
-                <li>Zip Code</li>
-            </ul>
-        </div>
+<!-- <div class="profile-notice">
+    <p><strong>Notice:</strong> You have to update your profile before submission. Click <a routerLink="/user/edit-profile">here</a> to go to the profile update page.</p>
+    <p>Least required information:</p>
+    <ul>
+        <li>First Name</li>
+        <li>Last Name</li>
+        <li>Mobile or Telephone</li>
+        <li>Institute</li>
+        <li>Country</li>
+        <li>Address</li>
+        <li>Zip Code</li>
+    </ul>
+</div> -->
 
-        <!-- Submission Form -->
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title mb-4" style="color: #2e7d32;">Article Submission Form</h4>
-                <form id="submissionForm" enctype="multipart/form-data">
-                    <!-- Error Message Placeholder -->
-                    <div id="submissionError-messageQ" class="alert alert-danger d-none mb-3" role="alert">
-                        <!-- Dynamic error messages will appear here -->
-                    </div>
+<!-- Submission Form -->
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-4" style="color: #2e7d32;">Article Submission Form</h4>
+        <form id="submissionForm" enctype="multipart/form-data">
+            <!-- Error Message Placeholder -->
+            <div id="submissionError-messageQ" class="alert alert-danger d-none mb-3" role="alert">
+                <!-- Dynamic error messages will appear here -->
+            </div>
 
-                    <!-- Article Title -->
-                    <div class="mb-3">
-                        <label for="articleTitle" class="form-label">Article Title</label>
-                        <input type="text" class="form-control" id="articleTitle" name="articleTitle" required>
-                    </div>
-
-                    <!-- Abstract -->
-                    <div class="mb-3">
-                        <label for="abstract" class="form-label">Abstract</label>
-                        <textarea class="form-control" id="abstract" name="abstract" rows="5" autocomplete="off" required></textarea>
-                    </div>
-
-                    <!-- Keywords -->
-                    <div class="mb-3">
-                        <label for="keywords" class="form-label">Keywords</label>
-                        <textarea class="form-control" id="keywords" name="keywords" rows="3" autocomplete="off" required></textarea>
-                    </div>
-
-                    <!-- File Uploads -->
+            <!-- Article Title -->
             <div class="mb-3">
-                <label for="articleFile" class="form-label">Manuscript File (PDF only)</label>
-                <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".pdf" required>
-            </div>
-            <div class="mb-3">
-                <label for="coverLetter" class="form-label">Cover Letter (optional, PDF only)</label>
-                <input type="file" class="form-control" id="coverLetter" name="coverLetter" accept=".pdf">
+                <label for="articleTitle" class="form-label">Article Title <i>*</i></label>
+                <input type="text" class="form-control" id="articleTitle" name="articleTitle" required>
             </div>
 
-                    <!-- Submit and Cancel Buttons -->
-                    <hr class="my-4">
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn btn-primary" id="submissionSubmit-btn"><i class="bi bi-upload me-2"></i>Submit</button>
-                        <button type="button" class="btn btn-outline-secondary" id="cancel-btn" onclick="document.location.reload()">Cancel</button>
-                    </div>
-                </form>
+            <!-- Article Category -->
+            <div class="mb-3">
+                <label for="articleCategory" class="form-label">Article Category <i>*</i></label>
+                <select class="form-select" id="articleCategory" name="articleCategory" required>
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="research">Research Article</option>
+                    <option value="review">Review Article</option>
+                    <option value="case-study">Case Study</option>
+                    <option value="editorial">Editorial</option>
+                    <option value="other">Other</option>
+                </select>
             </div>
-        </div>
+
+            <!-- Abstract -->
+            <div class="mb-3">
+                <label for="abstract" class="form-label">Abstract <i>*</i></label>
+                <textarea class="form-control" id="abstract" name="abstract" rows="5" autocomplete="off" required></textarea>
+            </div>
+
+            <!-- Keywords -->
+            <div class="mb-3">
+                <label for="keywords" class="form-label">Keywords (Comma Seperated) <i>*</i></label>
+                <!-- <textarea class="form-control" id="keywords" name="keywords" rows="3" autocomplete="off" required></textarea> -->
+                    <input type="text" class="form-control" id="keywords" name="keywords" required>
+            </div>
+
+            <!-- File Uploads -->
+    <div class="mb-3">
+        <label for="articleFile" class="form-label">Manuscript File (DOC, XDOC, PDF Only) <i>*</i></label>
+        <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".pdf" required>
+    </div>
+    <div class="mb-3">
+        <label for="coverLetter" class="form-label">Cover Letter (DOC, XDOC, PDF Only)</label>
+        <input type="file" class="form-control" id="coverLetter" name="coverLetter" accept=".pdf">
+    </div>
+
+            <!-- Submit and Cancel Buttons -->
+            <hr class="my-4">
+            <div class="d-flex gap-3">
+                <button type="submit" class="btn btn-primary" id="submissionSubmit-btn"><i class="bi bi-upload me-2"></i>Submit</button>
+                <button type="button" class="btn btn-outline-secondary" id="cancel-btn" onclick="document.location.reload()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

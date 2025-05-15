@@ -23,7 +23,7 @@
     font-size: 16px;
 }
 .table td:first-child {
-    font-weight: 500;
+    font-weight: 600;
     width: 200px;
 }
 .social-link {
@@ -34,6 +34,24 @@
 .social-link:hover {
     text-decoration: underline;
 }
+
+.card-title {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+.card-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px; /* Fixed length for the underline */
+    height: 3px;
+    background: linear-gradient(to right, #2e7d32, #4caf50);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
 @media (max-width: 768px) {
     .profile-img {
         margin: 0 auto;

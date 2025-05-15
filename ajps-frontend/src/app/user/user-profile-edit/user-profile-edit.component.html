@@ -1,83 +1,98 @@
-<!-- Edit Profile Card -->
-        <div class="card">
-            <div class="card-body">
-                <h4 class="card-title mb-4" style="color: #2e7d32;">Edit Profile</h4>
-                <div class="text-center mb-4">
-                    <img src="profile-image/avatar.gif" alt="Profile Avatar" class="profile-avatar">
-                </div>
-                <form id="profileForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="firstName" class="form-label">First Name *</label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" value="Jane" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="lastName" class="form-label">Last Name *</label>
-                            <input type="text" class="form-control" id="lastName" name="lastName" value="Doe" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="professionalTitle" class="form-label">Professional Title</label>
-                        <input type="text" class="form-control" id="professionalTitle" name="professionalTitle" value="Professor of Computer Science">
-                    </div>
-                    <div class="mb-3">
-                        <label for="educationalQualification" class="form-label">Educational Qualification</label>
-                        <input type="text" class="form-control" id="educationalQualification" name="educationalQualification" value="Ph.D. in Computer Science">
-                    </div>
-                    <div class="mb-3">
-                        <label for="institute" class="form-label">Institute *</label>
-                        <input type="text" class="form-control" id="institute" name="institute" value="University of Example" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="expertise" class="form-label">Expertise</label>
-                        <input type="text" class="form-control" id="expertise" name="expertise" value="Artificial Intelligence, Machine Learning, Data Science">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email *</label>
-                        <input type="email" class="form-control" id="email" name="email" value="jane.doe@university.edu" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="mobile" class="form-label">Mobile *</label>
-                            <input type="tel" class="form-control" id="mobile" name="mobile" value="+1 (123) 456-7890" required>
-                            <small id="mobileError" class="error-message">Either Mobile or Telephone is required.</small>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="telephone" class="form-label">Telephone</label>
-                            <input type="tel" class="form-control" id="telephone" name="telephone" value="+1 (123) 555-1234">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="country" class="form-label">Country/Region *</label>
-                        <input type="text" class="form-control" id="country" name="country" value="United States" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address *</label>
-                        <textarea class="form-control" id="address" name="address" rows="3" required>123 Academic Lane, Example City, CA</textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="zipCode" class="form-label">Zip Code *</label>
-                        <input type="text" class="form-control" id="zipCode" name="zipCode" value="90210" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="facebook" class="form-label">Facebook URL (optional)</label>
-                            <input type="url" class="form-control" id="facebook" name="facebook" value="https://facebook.com/janedoe">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="twitter" class="form-label">Twitter URL (optional)</label>
-                            <input type="url" class="form-control" id="twitter" name="twitter" value="https://twitter.com/janedoe">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="avatar" class="form-label">Profile Picture (optional)</label>
-                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
-                    </div>
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title mb-4" style="color: #2e7d32;">Edit Profile</h4>
 
-                    <hr class="my-4">
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Changes</button>
+        <!-- Profile Picture Section -->
+        <div class="mb-5">
+            <h5 class="mb-3 text-primary">Profile Picture</h5>
+            <form id="avatarForm" enctype="multipart/form-data">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <img src="profile-image/avatar.gif" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;">
                     </div>
-                </form>
-            </div>
+                    <div>
+                        <label for="avatar" class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">                        
+                        <div class="d-flex" style="margin-top: 10px;">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Picture</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
+
+        <!-- Profile Information Section -->
+        <div>
+            <h5 class="mb-3 text-primary">Profile Information</h5>
+            <form id="profileForm">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label">First Name <i>*</i></label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" value="Jane" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label">Last Name <i>*</i></label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" value="Doe" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="professionalTitle" class="form-label">Professional Title</label>
+                    <input type="text" class="form-control" id="professionalTitle" name="professionalTitle" value="Professor of Computer Science">
+                </div>
+                <div class="mb-3">
+                    <label for="educationalQualification" class="form-label">Educational Qualification</label>
+                    <input type="text" class="form-control" id="educationalQualification" name="educationalQualification" value="Ph.D. in Computer Science">
+                </div>
+                <div class="mb-3">
+                    <label for="institute" class="form-label">Institute <i>*</i></label>
+                    <input type="text" class="form-control" id="institute" name="institute" value="University of Example" required>
+                </div>
+                <div class="mb-3">
+                    <label for="expertise" class="form-label">Expertise</label>
+                    <input type="text" class="form-control" id="expertise" name="expertise" value="Artificial Intelligence, Machine Learning, Data Science">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email <i>*</i></label>
+                    <input type="email" class="form-control" id="email" name="email" value="jane.doe@university.edu" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="mobile" class="form-label">Mobile <i>*</i></label>
+                        <input type="tel" class="form-control" id="mobile" name="mobile" value="+1 (123) 456-7890" required>
+                        <small id="mobileError" class="error-message">Either Mobile or Telephone is required.</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="telephone" class="form-label">Telephone</label>
+                        <input type="tel" class="form-control" id="telephone" name="telephone" value="+1 (123) 555-1234">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="country" class="form-label">Country/Region <i>*</i></label>
+                    <input type="text" class="form-control" id="country" name="country" value="United States" required>
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address <i>*</i></label>
+                    <textarea class="form-control" id="address" name="address" rows="3" required>123 Academic Lane, Example City, CA</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="zipCode" class="form-label">Zip Code <i>*</i></label>
+                    <input type="text" class="form-control" id="zipCode" name="zipCode" value="90210" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="facebook" class="form-label">Facebook URL</label>
+                        <input type="url" class="form-control" id="facebook" name="facebook" value="https://facebook.com/janedoe">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="twitter" class="form-label">Twitter URL</label>
+                        <input type="url" class="form-control" id="twitter" name="twitter" value="https://twitter.com/janedoe">
+                    </div>
+                </div>
+                <hr class="my-4">
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Information</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

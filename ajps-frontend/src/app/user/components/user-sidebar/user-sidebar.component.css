@@ -39,3 +39,15 @@
     color: #1e2a44;
     margin: 0;
 }
+
+.submenu {
+    list-style: none;
+    padding-left: 20px;
+}
+.submenu .nav-link {
+    font-size: 0.95rem;
+    padding: 5px 15px;
+}
+.submenu > .nav-item > .submenu-active {
+    color: #0057d8;
+}

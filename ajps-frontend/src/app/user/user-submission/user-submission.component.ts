@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-submission',
-  imports: [RouterLink],
+  imports: [],
   templateUrl: './user-submission.component.html',
   styleUrl: './user-submission.component.css'
 })
