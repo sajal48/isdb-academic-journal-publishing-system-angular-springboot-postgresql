@@ -1,1 +1,132 @@
-<p>editor-reviewers works!</p>
+<!-- Content Area -->
+<div class="content-area" id="contentArea">
+    <!-- Reviewers Card -->
+    <div class="card">
+        <h3 class="page-title" style="color: #2e7d32;">Manage Reviewers</h3>
+        <div class="card-body">
+            <!-- Filter and Add Reviewer -->
+            <div class="filter-container">
+                <div>
+                    <label for="expertiseFilter" class="form-label me-2">Filter by Expertise:</label>
+                    <select id="expertiseFilter" class="form-select d-inline-block w-auto">
+                        <option value="all">All</option>
+                        <option value="ai">AI</option>
+                        <option value="quantum">Quantum Computing</option>
+                        <option value="climate">Climate Science</option>
+                        <option value="blockchain">Blockchain</option>
+                    </select>
+                </div>
+                <!-- <button class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Recruit New Reviewer
+                </button> -->
+            </div>
+            <!-- Reviewers Table -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Expertise</th>
+                            <th scope="col">Assigned Manuscripts</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>R001</td>
+                            <td>Dr. Alice Johnson</td>
+                            <td>alice.johnson&#64;university.edu</td>
+                            <td>AI, Machine Learning</td>
+                            <td>#1234, #5678</td>
+                            <td>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-file-earmark-plus"></i> Assign
+                                </button>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-turquoise btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R002</td>
+                            <td>Prof. Bob Carter</td>
+                            <td>bob.carter&#64;university.edu</td>
+                            <td>Quantum Computing</td>
+                            <td>#9012</td>
+                            <td>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-file-earmark-plus"></i> Assign
+                                </button>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-turquoise btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R003</td>
+                            <td>Dr. Clara Lee</td>
+                            <td>clara.lee&#64;university.edu</td>
+                            <td>Climate Science, Ecology</td>
+                            <td>--</td>
+                            <td>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-file-earmark-plus"></i> Assign
+                                </button>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-turquoise btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R004</td>
+                            <td>Prof. David Kim</td>
+                            <td>david.kim&#64;university.edu</td>
+                            <td>Blockchain, Cybersecurity</td>
+                            <td>#3456</td>
+                            <td>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-file-earmark-plus"></i> Assign
+                                </button>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-turquoise btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>R005</td>
+                            <td>Dr. Emma Wilson</td>
+                            <td>emma.wilson&#64;university.edu</td>
+                            <td>Neural Networks, AI</td>
+                            <td>#7890</td>
+                            <td>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-file-earmark-plus"></i> Assign
+                                </button>
+                                <button class="btn btn-turquoise btn-sm me-1">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-turquoise btn-sm">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

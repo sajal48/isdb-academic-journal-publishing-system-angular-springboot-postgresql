@@ -31,9 +31,12 @@ import { EditorOverviewComponent } from './user/editor-overview/editor-overview.
 import { EditorSubmissionsComponent } from './user/editor-submissions/editor-submissions.component';
 import { EditorReviewersComponent } from './user/editor-reviewers/editor-reviewers.component';
 import { EditorReportsComponent } from './user/editor-reports/editor-reports.component';
-import { EditorJournalSettingsComponent } from './user/editor-journal-settings/editor-journal-settings.component';
-import { InReviewComponent } from './user/user-submission/in-review/in-review.component';
-import { DecisionQueueComponent } from './user/user-submission/decision-queue/decision-queue.component';
+import { InReviewComponent } from './user/editor-submissions/in-review/in-review.component';
+import { DecisionQueueComponent } from './user/editor-submissions/decision-queue/decision-queue.component';
+import { EditorEditorialBoardComponent } from './user/editor-editorial-board/editor-editorial-board.component';
+import { ReviewerDashboardComponent } from './user/reviewer-dashboard/reviewer-dashboard.component';
+import { ReviewerAssignedManuscriptsComponent } from './user/reviewer-assigned-manuscripts/reviewer-assigned-manuscripts.component';
+import { ReviewerSubmittedReviewsComponent } from './user/reviewer-submitted-reviews/reviewer-submitted-reviews.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -83,13 +86,17 @@ export const routes: Routes = [
                 children: [
                     {path: '', redirectTo: 'new-submissions', pathMatch: 'full'},
                     {path: 'new-submissions', component: EditorSubmissionsComponent, title: 'New Submissions - ScholarPress'},
-                    {path: 'in-review', component: InReviewComponent, title: 'In Review - ScholarPress'},
+                    {path: 'under-review', component: InReviewComponent, title: 'Under Review - ScholarPress'},
                     {path: 'decision-queue', component: DecisionQueueComponent, title: 'Decision Queue - ScholarPress'},
                 ]
             },
             {path: 'journal-reviewers', component: EditorReviewersComponent, title: 'Journal Reviewers - ScholarPress'},
             {path: 'journal-reports', component: EditorReportsComponent, title: 'Journal Reports - ScholarPress'},
-            {path: 'journal-settings', component: EditorJournalSettingsComponent, title: 'Journal Settings - ScholarPress'},
+            {path: 'journal-editorial-board', component: EditorEditorialBoardComponent, title: 'Journal Settings - ScholarPress'},
+            // reviewer pages:
+            {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, title: 'Reviewer Dashboard - ScholarPress'},
+            {path: 'reviewer-manuscripts', component: ReviewerAssignedManuscriptsComponent, title: 'Reviewer Assigned Manuscripts - ScholarPress'},
+            {path: 'reviewer-reviews', component: ReviewerSubmittedReviewsComponent, title: 'Reviewer Submitted Reviews - ScholarPress'},
         ]
     },
     // error page:

@@ -1,0 +1,83 @@
+<main class="container">
+    <h3 class="mb-4 page-title" style="color: #2e7d32;">Under Review Submissions</h3>
+
+    <!-- Filter/Search -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="Search by title, author...">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select">
+          <option value="" disabled selected>Filter by Category</option>
+          <option value="research">Research Article</option>
+          <option value="review">Review Article</option>
+          <option value="case-study">Case Study</option>
+          <option value="editorial">Editorial</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Submissions Table -->
+    <div class="card-body mb-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Article Title</th>
+                        <th>Status</th>
+                        <th>Assigned Reviewer</th>
+                        <th>Last Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1012</td>
+                        <td>Exploring Plant Biodiversity</td>
+                        <td><span class="badge bg-warning text-dark">Under Review</span></td>
+                        <td>Dr. A. Smith</td>
+                        <td>2025-05-11</td>
+                        <td>
+                        <button class="btn btn-sm btn-outline-secondary">View</button>
+                        <button class="btn btn-sm btn-outline-success">Change Reviewer</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1013</td>
+                        <td>Urban Ecology Review</td>
+                        <td><span class="badge bg-warning text-dark">Under Review</span></td>
+                        <td>Ali Rahman</td>
+                        <td>2025-05-12</td>
+                        <td>
+                        <button class="btn btn-sm btn-outline-secondary">View</button>
+                        <button class="btn btn-sm btn-outline-success">Change Reviewer</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1014</td>
+                        <td>Soil Microbiome Studies</td>
+                        <td><span class="badge bg-warning text-dark">Under Review</span></td>
+                        <td>Dr. L. Chen</td>
+                        <td>2025-05-10</td>
+                        <td>
+                        <button class="btn btn-sm btn-outline-secondary">View</button>
+                        <button class="btn btn-sm btn-outline-success">Change Reviewer</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav>
+      <ul class="pagination">
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+      </ul>
+    </nav>
+
+</main>

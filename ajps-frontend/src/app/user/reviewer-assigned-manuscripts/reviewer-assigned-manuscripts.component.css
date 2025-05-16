@@ -26,9 +26,6 @@
 }
 .filter-container {
     margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 .table-responsive {
     overflow-x: auto;
@@ -78,4 +75,11 @@ table > tbody > tr > td > button {
     background: linear-gradient(to right, #2e7d32, #4caf50);
     transition: transform 0.3s ease;
     transform-origin: left;
+}
+.badge {
+    /* padding: 0.6rem 1rem; */
+    border-radius: 2px;
+    font-weight: 400;
+    font-size: 12px;
+    /* transition: transform 0.2s ease; */
 }
