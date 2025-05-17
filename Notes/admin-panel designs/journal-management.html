@@ -1,0 +1,319 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: #e9ecef;
+      color: #333;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1e2a44;
+    }
+    .header h1::before {
+      content: '📚';
+      margin-right: 0.5rem;
+      font-size: 1.8rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .btn-primary {
+      background: #3b82f6;
+    }
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+    .btn-success {
+      background: #10b981;
+    }
+    .btn-success:hover {
+      background: #059669;
+    }
+    .btn-danger {
+      background: #ef4444;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    .table th, .table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .table th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #1e2a44;
+    }
+    .table td {
+      color: #4b5e7a;
+    }
+    .form-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+      display: none;
+    }
+    .form-section.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #1e2a44;
+      margin-bottom: 0.5rem;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .form-group textarea {
+      resize: vertical;
+    }
+    .form-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    p {
+      color: #4b5e7a;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      .table th, .table td {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Journal Management</h1>
+      <div>
+        <a href="#" class="btn btn-primary" onclick="showSection('journal-list')">View Journals</a>
+        <a href="#" class="btn btn-success" onclick="showSection('journal-create')">Create New Journal</a>
+      </div>
+    </div>
+
+    <div id="journal-list" class="form-section active">
+      <p>Manage existing journals, including editing details or archiving them.</p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Journal ID</th>
+            <th>Title</th>
+            <th>ISSN</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>JRN-001</td>
+            <td>Journal of AI Research</td>
+            <td>1234-5678</td>
+            <td>Active</td>
+            <td>
+              <a href="#" class="btn btn-primary btn-sm" onclick="showSection('journal-edit')">Edit</a>
+              <a href="#" class="btn btn-danger btn-sm">Archive</a>
+            </td>
+          </tr>
+          <tr>
+            <td>JRN-002</td>
+            <td>Quantum Science Review</td>
+            <td>8765-4321</td>
+            <td>Active</td>
+            <td>
+              <a href="#" class="btn btn-primary btn-sm" onclick="showSection('journal-edit')">Edit</a>
+              <a href="#" class="btn btn-danger btn-sm">Archive</a>
+            </td>
+          </tr>
+          <tr>
+            <td>JRN-003</td>
+            <td>Environmental Studies Quarterly</td>
+            <td>5678-1234</td>
+            <td>Draft</td>
+            <td>
+              <a href="#" class="btn btn-primary btn-sm" onclick="showSection('journal-edit')">Edit</a>
+              <a href="#" class="btn btn-danger btn-sm">Archive</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="journal-create" class="form-section">
+      <h2>Create New Journal</h2>
+      <p>Fill in the details to create a new journal.</p>
+      <div class="form-group">
+        <label for="journal-title">Journal Title</label>
+        <input type="text" id="journal-title" placeholder="Enter journal title" />
+      </div>
+      <div class="form-group">
+        <label for="journal-issn">ISSN</label>
+        <input type="text" id="journal-issn" placeholder="Enter ISSN (e.g., 1234-5678)" />
+      </div>
+      <div class="form-group">
+        <label for="journal-description">Description</label>
+        <textarea id="journal-description" rows="4" placeholder="Enter journal description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="journal-policies">Submission Policies</label>
+        <textarea id="journal-policies" rows="4" placeholder="Enter submission policies"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="journal-status">Status</label>
+        <select id="journal-status">
+          <option value="draft">Draft</option>
+          <option value="active">Active</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <a href="#" class="btn btn-success">Save Journal</a>
+        <a href="#" class="btn btn-primary" onclick="showSection('journal-list')">Cancel</a>
+      </div>
+    </div>
+
+    <div id="journal-edit" class="form-section">
+      <h2>Edit Journal</h2>
+      <p>Update the details of an existing journal.</p>
+      <div class="form-group">
+        <label for="edit-journal-title">Journal Title</label>
+        <input type="text" id="edit-journal-title" value="Journal of AI Research" />
+      </div>
+      <div class="form-group">
+        <label for="edit-journal-issn">ISSN</label>
+        <input type="text" id="edit-journal-issn" value="1234-5678" />
+      </div>
+      <div class="form-group">
+        <label for="edit-journal-description">Description</label>
+        <textarea id="edit-journal-description" rows="4">A peer-reviewed journal focusing on advancements in artificial intelligence and machine learning.</textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-journal-policies">Submission Policies</label>
+        <textarea id="edit-journal-policies" rows="4">Submissions must be original research, formatted in APA style, and include an abstract.</textarea>
+      </div>
+      <div class="form-group">
+        <label for="edit-journal-status">Status</label>
+        <select id="edit-journal-status">
+          <option value="draft">Draft</option>
+          <option value="active" selected>Active</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <a href="#" class="btn btn-success">Update Journal</a>
+        <a href="#" class="btn btn-primary" onclick="showSection('journal-list')">Cancel</a>
+      </div>
+    </div>
+  </div>
+  <script>
+    function showSection(sectionId) {
+      document.querySelectorAll('.form-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Publication</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    body {
+      background: #e9ecef;
+      color: #333;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1e2a44;
+    }
+    .header h1::before {
+      content: '📖';
+      margin-right: 0.5rem;
+      font-size: 1.8rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .btn-primary {
+      background: #3b82f6;
+    }
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+    .btn-success {
+      background: #10b981;
+    }
+    .btn-success:hover {
+      background: #059669;
+    }
+    .form-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      color: #1e2a44;
+      margin-bottom: 0.5rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .form-group textarea {
+      resize: vertical;
+    }
+    .form-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    p {
+      color: #4b5e7a;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      .header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Edit Publication</h1>
+      <div>
+        <a href="#" class="btn btn-primary">Back to Publications</a>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <p>Update the details of the selected publication, including metadata, volume/issue, and status.</p>
+      <div class="form-group">
+        <label for="article-id">Article ID</label>
+        <input type="text" id="article-id" value="ART-2025-001" readonly />
+      </div>
+      <div class="form-group">
+        <label for="article-title">Article Title</label>
+        <input type="text" id="article-title" value="Study on AI Ethics" />
+      </div>
+      <div class="form-group">
+        <label for="article-journal">Journal</label>
+        <select id="article-journal">
+          <option value="jrn-001" selected>Journal of AI Research</option>
+          <option value="jrn-002">Quantum Science Review</option>
+          <option value="jrn-003">Environmental Studies Quarterly</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="article-volume">Volume</label>
+        <input type="text" id="article-volume" value="12" />
+      </div>
+      <div class="form-group">
+        <label for="article-issue">Issue Number</label>
+        <input type="text" id="article-issue" value="3" />
+      </div>
+      <div class="form-group">
+        <label for="article-date">Publication Date</label>
+        <input type="date" id="article-date" value="2025-03-15" />
+      </div>
+      <div class="form-group">
+        <label for="article-doi">DOI</label>
+        <input type="text" id="article-doi" value="10.1000/jair.2025.001" />
+      </div>
+      <div class="form-group">
+        <label for="article-abstract">Abstract</label>
+        <textarea id="article-abstract" rows="5">This paper explores ethical considerations in artificial intelligence, focusing on bias mitigation and transparency in machine learning models.</textarea>
+      </div>
+      <div class="form-group">
+        <label for="article-authors">Authors</label>
+        <input type="text" id="article-authors" value="Dr. Jane Smith, Prof. John Doe" />
+      </div>
+      <div class="form-group">
+        <label for="article-status">Status</label>
+        <select id="article-status">
+          <option value="published" selected>Published</option>
+          <option value="draft">Draft</option>
+          <option value="unpublished">Unpublished</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <a href="#" class="btn btn-success">Update Publication</a>
+        <a href="#" class="btn btn-primary">Cancel</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
