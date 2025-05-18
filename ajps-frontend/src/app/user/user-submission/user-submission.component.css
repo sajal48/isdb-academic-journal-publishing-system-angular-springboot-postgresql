@@ -52,3 +52,6 @@
     transition: transform 0.3s ease;
     transform-origin: left;
 }
+form {
+    max-width: 800px;
+}

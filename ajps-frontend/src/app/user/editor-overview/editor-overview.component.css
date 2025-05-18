@@ -1,5 +1,6 @@
 .container {
-    max-width: 1400px;
+    /* max-width: 1400px; */
+    max-width: 100%;
     /* padding: 2rem 1rem; */
     margin-top: 10px;
 }
@@ -229,6 +230,61 @@ h2, h4, h5 {
     background: linear-gradient(to right, #2e7d32, #4caf50);
     transition: transform 0.3s ease;
     transform-origin: left;
+}
+
+.submission-statistics {
+    padding: 0;
+}
+.submission-statistics > .card {
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
+    overflow: hidden;
+    padding: 0;
+}
+.submission-statistics > .card > .card-header {
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 1.15rem;
+    padding: 1rem;
+    position: relative;
+}
+.submission-statistics > .card > .card-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: #17a2b8;
+    border-radius: 0 4px 4px 0;
+}
+.submission-statistics > .card > .card-header > h5 {
+    margin: 0;
+}
+.submission-statistics > .card > .card-body {
+    padding: 1rem 1rem 0 1rem ;
+    border-bottom: 1px solid #ccc;
+}
+.submission-statistics > .card > .card-body > .row > .stat-item {
+    text-align: center;
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+.submission-statistics > .card > .card-body > .row > .stat-item h6 {
+    font-size: 0.95rem;
+    color: #718096;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+.submission-statistics > .card > .card-body > .row > .stat-item p {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: #2d3748;
 }
 
 @media (max-width: 768px) {

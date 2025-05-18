@@ -44,6 +44,7 @@ import { AdminJournalManagementComponent } from './user/admin-journal-management
 import { AdminEditorialManagementComponent } from './user/admin-editorial-management/admin-editorial-management.component';
 import { AdminReviewerManagementComponent } from './user/admin-reviewer-management/admin-reviewer-management.component';
 import { AdminUserManagementComponent } from './user/admin-user-management/admin-user-management.component';
+import { AdminActivityLogsComponent } from './user/admin-activity-logs/admin-activity-logs.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -113,6 +114,7 @@ export const routes: Routes = [
             {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, title: 'Reviewer Management - ScholarPress'},
             {path: 'admin-user-management', component: AdminUserManagementComponent, title: 'User Management - ScholarPress'},
             {path: 'admin-site-settings', component: AdminUserManagementComponent, title: 'Site Settings - ScholarPress'},
+            {path: 'admin-activity-logs', component: AdminActivityLogsComponent, title: 'Activity Logs - ScholarPress'},
         ]
     },
     // error page:
