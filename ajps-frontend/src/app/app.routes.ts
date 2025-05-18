@@ -37,6 +37,13 @@ import { EditorEditorialBoardComponent } from './user/editor-editorial-board/edi
 import { ReviewerDashboardComponent } from './user/reviewer-dashboard/reviewer-dashboard.component';
 import { ReviewerAssignedManuscriptsComponent } from './user/reviewer-assigned-manuscripts/reviewer-assigned-manuscripts.component';
 import { ReviewerSubmittedReviewsComponent } from './user/reviewer-submitted-reviews/reviewer-submitted-reviews.component';
+import { AdminDashboardComponent } from './user/admin-dashboard/admin-dashboard.component';
+import { AdminJournalPublicationComponent } from './user/admin-journal-publication/admin-journal-publication.component';
+import { AdminUserSubmissionsComponent } from './user/admin-user-submissions/admin-user-submissions.component';
+import { AdminJournalManagementComponent } from './user/admin-journal-management/admin-journal-management.component';
+import { AdminEditorialManagementComponent } from './user/admin-editorial-management/admin-editorial-management.component';
+import { AdminReviewerManagementComponent } from './user/admin-reviewer-management/admin-reviewer-management.component';
+import { AdminUserManagementComponent } from './user/admin-user-management/admin-user-management.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -97,6 +104,15 @@ export const routes: Routes = [
             {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, title: 'Reviewer Dashboard - ScholarPress'},
             {path: 'reviewer-manuscripts', component: ReviewerAssignedManuscriptsComponent, title: 'Reviewer Assigned Manuscripts - ScholarPress'},
             {path: 'reviewer-reviews', component: ReviewerSubmittedReviewsComponent, title: 'Reviewer Submitted Reviews - ScholarPress'},
+            // admin pages:
+            {path: 'admin-dashboard', component: AdminDashboardComponent, title: 'Admin Dashboard - ScholarPress'},
+            {path: 'admin-journal-publication', component: AdminJournalPublicationComponent, title: 'Journal Publication - ScholarPress'},
+            {path: 'admin-user-submissions', component: AdminUserSubmissionsComponent, title: 'User Submissions - ScholarPress'},
+            {path: 'admin-journal-management', component: AdminJournalManagementComponent, title: 'Journal Management - ScholarPress'},
+            {path: 'admin-editorial-management', component: AdminEditorialManagementComponent, title: 'Editorial Management - ScholarPress'},
+            {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, title: 'Reviewer Management - ScholarPress'},
+            {path: 'admin-user-management', component: AdminUserManagementComponent, title: 'User Management - ScholarPress'},
+            {path: 'admin-site-settings', component: AdminUserManagementComponent, title: 'Site Settings - ScholarPress'},
         ]
     },
     // error page:
