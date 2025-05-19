@@ -4,11 +4,10 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { FooterComponent } from '../../../components/footer/footer.component';
 import { JournalBannerComponent } from '../../../journals/components/journal-banner/journal-banner.component';
 import { JournalSidebarComponent } from '../../../journals/components/journal-sidebar/journal-sidebar.component';
-import { NgxLoadingBar } from '@ngx-loading-bar/core';
 
 @Component({
   selector: 'app-journal-view',
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, JournalBannerComponent, JournalSidebarComponent, NgxLoadingBar],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, JournalBannerComponent, JournalSidebarComponent],
   templateUrl: './journal-view.component.html',
   styleUrl: './journal-view.component.css'
 })
