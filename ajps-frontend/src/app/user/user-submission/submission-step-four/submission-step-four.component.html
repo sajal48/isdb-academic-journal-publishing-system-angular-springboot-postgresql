@@ -1,0 +1,46 @@
+<div class="mb-4">
+    <h5 class="mb-2 text-primary">Suggested Reviewers</h5>
+    <p class="text-muted mb-2 small">Provide at least two reviewers (not collaborators or co-authors, from different institutions with institutional emails).</p>
+    <form id="suggestedReviewersForm">
+        <div class="row g-3">
+            <!-- Reviewer 1 -->
+            <div class="col-md-6">
+                <h6 class="mb-2">Reviewer 1</h6>
+                <div class="mb-2">
+                    <label for="reviewer1-name" class="form-label small">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="reviewer1-name" name="reviewer1-name" placeholder="Name" required>
+                </div>
+                <div class="mb-2">
+                    <label for="reviewer1-email" class="form-label small">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control form-control-sm" id="reviewer1-email" name="reviewer1-email" placeholder="Institutional email" required>
+                </div>
+                <div class="mb-2">
+                    <label for="reviewer1-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="reviewer1-institution" name="reviewer1-institution" placeholder="Institution name" required>
+                </div>
+            </div>
+            <!-- Reviewer 2 -->
+            <div class="col-md-6">
+                <h6 class="mb-2">Reviewer 2</h6>
+                <div class="mb-2">
+                    <label for="reviewer2-name" class="form-label small">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="reviewer2-name" name="reviewer2-name" placeholder="Name" required>
+                </div>
+                <div class="mb-2">
+                    <label for="reviewer2-email" class="form-label small">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control form-control-sm" id="reviewer2-email" name="reviewer2-email" placeholder="Institutional email" required>
+                </div>
+                <div class="mb-2">
+                    <label for="reviewer2-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control form-control-sm" id="reviewer2-institution" name="reviewer2-institution" placeholder="Institution name" required>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/manuscript-upload">Back</button>
+            <button type="button" class="btn btn-primary" routerLink="/submission/additional-informations">Next: Additional Information</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+        </div>
+    </form>
+</div>

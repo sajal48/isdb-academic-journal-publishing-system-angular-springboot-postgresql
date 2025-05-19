@@ -12,6 +12,7 @@
 .profile-notice a:hover {
     text-decoration: underline;
 }
+
 .card {
     border: none;
     border-radius: 10px;
@@ -54,4 +55,70 @@
 }
 form {
     max-width: 800px;
+}
+
+
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 0;
+    list-style: none;
+}
+.step-indicator li {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+.step-indicator li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto 0.5rem;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+}
+.step-indicator li.active a {
+    background-color: #2e7d32;
+    color: white;
+}
+.step-indicator li.completed a {
+    background-color: #2e7d32;
+    color: white;
+}
+.step-indicator li.completed a::before {
+    content: '\f26e'; /* Bootstrap Icons checkmark */
+    font-family: 'bootstrap-icons';
+}
+.step-indicator li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 0.9rem;
+    left: 50%;
+    width: 100%;
+    height: 0.2rem;
+    background-color: #e9ecef;
+    z-index: -1;
+}
+.step-indicator li.active:not(:last-child)::after,
+.step-indicator li.completed:not(:last-child)::after {
+    background-color: #2e7d32;
+}
+.step-indicator li a:hover {
+    background-color: #2e7d32;
+    color: white;
+}
+.step-indicator li.completed a:hover::before {
+    content: '\f26e'; /* Ensure checkmark persists on hover */
+    font-family: 'bootstrap-icons';
+}
+.step-indicator .small {
+    font-size: 0.85rem;
 }

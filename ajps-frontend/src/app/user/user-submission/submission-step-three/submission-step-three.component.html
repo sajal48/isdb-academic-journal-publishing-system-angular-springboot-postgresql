@@ -1,0 +1,19 @@
+<div class="mb-4">
+    <h5 class="mb-3 text-primary">Manuscript Upload</h5>
+    <form id="manuscriptUploadForm" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="articleFile" class="form-label">Manuscript File (DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
+            <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".doc,.docx,.pdf" required>
+        </div>
+        <div class="mb-3">
+            <label for="coverLetter" class="form-label">Cover Letter (DOC, DOCX, PDF Only)</label>
+            <input type="file" class="form-control" id="coverLetter" name="coverLetter" accept=".doc,.docx,.pdf">
+        </div>
+        <hr class="my-4">
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/author-informations">Back</button>
+            <button type="button" class="btn btn-primary" routerLink="/submission/suggested-reviewers">Next: Suggested Reviewers</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+        </div>
+    </form>
+</div>

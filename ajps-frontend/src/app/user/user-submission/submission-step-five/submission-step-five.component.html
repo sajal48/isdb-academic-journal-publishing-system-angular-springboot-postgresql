@@ -1,0 +1,19 @@
+<div class="mb-4">
+    <h5 class="mb-3 text-primary">Additional Information</h5>
+    <form id="additionalInformationForm">
+        <div class="mb-3">
+            <label for="comments" class="form-label">Comments to the Editor (Optional)</label>
+            <textarea class="form-control" id="comments" name="comments" rows="5" placeholder="Enter any additional comments for the editor"></textarea>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="confirmation" name="confirmation" required>
+            <label class="form-check-label" for="confirmation">I confirm that the manuscript adheres to the journal’s formatting, aims, and scope, and that the suggested reviewers are not collaborators or previous co-authors.</label>
+        </div>
+        <hr class="my-4">
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/suggested-reviewers">Back</button>
+            <button type="button" class="btn btn-primary" routerLink="/submission/submission-confirmation">Next: Submission Confirmation</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+        </div>
+    </form>
+</div>

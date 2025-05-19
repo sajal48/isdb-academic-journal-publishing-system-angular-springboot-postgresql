@@ -1,0 +1,14 @@
+<div class="mb-4">
+    <h5 class="mb-3 text-primary">Submission Confirmation</h5>
+    <form id="submissionConfirmationForm">
+        <div class="alert alert-info mb-3" role="alert">
+            <p>Please review all provided information before final submission. Click "Submit" to complete the process.</p>
+        </div>
+        <hr class="my-4">
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/additional-informations">Back</button>
+            <button type="submit" class="btn btn-primary" id="submissionSubmit-btn"><i class="bi bi-upload me-2"></i>Submit</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+        </div>
+    </form>
+</div>

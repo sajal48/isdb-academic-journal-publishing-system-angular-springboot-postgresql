@@ -45,6 +45,12 @@ import { AdminEditorialManagementComponent } from './user/admin-editorial-manage
 import { AdminReviewerManagementComponent } from './user/admin-reviewer-management/admin-reviewer-management.component';
 import { AdminUserManagementComponent } from './user/admin-user-management/admin-user-management.component';
 import { AdminActivityLogsComponent } from './user/admin-activity-logs/admin-activity-logs.component';
+import { SubmissionStepOneComponent } from './user/user-submission/submission-step-one/submission-step-one.component';
+import { SubmissionStepTwoComponent } from './user/user-submission/submission-step-two/submission-step-two.component';
+import { SubmissionStepThreeComponent } from './user/user-submission/submission-step-three/submission-step-three.component';
+import { SubmissionStepFiveComponent } from './user/user-submission/submission-step-five/submission-step-five.component';
+import { SubmissionStepFourComponent } from './user/user-submission/submission-step-four/submission-step-four.component';
+import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -83,7 +89,18 @@ export const routes: Routes = [
             // general user:
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'},
-            {path: 'submission', component: UserSubmissionComponent, title: 'Online Submission - ScholarPress'},
+            // {path: 'submission', component: UserSubmissionComponent, title: 'Online Submission - ScholarPress'},
+            {path: 'submission', component: UserSubmissionComponent,
+                children: [
+                    {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
+                    {path: 'manuscript-details', component: SubmissionStepOneComponent, title: 'Manuscript Details Submission - ScholarPress'},
+                    {path: 'author-informations', component: SubmissionStepTwoComponent, title: 'Author Informations Submission - ScholarPress'},
+                    {path: 'manuscript-upload', component: SubmissionStepThreeComponent, title: 'Manuscript File Submission - ScholarPress'},
+                    {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
+                    {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
+                    {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
+                ]
+            },
             {path: 'view-profile', component: UserProfileComponent, title: 'View Profile - ScholarPress'},
             {path: 'edit-profile', component: UserProfileEditComponent, title: 'Edit Profile - ScholarPress'},
             {path: 'settings', component: UserSettingsComponent, title: 'Profile Settings - ScholarPress'},

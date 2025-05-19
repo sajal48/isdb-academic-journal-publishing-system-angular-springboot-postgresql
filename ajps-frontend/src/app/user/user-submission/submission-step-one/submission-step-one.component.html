@@ -1,0 +1,37 @@
+<div class="mb-4">
+    <h5 class="mb-3 text-primary">Manuscript Details</h5>
+    <form id="manuscriptDetailsForm" enctype="multipart/form-data">
+        <!-- Error Message Placeholder -->
+        <div id="submissionError-messageQ" class="alert alert-danger d-none mb-3" role="alert">
+            <!-- Dynamic error messages will appear here -->
+        </div>
+        <div class="mb-3">
+            <label for="articleTitle" class="form-label">Article Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="articleTitle" name="articleTitle" placeholder="Enter manuscript title" required>
+        </div>
+        <div class="mb-3">
+            <label for="articleCategory" class="form-label">Article Category <span class="text-danger">*</span></label>
+            <select class="form-select" id="articleCategory" name="articleCategory" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="research">Research Article</option>
+                <option value="review">Review Article</option>
+                <option value="case-study">Case Study</option>
+                <option value="editorial">Editorial</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="abstract" class="form-label">Abstract <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="abstract" name="abstract" rows="5" placeholder="Enter abstract (max 300 words)" autocomplete="off" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="keywords" class="form-label">Keywords (Comma Separated) <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Enter keywords (e.g., ecology, biodiversity, photosynthesis)" required>
+        </div>
+        <hr class="my-4">
+        <div class="d-flex gap-3">
+            <button type="button" class="btn btn-primary" routerLink="/submission/author-informations">Next: Author Information <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Save Draft</button>
+        </div>
+    </form>
+</div>
