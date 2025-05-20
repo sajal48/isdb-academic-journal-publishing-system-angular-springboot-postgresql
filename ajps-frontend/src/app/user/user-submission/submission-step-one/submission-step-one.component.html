@@ -6,6 +6,17 @@
             <!-- Dynamic error messages will appear here -->
         </div>
         <div class="mb-3">
+            <label for="journal" class="form-label">Select Journal <span class="text-danger">*</span></label>
+            <select class="form-select" id="journal" name="journal" required>
+                <option value="" disabled selected>Select a journal</option>
+                <option value="plants-and-ecosystem">Plants and Ecosystem</option>
+                <option value="journal-of-botany">Journal of Botany</option>
+                <option value="ecological-studies">Ecological Studies</option>
+                <option value="environmental-research">Environmental Research</option>
+                <option value="biodiversity-and-conservation">Biodiversity and Conservation</option>
+            </select>
+        </div>
+        <div class="mb-3">
             <label for="articleTitle" class="form-label">Article Title <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="articleTitle" name="articleTitle" placeholder="Enter manuscript title" required>
         </div>
@@ -30,8 +41,8 @@
         </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="button" class="btn btn-primary" routerLink="/submission/author-informations">Next: Author Information <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Save Draft</button>
+            <button type="button" class="btn btn-primary" routerLink="/user/submission/author-informations">Next: Author Information <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save Draft</button>
         </div>
     </form>
 </div>

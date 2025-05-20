@@ -13,7 +13,7 @@
 }
 .table {
     background-color: white;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     overflow: hidden;
 }
 table, tr, th, td {
@@ -47,4 +47,9 @@ table > tbody > tr > td> button {
     background: linear-gradient(to right, #2e7d32, #4caf50);
     transition: transform 0.3s ease;
     transform-origin: left;
+}
+
+.btn-link {
+    text-decoration: none;
+    font-weight: bolder;
 }

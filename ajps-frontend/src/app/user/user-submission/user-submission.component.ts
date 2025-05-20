@@ -24,7 +24,7 @@ export class UserSubmissionComponent implements OnInit {
 
   isStepCompleted(step: string): boolean {
     // Define your logic for step completion
-    const completedSteps = ['manuscript-details', 'author-informations']; // example   , 'author-informations'
+    const completedSteps = ['']; // example: 'manuscript-details', 'author-informations', 'suggested-reviewers'
     return completedSteps.includes(step);
   }
 

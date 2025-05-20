@@ -5,15 +5,11 @@
             <label for="articleFile" class="form-label">Manuscript File (DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
             <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".doc,.docx,.pdf" required>
         </div>
-        <div class="mb-3">
-            <label for="coverLetter" class="form-label">Cover Letter (DOC, DOCX, PDF Only)</label>
-            <input type="file" class="form-control" id="coverLetter" name="coverLetter" accept=".doc,.docx,.pdf">
-        </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/author-informations">Back</button>
-            <button type="button" class="btn btn-primary" routerLink="/submission/suggested-reviewers">Next: Suggested Reviewers</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/author-informations"><i class="bi bi-arrow-left-circle"></i> Back</button>
+            <button type="button" class="btn btn-primary" routerLink="/user/submission/suggested-reviewers">Next: Suggested Reviewers <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save Draft</button>
         </div>
     </form>
 </div>

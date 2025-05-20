@@ -6,14 +6,14 @@
             <textarea class="form-control" id="comments" name="comments" rows="5" placeholder="Enter any additional comments for the editor"></textarea>
         </div>
         <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="confirmation" name="confirmation" required>
-            <label class="form-check-label" for="confirmation">I confirm that the manuscript adheres to the journal’s formatting, aims, and scope, and that the suggested reviewers are not collaborators or previous co-authors.</label>
+            <input style="cursor: pointer;" type="checkbox" class="form-check-input" id="confirmation" name="confirmation" required>
+            <label style="cursor: pointer;" class="form-check-label" for="confirmation">I confirm that the manuscript adheres to the journal’s formatting, aims, and scope, and that the suggested reviewers are not collaborators or previous co-authors.</label>
         </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="button" class="btn btn-outline-secondary" routerLink="/submission/suggested-reviewers">Back</button>
-            <button type="button" class="btn btn-primary" routerLink="/submission/submission-confirmation">Next: Submission Confirmation</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="document.location.reload()">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/suggested-reviewers"><i class="bi bi-arrow-left-circle"></i> Back</button>
+            <button type="button" class="btn btn-primary" routerLink="/user/submission/submission-confirmation">Next: Submission Confirmation <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save Draft</button>
         </div>
     </form>
 </div>
