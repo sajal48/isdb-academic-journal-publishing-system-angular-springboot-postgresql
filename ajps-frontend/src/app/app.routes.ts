@@ -51,6 +51,8 @@ import { SubmissionStepThreeComponent } from './user/user-submission/submission-
 import { SubmissionStepFiveComponent } from './user/user-submission/submission-step-five/submission-step-five.component';
 import { SubmissionStepFourComponent } from './user/user-submission/submission-step-four/submission-step-four.component';
 import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
+import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
+import { SubmissionEditComponent } from './user/user-submission/submission-edit/submission-edit.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -99,6 +101,8 @@ export const routes: Routes = [
                     {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
                     {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
                     {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
+                    {path: 'submission-view', component: SubmissionViewComponent, title: 'View Article Submission - ScholarPress'},
+                    {path: 'submission-edit', component: SubmissionEditComponent, title: 'Edit Article Submission - ScholarPress'},
                 ]
             },
             {path: 'view-profile', component: UserProfileComponent, title: 'View Profile - ScholarPress'},
