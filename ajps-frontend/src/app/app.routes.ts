@@ -53,6 +53,7 @@ import { SubmissionStepFourComponent } from './user/user-submission/submission-s
 import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
 import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
 import { SubmissionEditComponent } from './user/user-submission/submission-edit/submission-edit.component';
+import { authGuardUserGuard } from './site-settings/auth/auth-guard-user.guard';
 
 export const routes: Routes = [
     // publisher site:
@@ -87,12 +88,15 @@ export const routes: Routes = [
     },
     // user site:
     {path: 'user', component: UserpanelViewComponent,
+        canActivate: [authGuardUserGuard],
+        data: {roles: ['user','editor','reviewer','admin']},
         children: [
             // general user:
             {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
-            {path: 'dashboard', component: UserDashboardComponent, title: 'Dashboard - ScholarPress'},
-            // {path: 'submission', component: UserSubmissionComponent, title: 'Online Submission - ScholarPress'},
+            {path: 'dashboard', component: UserDashboardComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Dashboard - ScholarPress'},
             {path: 'submission', component: UserSubmissionComponent,
+                canActivate: [authGuardUserGuard], 
+                data: {roles: ['user','editor','reviewer','admin']},
                 children: [
                     {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
                     {path: 'manuscript-details', component: SubmissionStepOneComponent, title: 'Manuscript Details Submission - ScholarPress'},
@@ -105,13 +109,15 @@ export const routes: Routes = [
                     {path: 'submission-edit', component: SubmissionEditComponent, title: 'Edit Article Submission - ScholarPress'},
                 ]
             },
-            {path: 'view-profile', component: UserProfileComponent, title: 'View Profile - ScholarPress'},
-            {path: 'edit-profile', component: UserProfileEditComponent, title: 'Edit Profile - ScholarPress'},
-            {path: 'settings', component: UserSettingsComponent, title: 'Profile Settings - ScholarPress'},
+            {path: 'view-profile', component: UserProfileComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Profile - ScholarPress'},
+            {path: 'edit-profile', component: UserProfileEditComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Edit Profile - ScholarPress'},
+            {path: 'settings', component: UserSettingsComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Profile Settings - ScholarPress'},
+            
             // editorial panel:
-            {path: 'journal-overview', component: EditorOverviewComponent, title: 'Journal Overview - ScholarPress'},
-                // editorial submissions:
+            {path: 'journal-overview', component: EditorOverviewComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Overview - ScholarPress'},
             {path: 'journal-submissions',
+                canActivate: [authGuardUserGuard], 
+                data: {roles: ['editor']},
                 children: [
                     {path: '', redirectTo: 'new-submissions', pathMatch: 'full'},
                     {path: 'new-submissions', component: EditorSubmissionsComponent, title: 'New Submissions - ScholarPress'},
@@ -119,23 +125,25 @@ export const routes: Routes = [
                     {path: 'decision-queue', component: DecisionQueueComponent, title: 'Decision Queue - ScholarPress'},
                 ]
             },
-            {path: 'journal-reviewers', component: EditorReviewersComponent, title: 'Journal Reviewers - ScholarPress'},
-            {path: 'journal-reports', component: EditorReportsComponent, title: 'Journal Reports - ScholarPress'},
-            {path: 'journal-editorial-board', component: EditorEditorialBoardComponent, title: 'Journal Settings - ScholarPress'},
-            // reviewer pages:
-            {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, title: 'Reviewer Dashboard - ScholarPress'},
-            {path: 'reviewer-manuscripts', component: ReviewerAssignedManuscriptsComponent, title: 'Reviewer Assigned Manuscripts - ScholarPress'},
-            {path: 'reviewer-reviews', component: ReviewerSubmittedReviewsComponent, title: 'Reviewer Submitted Reviews - ScholarPress'},
-            // admin pages:
-            {path: 'admin-dashboard', component: AdminDashboardComponent, title: 'Admin Dashboard - ScholarPress'},
-            {path: 'admin-journal-publication', component: AdminJournalPublicationComponent, title: 'Journal Publication - ScholarPress'},
-            {path: 'admin-user-submissions', component: AdminUserSubmissionsComponent, title: 'User Submissions - ScholarPress'},
-            {path: 'admin-journal-management', component: AdminJournalManagementComponent, title: 'Journal Management - ScholarPress'},
-            {path: 'admin-editorial-management', component: AdminEditorialManagementComponent, title: 'Editorial Management - ScholarPress'},
-            {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, title: 'Reviewer Management - ScholarPress'},
-            {path: 'admin-user-management', component: AdminUserManagementComponent, title: 'User Management - ScholarPress'},
-            {path: 'admin-site-settings', component: AdminUserManagementComponent, title: 'Site Settings - ScholarPress'},
-            {path: 'admin-activity-logs', component: AdminActivityLogsComponent, title: 'Activity Logs - ScholarPress'},
+            {path: 'journal-reviewers', component: EditorReviewersComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Reviewers - ScholarPress'},
+            {path: 'journal-reports', component: EditorReportsComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Reports - ScholarPress'},
+            {path: 'journal-editorial-board', component: EditorEditorialBoardComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Settings - ScholarPress'},
+            
+            // reviewer panel:
+            {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Dashboard - ScholarPress'},
+            {path: 'reviewer-manuscripts', component: ReviewerAssignedManuscriptsComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Assigned Manuscripts - ScholarPress'},
+            {path: 'reviewer-reviews', component: ReviewerSubmittedReviewsComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Submitted Reviews - ScholarPress'},
+            
+            // admin panel:
+            {path: 'admin-dashboard', component: AdminDashboardComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Admin Dashboard - ScholarPress'},
+            {path: 'admin-journal-publication', component: AdminJournalPublicationComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Journal Publication - ScholarPress'},
+            {path: 'admin-user-submissions', component: AdminUserSubmissionsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'User Submissions - ScholarPress'},
+            {path: 'admin-journal-management', component: AdminJournalManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Journal Management - ScholarPress'},
+            {path: 'admin-editorial-management', component: AdminEditorialManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Editorial Management - ScholarPress'},
+            {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Reviewer Management - ScholarPress'},
+            {path: 'admin-user-management', component: AdminUserManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'User Management - ScholarPress'},
+            {path: 'admin-site-settings', component: AdminUserManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Site Settings - ScholarPress'},
+            {path: 'admin-activity-logs', component: AdminActivityLogsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Activity Logs - ScholarPress'},
         ]
     },
     // error page:

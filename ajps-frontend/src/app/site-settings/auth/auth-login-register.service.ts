@@ -1,26 +1,62 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthRegisterRequest } from '../interface/auth-register-request';
+import { AuthRegisterLoginRequest } from '../interface/auth-register-login-request';
 import { Observable } from 'rxjs/internal/Observable';
 import { apiConfig } from '../configs/api-config';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthLoginRegisterService {
+  private readonly tokenKey = 'ajps_access_token';
+  private roleSubject = new BehaviorSubject<string | null>(null);
 
   constructor(
     private http: HttpClient
 
   ) {}
 
-  register(registerRequest: AuthRegisterRequest): Observable<any> {
+  register(registerRequest: AuthRegisterLoginRequest): Observable<any> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post<any>(`${apiConfig.apiBaseUrl}/auth/register`, registerRequest, {headers});
   }
 
-  login(credentials: {email: string; password: string}) {
-    return this.http.post<any>(`${apiConfig.apiBaseUrl}/auth/login`, credentials);
+  login(loginRequest: AuthRegisterLoginRequest): Observable<any> {
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    return this.http.post<any>(`${apiConfig.apiBaseUrl}/auth/login`, loginRequest, {headers});
+  }
+
+
+  setToken(token: string) {
+    localStorage.setItem(this.tokenKey, token);
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    this.roleSubject.next(payload.role);
+  }
+
+  getRole() {
+    return this.roleSubject.asObservable();
+  }
+
+  getToken() {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
+  getUserRole(): string {
+    const token = this.getToken();
+    if (!token) return '';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.role.toLowerCase();
+  }
+
+  logout() {
+    localStorage.removeItem(this.tokenKey);
+    this.roleSubject.next(null);
+    window.location.href="/login";
   }
 
 }

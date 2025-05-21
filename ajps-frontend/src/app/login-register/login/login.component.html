@@ -7,14 +7,17 @@
                         <h3>Login to Your Account</h3>
                     </div>
 
+                    <div *ngIf="serverError" [innerHtml]="serverError" class="alert alert-danger text-center" role="alert" style="font-size: 14px; padding: 10px;"></div>
+                    <div *ngIf="serverSuccess" [innerHtml]="serverSuccess" class="alert alert-success text-center" role="alert" style="font-size: 14px; padding: 10px;"></div>
+
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" id="email" [(ngModel)]="email">
+                        <input type="email" class="form-control" name="email" id="email" [(ngModel)]="user.email">
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="password">
+                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="user.password">
                     </div>
 
                     <div class="mb-3 text-end">

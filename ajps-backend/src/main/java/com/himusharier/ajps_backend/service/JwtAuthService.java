@@ -45,7 +45,10 @@ public class JwtAuthService {
         }
 
         auth.setPassword(passwordEncoder.encode(auth.getPassword()));
-        auth.setRole(Role.USER); // setting default role as USER
+        //auth.setRole(Role.USER); // setting default role as USER
+        if (auth.getRole() == null) {
+            auth.setRole(Role.USER);
+        }
 
         return authRepository.save(auth);
     }

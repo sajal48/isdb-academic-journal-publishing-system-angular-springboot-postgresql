@@ -4,6 +4,7 @@ import com.himusharier.ajps_backend.config.JwtTokenProvider;
 import com.himusharier.ajps_backend.dto.LoginRequest;
 import com.himusharier.ajps_backend.dto.RegisterRequest;
 import com.himusharier.ajps_backend.dto.AuthResponse;
+import com.himusharier.ajps_backend.exception.LoginRequestException;
 import com.himusharier.ajps_backend.exception.RegisterRequestException;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
@@ -50,8 +51,8 @@ public class AuthController {
         try {
             Auth auth = new Auth(
                     registerRequest.email(),
-                    registerRequest.password()
-//                    registerRequest.role()
+                    registerRequest.password(),
+                    registerRequest.role()
             );
 
             Auth savedAuth = userService.createAuth(auth);
@@ -90,6 +91,10 @@ public class AuthController {
 
             // Create response with token and user info
             Map<String, Object> responseData = new HashMap<>();
+            responseData.put("status", "success");
+            responseData.put("code", HttpStatus.OK.value());
+            responseData.put("message", "Login successful");
+
             responseData.put("access_token", jwt);
             responseData.put("tokenType", "Bearer");
 
@@ -102,9 +107,9 @@ public class AuthController {
             responseData.put("user", userData);
 
             return ResponseEntity.ok(responseData);
+
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid username or password");
+            throw new LoginRequestException(e.getMessage());
         }
     }
 

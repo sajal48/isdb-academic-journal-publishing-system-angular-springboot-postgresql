@@ -40,14 +40,16 @@ public class Auth {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Auth(
-            String email,
-            String password
-//            Role role
-    ) {
+    public Auth(String email, String password, Role role) {
         this.email = email;
         this.password = password;
-//        this.role = role;
+        //this.role = role;
+        this.role = (role != null) ? role : Role.USER; // default if null
+    }
+    public Auth(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
     }
 
     @PrePersist

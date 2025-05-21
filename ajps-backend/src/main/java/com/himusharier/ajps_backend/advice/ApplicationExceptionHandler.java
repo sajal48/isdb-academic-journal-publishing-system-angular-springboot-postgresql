@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.advice;
 
+import com.himusharier.ajps_backend.exception.LoginRequestException;
 import com.himusharier.ajps_backend.exception.RegisterRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -44,6 +45,15 @@ public class ApplicationExceptionHandler {
         response.put("status", "error");
         response.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.put("message", "Internal server error");
+        return response;
+    }
+
+    @ExceptionHandler(LoginRequestException.class)
+    public Map<String, Object> authenticationException(LoginRequestException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.UNAUTHORIZED.value());
+        response.put("message", "Invalid email or password.");
         return response;
     }
 
