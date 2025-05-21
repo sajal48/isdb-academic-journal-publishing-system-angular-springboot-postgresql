@@ -6,6 +6,9 @@
                     <div class="page-title-text text-center mb-4">
                         <h3>Create an Account</h3>
                     </div>
+                    
+                    <div *ngIf="serverError" [innerHtml]="serverError" class="alert alert-danger text-center" role="alert" style="font-size: 14px; padding: 10px;"></div>
+                    <div *ngIf="serverSuccess" [innerHtml]="serverSuccess" class="alert alert-success text-center" role="alert" style="font-size: 14px; padding: 10px;"></div>
 
                     <!-- <div class="row mb-3">
                         <div class="col-md-6">
@@ -29,8 +32,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" name="password" id="password" [(ngModel)]="user.password">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" name="confirm_password" id="confirm_password" [(ngModel)]="confirm_password">
+                        <small class="text-danger" *ngIf="passwordMismatch">
+                            Passwords do not match.
+                        </small>
                     </div>
 
                     <button type="submit" class="btn form-btn w-100 mb-3" (click)="onSubmit()">

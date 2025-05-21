@@ -3,11 +3,11 @@ package com.himusharier.ajps_backend.controller;
 import com.himusharier.ajps_backend.config.JwtTokenProvider;
 import com.himusharier.ajps_backend.dto.LoginRequest;
 import com.himusharier.ajps_backend.dto.RegisterRequest;
-import com.himusharier.ajps_backend.dto.UserResponse;
+import com.himusharier.ajps_backend.dto.AuthResponse;
 import com.himusharier.ajps_backend.exception.RegisterRequestException;
+import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
-import com.himusharier.ajps_backend.model.User;
-import com.himusharier.ajps_backend.service.JwtUserService;
+import com.himusharier.ajps_backend.service.JwtAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -33,11 +33,11 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtUserService userService;
+    private final JwtAuthService userService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenProvider jwtTokenProvider,
-                          JwtUserService userService) {
+                          JwtAuthService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
@@ -48,29 +48,20 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest registerRequest
     ) {
         try {
-            User user = new User(
+            Auth auth = new Auth(
                     registerRequest.email(),
-                    registerRequest.password(),
-                    registerRequest.role(),
-                    registerRequest.firstName(),
-                    registerRequest.lastName(),
-                    registerRequest.phoneNumber()
+                    registerRequest.password()
+//                    registerRequest.role()
             );
 
-            User savedUser = userService.createUser(user);
+            Auth savedAuth = userService.createAuth(auth);
 
-            // Create DTO to return (exclude sensitive info)
-            UserResponse userResponse = new UserResponse();
-            userResponse.setId(savedUser.getId());
-            userResponse.setEmail(savedUser.getEmail());
-            userResponse.setRole(savedUser.getRole());
-            userResponse.setFirstName(savedUser.getFirstName());
-            userResponse.setLastName(savedUser.getLastName());
-            userResponse.setPhoneNumber(savedUser.getPhoneNumber());
-            userResponse.setCreatedAt(savedUser.getCreatedAt());
-            userResponse.setUpdatedAt(savedUser.getUpdatedAt());
+            Map<String, Object> authResponse = new HashMap<>();
+            authResponse.put("status", "success");
+            authResponse.put("code", 200);
+            authResponse.put("message", "Registration successful");
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+            return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
 
         } catch (MethodArgumentTypeMismatchException e) {
             throw new RegisterRequestException(e.getMessage());
@@ -95,7 +86,7 @@ public class AuthController {
 
             // Get user details
             AuthUserDetails userDetails = (AuthUserDetails) authentication.getPrincipal();
-            User user = userDetails.user();
+            Auth auth = userDetails.auth();
 
             // Create response with token and user info
             Map<String, Object> responseData = new HashMap<>();
@@ -104,11 +95,9 @@ public class AuthController {
 
             // Add user information
             Map<String, Object> userData = new HashMap<>();
-            userData.put("id", user.getId());
-            userData.put("email", user.getEmail());
-            userData.put("role", user.getRole());
-            userData.put("firstName", user.getFirstName());
-            userData.put("lastName", user.getLastName());
+            userData.put("id", auth.getId());
+            userData.put("email", auth.getEmail());
+            userData.put("role", auth.getRole());
 
             responseData.put("user", userData);
 
@@ -130,16 +119,14 @@ public class AuthController {
 
             // Return user information
             AuthUserDetails customUserDetails = (AuthUserDetails) userDetails;
-            User user = customUserDetails.user();
+            Auth auth = customUserDetails.auth();
 
-            UserResponse userResponse = new UserResponse();
-            userResponse.setId(user.getId());
-            userResponse.setEmail(user.getEmail());
-            userResponse.setRole(user.getRole());
-            userResponse.setFirstName(user.getFirstName());
-            userResponse.setLastName(user.getLastName());
+            AuthResponse authResponse = new AuthResponse();
+            authResponse.setId(auth.getId());
+            authResponse.setEmail(auth.getEmail());
+            authResponse.setRole(auth.getRole());
 
-            return ResponseEntity.ok(userResponse);
+            return ResponseEntity.ok(authResponse);
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");

@@ -5,24 +5,15 @@ import com.himusharier.ajps_backend.constants.Role;
 import jakarta.validation.constraints.*;
 
 public record RegisterRequest(
-        @NotBlank(message = "Email cannot be blank")
-        @Email(message = "Email should be valid")
+        @NotBlank(message = "Email cannot be blank.")
+        @Email(message = "Email should be valid.")
         String email,
 
-        @NotBlank(message = "Password cannot be blank")
-        @Size(min = 6, message = "Password must be at least 6 characters")
-        String password,
+        @NotBlank(message = "Password cannot be blank.")
+        @Size(min = 6, message = "Password must be at least 6 characters.")
+        String password
 
-        @ValidRole(message = "Role must be valid")
-        Role role,
-
-        @NotBlank(message = "First name cannot be blank")
-        String firstName,
-
-        @NotBlank(message = "Last name cannot be blank")
-        String lastName,
-
-        @NotBlank(message = "Phone number cannot be blank")
-        String phoneNumber
+//        @ValidRole(message = "Role must be valid")
+//        Role role
 ) {
 }

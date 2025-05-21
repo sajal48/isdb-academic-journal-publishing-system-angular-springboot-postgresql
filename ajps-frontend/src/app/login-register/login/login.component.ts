@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { LoginRegisterService } from '../../site-settings/auth/login-register.service';
+import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 
 @Component({
   selector: 'app-login',
@@ -14,12 +14,12 @@ export class LoginComponent {
   password: string = '';
 
   constructor(
-    private loginRegisterService: LoginRegisterService
+    private authLoginRegisterService: AuthLoginRegisterService
 
   ) {}
 
   onSubmit() {
-    this.loginRegisterService.login({email: this.email, password: this.password}).subscribe({
+    this.authLoginRegisterService.login({email: this.email, password: this.password}).subscribe({
       next: (response) => {
         
         // Reset the form by clearing the user object

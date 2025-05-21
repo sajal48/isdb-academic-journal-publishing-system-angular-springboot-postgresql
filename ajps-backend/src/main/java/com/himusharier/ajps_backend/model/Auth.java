@@ -9,16 +9,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "AJPS_USERS")
-public class User {
+@Table(name = "AJPS_AUTH")
+public class Auth {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false, nullable = false, unique = true)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -32,40 +34,35 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public User(
+    public Auth(
             String email,
-            String password,
-            Role role,
-            String firstName,
-            String lastName,
-            String phoneNumber
+            String password
+//            Role role
     ) {
         this.email = email;
         this.password = password;
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phoneNumber = phoneNumber;
+//        this.role = role;
     }
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        id = generateRandomId();
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    private Long generateRandomId() {
+        return 10_000_000L + new Random().nextLong(90_000_000L); // 8-digit number
     }
 }

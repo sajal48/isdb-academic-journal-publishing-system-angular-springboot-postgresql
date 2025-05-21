@@ -1,25 +1,20 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { AuthRegisterRequest } from '../interface/auth-register-request';
+import { Observable } from 'rxjs/internal/Observable';
 import { apiConfig } from '../configs/api-config';
-import { Observable } from 'rxjs';
-import { UserRegisterRequest } from '../interface/user-register-request';
-import { UserRegisterResponse } from '../interface/user-register-response';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoginRegisterService {
-
-  private readonly tokenKey = 'access_token';
+export class AuthLoginRegisterService {
 
   constructor(
-    private router: Router,
     private http: HttpClient
 
   ) {}
 
-  register(registerRequest: UserRegisterRequest): Observable<UserRegisterResponse> {
+  register(registerRequest: AuthRegisterRequest): Observable<any> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post<any>(`${apiConfig.apiBaseUrl}/auth/register`, registerRequest, {headers});
   }

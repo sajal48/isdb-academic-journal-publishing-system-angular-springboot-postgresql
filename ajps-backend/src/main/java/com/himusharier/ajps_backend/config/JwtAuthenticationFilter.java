@@ -1,7 +1,7 @@
 package com.himusharier.ajps_backend.config;
 
-import com.himusharier.ajps_backend.model.JwtUserDetails;
-import com.himusharier.ajps_backend.service.JwtUserDetailsService;
+import com.himusharier.ajps_backend.model.JwtAuthDetails;
+import com.himusharier.ajps_backend.service.JwtAuthDetailsService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    private JwtAuthDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -44,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 Claims claims = tokenProvider.getClaimsFromToken(jwt);
-                String username = claims.getSubject();
                 Long userId = claims.get("id", Long.class);
                 String email = claims.get("email", String.class);
                 String roleName = claims.get("role", String.class);
@@ -55,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                new JwtUserDetails(userId, username, email, roleName),
+                                new JwtAuthDetails(userId, email, roleName),
                                 null,
                                 authorities
                         );

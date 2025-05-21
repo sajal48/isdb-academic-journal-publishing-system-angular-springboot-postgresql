@@ -1,42 +1,85 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { LoginRegisterService } from '../../site-settings/auth/login-register.service';
-import { UserRegisterRequest } from '../../site-settings/interface/user-register-request';
+import { RouterLink } from '@angular/router';
+import { AuthRegisterRequest } from '../../site-settings/interface/auth-register-request';
+import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
+import { CommonModule } from '@angular/common';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
-  user: UserRegisterRequest = {
+  user: AuthRegisterRequest = {
     email: '',
     password: ''
   }
+  confirm_password: string = '';
+  passwordMismatch: boolean = false;
+
+  serverError: SafeHtml | null = null;
+  serverSuccess: SafeHtml | null = null;
 
   constructor(
-    private loginRegisterService: LoginRegisterService
+    private authLoginRegisterService: AuthLoginRegisterService
 
   ){}
 
   onSubmit() {
-    this.loginRegisterService.register(this.user).subscribe({
+    if (!this.user.email || !this.user.password || !this.confirm_password) {
+      this.serverError = '<i class="bi bi-exclamation-circle"></i> All fields are required.';
+      this.serverSuccess = null;
+      return;
+    }
+    if (this.user.password !== this.confirm_password) {
+      this.passwordMismatch = true;
+      this.serverError = '<i class="bi bi-exclamation-circle"></i> Passwords do not match.';
+      this.serverSuccess = null;
+      return;
+    }
+    this.passwordMismatch = false;
+    this.serverError = null;
+    this.serverSuccess = null;
+
+    this.authLoginRegisterService.register(this.user).subscribe({
       next: (response) => {
-        
-        // Reset the form by clearing the user object
-        this.user = {email: '', password: ''};
 
-        console.log('Registration successful:', response);
-        alert('Registration successful! Please log in.');
+        // console.log('Registration successful:', response);
+      //   this.serverSuccess = '<i class="bi bi-check-circle"></i> Registration successful! Please log in.';
+      //   this.serverError = null;
 
-      },
-      error: (error: Error) => {
-        console.error('Registration error:', error.message);
-        alert(error.message);
+      //   this.user = { email: '', password: ''};
+      //   this.confirm_password = '';
+
+      // },
+      // error: (error: any) => {
+        // console.error('Registration error:', error);
+        // alert(error.message);
+        // this.serverError = error?.error?.message || '<i class="bi bi-exclamation-circle"></i> Something went wrong. Please try again.';
+        // this.serverSuccess = null;
+
+
+        if (response.code === 200) {
+        this.serverSuccess = `<i class="bi bi-check-circle"></i> ${response.message}`;
+        this.serverError = null;
+
+        // Clear form
+        this.user = { email: '', password: '' };
+        this.confirm_password = '';
+
+      } else {
+        this.serverError = `<i class="bi bi-exclamation-circle"></i> ${response.message}`;
+        this.serverSuccess = null;
       }
-    });
+
+
+      }
+    }
+
+  );
   }
 
 }
