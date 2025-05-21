@@ -12,12 +12,8 @@ import { UserRegisterRequest } from '../../site-settings/interface/user-register
 })
 export class RegisterComponent {
   user: UserRegisterRequest = {
-    firstName: '',
-    lastName: '',
     email: '',
-    password: '',
-    phoneNumber: '',
-    role: 'USER'
+    password: ''
   }
 
   constructor(
@@ -30,7 +26,7 @@ export class RegisterComponent {
       next: (response) => {
         
         // Reset the form by clearing the user object
-        this.user = {firstName: '', lastName: '', email: '', password: '', phoneNumber: '', role: ''};
+        this.user = {email: '', password: ''};
 
         console.log('Registration successful:', response);
         alert('Registration successful! Please log in.');

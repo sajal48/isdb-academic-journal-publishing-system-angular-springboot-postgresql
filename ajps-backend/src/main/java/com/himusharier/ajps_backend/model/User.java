@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "USERS")
+@Table(name = "AJPS_USERS")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,7 +42,14 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public User(String email, String password, Role role, String firstName, String lastName, String phoneNumber) {
+    public User(
+            String email,
+            String password,
+            Role role,
+            String firstName,
+            String lastName,
+            String phoneNumber
+    ) {
         this.email = email;
         this.password = password;
         this.role = role;
