@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.service;
 
+import com.himusharier.ajps_backend.constants.AuthStatus;
 import com.himusharier.ajps_backend.constants.Role;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
@@ -49,6 +50,8 @@ public class JwtAuthService {
         if (auth.getRole() == null) {
             auth.setRole(Role.USER);
         }
+        //auth.setAuthStatus(AuthStatus.REGISTERED);
+        //auth.setOtpUsed(false);
 
         return authRepository.save(auth);
     }
