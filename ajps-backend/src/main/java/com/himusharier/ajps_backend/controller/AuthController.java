@@ -12,7 +12,9 @@ import com.himusharier.ajps_backend.service.JwtAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -59,7 +61,7 @@ public class AuthController {
 
             Map<String, Object> authResponse = new HashMap<>();
             authResponse.put("status", "success");
-            authResponse.put("code", 200);
+            authResponse.put("code", HttpStatus.OK.value());
             authResponse.put("message", "Registration successful");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
@@ -100,11 +102,22 @@ public class AuthController {
 
             // Add user information
             Map<String, Object> userData = new HashMap<>();
-            userData.put("id", auth.getId());
+            userData.put("id", auth.getUserId());
             userData.put("email", auth.getEmail());
             userData.put("role", auth.getRole());
 
             responseData.put("user", userData);
+
+
+            // Create secure HTTP-only cookie
+            ResponseCookie cookie = ResponseCookie.from("ajps_access_token", jwt)
+                    .httpOnly(true)
+                    .secure(true) // Set to true in production with HTTPS
+                    .path("/")
+                    .maxAge(60 * 60 * 24 * 7) // 7 days
+                    .sameSite("Strict")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
             return ResponseEntity.ok(responseData);
 
@@ -127,14 +140,19 @@ public class AuthController {
             Auth auth = customUserDetails.auth();
 
             AuthResponse authResponse = new AuthResponse();
-            authResponse.setId(auth.getId());
+            authResponse.setId(auth.getUserId());
             authResponse.setEmail(auth.getEmail());
             authResponse.setRole(auth.getRole());
 
             return ResponseEntity.ok(authResponse);
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        Map<String, Object> authResponse = new HashMap<>();
+        authResponse.put("status", "error");
+        authResponse.put("code", HttpStatus.UNAUTHORIZED.value());
+        authResponse.put("message", "Invalid or expired token.");
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse);
     }
 
     // Helper method to extract JWT from request

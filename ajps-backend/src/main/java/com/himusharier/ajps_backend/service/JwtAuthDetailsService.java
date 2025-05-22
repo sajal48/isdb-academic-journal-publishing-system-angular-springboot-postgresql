@@ -24,7 +24,7 @@ public class JwtAuthDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Auth auth = authRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with: " + email));
 
         return new AuthUserDetails(auth);
     }

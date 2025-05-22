@@ -21,7 +21,7 @@ public record AuthUserDetails(Auth auth) implements UserDetails {
     }
 
     public Long getId() {
-        return auth.getId();
+        return auth.getUserId();
     }
 
     public String getEmail() {

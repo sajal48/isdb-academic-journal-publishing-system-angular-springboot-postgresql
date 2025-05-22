@@ -12,6 +12,6 @@ public class AuthResponse {
     private Long id;
     private String email;
     private Role role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+//    private LocalDateTime createdAt;
+//    private LocalDateTime updatedAt;
 }
