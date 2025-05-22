@@ -29,7 +29,7 @@ export class AuthLoginRegisterService {
 
 
   setToken(token: string) {
-    localStorage.setItem(this.tokenKey, token);
+    sessionStorage.setItem(this.tokenKey, token);
     const payload = JSON.parse(atob(token.split('.')[1]));
     this.roleSubject.next(payload.role);
   }
@@ -39,7 +39,7 @@ export class AuthLoginRegisterService {
   }
 
   getToken() {
-    return localStorage.getItem(this.tokenKey);
+    return sessionStorage.getItem(this.tokenKey);
   }
 
   isAuthenticated(): boolean {
@@ -54,7 +54,7 @@ export class AuthLoginRegisterService {
   }
 
   logout() {
-    localStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem(this.tokenKey);
     this.roleSubject.next(null);
     window.location.href="/login";
   }

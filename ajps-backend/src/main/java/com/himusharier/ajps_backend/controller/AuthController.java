@@ -108,17 +108,6 @@ public class AuthController {
 
             responseData.put("user", userData);
 
-
-            // Create secure HTTP-only cookie
-            ResponseCookie cookie = ResponseCookie.from("ajps_access_token", jwt)
-                    .httpOnly(true)
-                    .secure(true) // Set to true in production with HTTPS
-                    .path("/")
-                    .maxAge(60 * 60 * 24 * 7) // 7 days
-                    .sameSite("Strict")
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
             return ResponseEntity.ok(responseData);
 
         } catch (AuthenticationException e) {

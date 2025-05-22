@@ -12,7 +12,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 export class HeaderComponent {
   showSearch = false;
   searchQuery = '';
-  searchType = 'internal'; // Default to internal search
 
   toggleSearch() {
     this.showSearch = !this.showSearch;
@@ -20,14 +19,10 @@ export class HeaderComponent {
 
   onSearch() {
     if (this.searchQuery.trim()) {
-      if (this.searchType === 'internal') {
-        // Placeholder: Implement internal search logic (e.g., navigate to search results)
-        console.log(`Internal search for: ${this.searchQuery}`);
-      } else {
-        // Placeholder: Implement external search (e.g., redirect to Google Scholar)
-        console.log(`External search for: ${this.searchQuery}`);
-        // Example: window.location.href = `https://scholar.google.com/scholar?q=${encodeURIComponent(this.searchQuery)}`;
-      }
+     
+      console.log(`External search for: ${this.searchQuery}`);
+      // Example: window.location.href = `https://scholar.google.com/scholar?q=${encodeURIComponent(this.searchQuery)}`;
+      
     }
   }
 
