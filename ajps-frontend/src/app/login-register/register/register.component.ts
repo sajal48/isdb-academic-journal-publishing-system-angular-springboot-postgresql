@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthRegisterLoginRequest } from '../../site-settings/interface/auth-register-login-request';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { CommonModule } from '@angular/common';
 import { SafeHtml } from '@angular/platform-browser';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',
@@ -24,9 +25,21 @@ export class RegisterComponent {
   serverSuccess: SafeHtml | null = null;
 
   constructor(
-    private authLoginRegisterService: AuthLoginRegisterService
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private router: Router
 
   ){}
+
+  ngOnInit(): void {
+    this.authLoginRegisterService.isAuthenticated().pipe(
+      map((isValid) => {
+        if (isValid) {
+          // window.location.href="/user";
+          this.router.navigate(['/user']);
+        }
+      })
+    ).subscribe();
+  }
 
   onSubmit() {
     if (!this.user.email || !this.user.password || !this.confirm_password) {

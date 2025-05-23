@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { CommonModule } from '@angular/common';
 import { AuthRegisterLoginRequest } from '../../site-settings/interface/auth-register-login-request';
 import { SafeHtml } from '@angular/platform-browser';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,7 @@ import { SafeHtml } from '@angular/platform-browser';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   user: AuthRegisterLoginRequest = {
     email: '',
     password: ''
@@ -22,9 +23,21 @@ export class LoginComponent {
   serverSuccess: SafeHtml | null = null;
 
   constructor(
-    private authLoginRegisterService: AuthLoginRegisterService
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private router: Router
 
   ) {}
+
+  ngOnInit(): void {
+    this.authLoginRegisterService.isAuthenticated().pipe(
+      map((isValid) => {
+        if (isValid) {
+          // window.location.href="/user";
+          this.router.navigate(['/user']);
+        }
+      })
+    ).subscribe();
+  }
 
   onSubmit() {
     if (!this.user.email || !this.user.password) {

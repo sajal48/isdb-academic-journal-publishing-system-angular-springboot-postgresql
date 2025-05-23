@@ -26,10 +26,10 @@ export class AuthLoginRegisterService {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post<any>(`${apiConfig.apiBaseUrl}/auth/login`, loginRequest, {headers});
   }
-
+  
 
   setToken(token: string) {
-    sessionStorage.setItem(this.tokenKey, token);
+    localStorage.setItem(this.tokenKey, token);
     const payload = JSON.parse(atob(token.split('.')[1]));
     this.roleSubject.next(payload.role);
   }
@@ -39,12 +39,23 @@ export class AuthLoginRegisterService {
   }
 
   getToken() {
-    return sessionStorage.getItem(this.tokenKey);
+    return localStorage.getItem(this.tokenKey);
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
+  isAuthenticated(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      return new BehaviorSubject<boolean>(false).asObservable();
+    }
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+    return this.http.get<boolean>(`${apiConfig.apiBaseUrl}/auth/validate-token`, { headers });
+  }  
+
+  // isAuthenticated(): boolean {
+  //   return !!this.getToken();
+  // }
 
   getUserRole(): string {
     const token = this.getToken();
@@ -53,10 +64,23 @@ export class AuthLoginRegisterService {
     return payload.role.toLowerCase();
   }
 
-  logout() {
-    sessionStorage.removeItem(this.tokenKey);
+  getUserEmail(): string {
+    const token = this.getToken();
+    if (!token) return '';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.email.toLowerCase();
+  }
+
+  logout(targetUrl?: string): void {
+    localStorage.removeItem(this.tokenKey);
     this.roleSubject.next(null);
-    window.location.href="/login";
+    const redirectUrl = targetUrl || '/login'; // default fallback
+    window.location.href=`${redirectUrl}`;
+  }
+
+  deleteToken(): void {
+    localStorage.removeItem(this.tokenKey);
+    this.roleSubject.next(null);
   }
 
 }

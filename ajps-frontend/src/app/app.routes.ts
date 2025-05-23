@@ -71,7 +71,7 @@ export const routes: Routes = [
         ]
     },
     // journal site:
-    {path: 'journals/:journalName', component: JournalViewComponent,
+    {path: 'journals/:journalName', component: JournalViewComponent,    
         children: [
             {path: '', redirectTo: 'homepage', pathMatch: 'full'},
             {path: 'homepage', component: JournalHomepageComponent, title: 'Homepage - ScholarPress'},

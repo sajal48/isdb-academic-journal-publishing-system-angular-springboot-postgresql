@@ -26,30 +26,42 @@
             <h5 class="mb-3 text-primary">Profile Information</h5>
             <form id="profileForm">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="nameTitle" class="form-label">Title <i>*</i></label>
+                        <input type="text" class="form-control" id="nameTitle" name="nameTitle" value="Dr." required>
+                    </div>
+                    <div class="col-md-3 mb-3">
                         <label for="firstName" class="form-label">First Name <i>*</i></label>
                         <input type="text" class="form-control" id="firstName" name="firstName" value="Jane" required>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="middleName" class="form-label">Middle Name</label>
+                        <input type="text" class="form-control" id="middleName" name="middleName" value="">
+                    </div>
+                    <div class="col-md-3 mb-3">
                         <label for="lastName" class="form-label">Last Name <i>*</i></label>
                         <input type="text" class="form-control" id="lastName" name="lastName" value="Doe" required>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="professionalTitle" class="form-label">Professional Title</label>
-                    <input type="text" class="form-control" id="professionalTitle" name="professionalTitle" value="Professor of Computer Science">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="professionalTitle" class="form-label">Professional Title</label>
+                        <input type="text" class="form-control" id="professionalTitle" name="professionalTitle" value="Professor of Computer Science">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="educationalQualification" class="form-label">Educational Qualification</label>
+                        <input type="text" class="form-control" id="educationalQualification" name="educationalQualification" value="Ph.D. in Computer Science">
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="educationalQualification" class="form-label">Educational Qualification</label>
-                    <input type="text" class="form-control" id="educationalQualification" name="educationalQualification" value="Ph.D. in Computer Science">
-                </div>
-                <div class="mb-3">
-                    <label for="institute" class="form-label">Institute <i>*</i></label>
-                    <input type="text" class="form-control" id="institute" name="institute" value="University of Example" required>
-                </div>
-                <div class="mb-3">
-                    <label for="expertise" class="form-label">Expertise</label>
-                    <input type="text" class="form-control" id="expertise" name="expertise" value="Artificial Intelligence, Machine Learning, Data Science">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="institute" class="form-label">Institute <i>*</i></label>
+                        <input type="text" class="form-control" id="institute" name="institute" value="University of Example" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="expertise" class="form-label">Expertise</label>
+                        <input type="text" class="form-control" id="expertise" name="expertise" value="Artificial Intelligence, Machine Learning, Data Science">
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email <i>*</i></label>
@@ -80,12 +92,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="facebook" class="form-label">Facebook URL</label>
-                        <input type="url" class="form-control" id="facebook" name="facebook" value="https://facebook.com/janedoe">
+                        <label for="facebookUrl" class="form-label">Facebook URL</label>
+                        <input type="url" class="form-control" id="facebookUrl" name="facebookUrl" value="https://facebook.com/janedoe">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="twitter" class="form-label">Twitter URL</label>
-                        <input type="url" class="form-control" id="twitter" name="twitter" value="https://twitter.com/janedoe">
+                        <label for="twitterUrl" class="form-label">Twitter URL</label>
+                        <input type="url" class="form-control" id="twitterUrl" name="twitterUrl" value="https://twitter.com/janedoe">
                     </div>
                 </div>
                 <hr class="my-4">
@@ -94,5 +106,7 @@
                 </div>
             </form>
         </div>
+
+
     </div>
 </div>

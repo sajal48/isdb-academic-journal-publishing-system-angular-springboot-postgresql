@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 
 @Component({
   selector: 'app-header',
@@ -9,9 +10,34 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   showSearch = false;
   searchQuery = '';
+  userName = '';
+  isLoggedIn = false;
+
+  constructor(
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private router: Router
+
+  ) {}
+
+  ngOnInit(): void {
+    this.authLoginRegisterService.isAuthenticated().subscribe({
+      next: (isValid) => {
+        if (isValid) {
+          const email = this.authLoginRegisterService.getUserEmail();
+          this.userName = email ? email.split('@')[0] : '';
+          this.isLoggedIn = true;
+        }
+      },
+      error: () => {
+        this.isLoggedIn = false;
+        this.authLoginRegisterService.deleteToken();
+      }
+    });
+  }
+
 
   toggleSearch() {
     this.showSearch = !this.showSearch;
@@ -24,6 +50,11 @@ export class HeaderComponent {
       // Example: window.location.href = `https://scholar.google.com/scholar?q=${encodeURIComponent(this.searchQuery)}`;
       
     }
+  }
+
+  logout() {
+    this.authLoginRegisterService.logout(this.router.url);
+    // this.authLoginRegisterService.logout('/login');
   }
 
 }

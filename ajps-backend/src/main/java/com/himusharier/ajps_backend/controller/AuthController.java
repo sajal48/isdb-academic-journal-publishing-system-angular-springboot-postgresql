@@ -62,7 +62,7 @@ public class AuthController {
             Map<String, Object> authResponse = new HashMap<>();
             authResponse.put("status", "success");
             authResponse.put("code", HttpStatus.OK.value());
-            authResponse.put("message", "Registration successful");
+            authResponse.put("message", "Registration successful. Please login...");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
 

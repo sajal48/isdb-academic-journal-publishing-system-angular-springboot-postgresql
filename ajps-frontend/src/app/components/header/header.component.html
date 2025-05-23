@@ -32,23 +32,26 @@
                 </li>
             </ul>
             <div class="d-flex" role="user">
-                <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link active" routerLink="/register" routerLinkActive="active-page"><i class="bi bi-person-plus-fill"></i> Register</a></li>
-                    <li class="nav-item"><a class="nav-link active" routerLink="/login" routerLinkActive="active-page"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
-                </ul>
-                <!-- <div class="btn-group">
+                @if (isLoggedIn) {
+                <div class="btn-group">
                   <button type="button" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="bi bi-person-fill"></i> Sharier Himu
+                      <i class="bi bi-person-fill"></i> {{ userName }}
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end">
                     <li><a [routerLink]="['/user/dashboard']"><button class="dropdown-item" type="button">Dashboard</button></a></li>
                     <li><a [routerLink]="['/user/submission']"><button class="dropdown-item" type="button">Online Submission</button></a></li>
                     <li><a [routerLink]="['/user/view-profile']"><button class="dropdown-item" type="button">View Profile</button></a></li>
-                    <li><a [routerLink]="['/user/settings']"><button class="dropdown-item" type="button">Settings</button></a></li>
+                    <li><a [routerLink]="['/user/settings']"><button class="dropdown-item" type="button">Profile Settings</button></a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a routerLink=""></a><button class="dropdown-item" type="button" style="color: #ff8482;"><i class="bi bi-power"></i> Logout</button></li>
+                    <li><button (click)="logout()" class="dropdown-item" type="button" style="color: #ff8482;"><i class="bi bi-power"></i> Logout</button></li>
                   </ul>
-                </div> -->
+                </div>
+                } @else {
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" routerLink="/register" routerLinkActive="active-page"><i class="bi bi-person-plus-fill"></i> Register</a></li>
+                    <li class="nav-item"><a class="nav-link active" routerLink="/login" routerLinkActive="active-page"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+                </ul>
+                }
             </div>
         </div>
     </div>
