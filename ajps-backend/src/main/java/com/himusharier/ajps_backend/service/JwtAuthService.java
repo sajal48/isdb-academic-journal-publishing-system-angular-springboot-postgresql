@@ -4,7 +4,9 @@ import com.himusharier.ajps_backend.constants.AuthStatus;
 import com.himusharier.ajps_backend.constants.Role;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
+import com.himusharier.ajps_backend.model.UserProfile;
 import com.himusharier.ajps_backend.repository.AuthRepository;
+import com.himusharier.ajps_backend.repository.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,11 +22,13 @@ public class JwtAuthService {
 
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
-    public JwtAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder) {
+    public JwtAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, UserProfileRepository userProfileRepository) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userProfileRepository = userProfileRepository;
     }
 
     public List<Auth> getAllUsers() {
@@ -53,7 +57,16 @@ public class JwtAuthService {
         //auth.setAuthStatus(AuthStatus.REGISTERED);
         //auth.setOtpUsed(false);
 
-        return authRepository.save(auth);
+        Auth saveAuth = authRepository.save(auth);
+
+        // create user profile:
+        UserProfile userProfile = new UserProfile();
+        userProfile.setEmail(saveAuth.getEmail());
+        userProfile.setAuth(saveAuth);
+
+        userProfileRepository.save(userProfile);
+
+        return saveAuth;
     }
 
     @Transactional

@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.config;
 
+import com.himusharier.ajps_backend.exception.JwtUserAuthenticationException;
 import com.himusharier.ajps_backend.model.JwtAuthDetails;
 import com.himusharier.ajps_backend.service.JwtAuthDetailsService;
 import io.jsonwebtoken.Claims;
@@ -63,7 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
-            log.error("Could not set user authentication in security context", ex);
+//            log.error("Could not set user authentication in security context", ex);
+            throw new JwtUserAuthenticationException("Invalid unauthenticated request.");
         }
 
         filterChain.doFilter(request, response);

@@ -1,5 +1,5 @@
 <!-- Profile Card -->
-<div class="card">
+<div class="card" *ngIf="user">
     <div class="card-body">
         <h4 class="card-title mb-4" style="color: #2e7d32;">My Profile</h4>
         <div class="row">
@@ -11,55 +11,22 @@
             <div class="col-md-10" style="max-width: 800px;">
                 <table class="table">
                     <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>Dr. Jane Elizabeth Doe</td>
-                        </tr>
-                        <tr>
-                            <td>Professional Title</td>
-                            <td>Professor of Computer Science</td>
-                        </tr>
-                        <tr>
-                            <td>Educational Qualification</td>
-                            <td>Ph.D. in Computer Science</td>
-                        </tr>
-                        <tr>
-                            <td>Institute</td>
-                            <td>University of Example</td>
-                        </tr>
-                        <tr>
-                            <td>Expertise</td>
-                            <td>Artificial Intelligence, Machine Learning, Data Science</td>
-                        </tr>
-                        <tr>
-                            <td>Email</td>
-                            <td>jane.doe&#64;university.edu</td>
-                        </tr>
-                        <tr>
-                            <td>Mobile</td>
-                            <td>+1 (123) 456-7890</td>
-                        </tr>
-                        <tr>
-                            <td>Telephone</td>
-                            <td>+1 (123) 555-1234</td>
-                        </tr>
-                        <tr>
-                            <td>Country/Region</td>
-                            <td>United States</td>
-                        </tr>
-                        <tr>
-                            <td>Address</td>
-                            <td>123 Academic Lane, Example City, CA 90210</td>
-                        </tr>
-                        <tr>
-                            <td>Zip Code</td>
-                            <td>90210</td>
-                        </tr>
+                        <tr><td>Name</td><td>{{ user.nameTitle }} {{ user.firstName }} {{ user.middleName }} {{ user.lastName }}</td></tr>
+                        <tr><td>Professional Title</td><td>{{ user.professionalTitle }}</td></tr>
+                        <tr><td>Educational Qualification</td><td>{{ user.educationalQualification }}</td></tr>
+                        <tr><td>Institute</td><td>{{ user.institute }}</td></tr>
+                        <tr><td>Expertise</td><td>{{ user.expertise }}</td></tr>
+                        <tr><td>Email</td><td>{{ user.email }}</td></tr>
+                        <tr><td>Mobile</td><td>{{ user.mobile }}</td></tr>
+                        <tr><td>Telephone</td><td>{{ user.telephone }}</td></tr>
+                        <tr><td>Country/Region</td><td>{{ user.country }}</td></tr>
+                        <tr><td>Address</td><td>{{ user.address }}</td></tr>
+                        <tr><td>Zip Code</td><td>{{ user.zipCode }}</td></tr>
                         <tr>
                             <td>Social Links</td>
                             <td>
-                                <a href="https://facebook.com/janedoe" class="social-link" target="_blank">Facebook <i class="bi bi-link-45deg"></i></a>
-                                <a href="https://twitter.com/janedoe" class="social-link" target="_blank">Twitter <i class="bi bi-link-45deg"></i></a>
+                                <a [href]="user.facebookUrl" class="social-link" target="_blank">Facebook <i class="bi bi-link-45deg"></i></a>
+                                <a [href]="user.twitterUrl" class="social-link" target="_blank">Twitter <i class="bi bi-link-45deg"></i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -68,3 +35,4 @@
         </div>
     </div>
 </div>
+<div *ngIf="loading">Loading profile...</div>

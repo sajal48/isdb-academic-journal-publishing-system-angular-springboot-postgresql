@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.config;
 
+import com.himusharier.ajps_backend.exception.JwtUserAuthenticationException;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -58,6 +59,7 @@ public class JwtTokenProvider {
             return true;
         } catch (SecurityException ex) {
             log.error("Invalid JWT signature");
+//            throw new JwtUserAuthenticationException("Invalid unauthenticated request.");
         } catch (MalformedJwtException ex) {
             log.error("Invalid JWT token");
         } catch (ExpiredJwtException ex) {

@@ -1,7 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.himusharier.ajps_backend.constants.AuthStatus;
 import com.himusharier.ajps_backend.constants.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,7 +22,7 @@ public class Auth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(updatable = false, nullable = false, unique = true, name = "user_id")
+    @Column(updatable = false, nullable = false, unique = true)
     private Long userId;
 
     @Column(unique = true, nullable = false)
@@ -40,6 +39,7 @@ public class Auth {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     //private Long otp;
     //private boolean isOtpUsed;
 
@@ -48,7 +48,7 @@ public class Auth {
     private AuthStatus authStatus;*/
 
     @OneToOne(mappedBy = "auth", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private UserInfo userInfo;
+    private UserProfile userProfile;
 
 
     public Auth(String email, String password, Role role) {

@@ -19,4 +19,5 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
 
     List<Auth> findByRole(Role role);
 
+    Optional<Auth> findByUserId(Long userId);
 }

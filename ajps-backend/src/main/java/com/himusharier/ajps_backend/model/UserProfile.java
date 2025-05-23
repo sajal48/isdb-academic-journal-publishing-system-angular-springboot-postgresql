@@ -1,25 +1,31 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "AJPS_USER_INFO")
-public class UserInfo {
+@Table(name = "AJPS_USER_PROFILE")
+public class UserProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", unique = true)
+    @JoinColumn(name = "auth_id", referencedColumnName = "id", unique = true)
+    @JsonIgnore
     private Auth auth;
+
+    private String email;
 
     private String nameTitle;
     private String firstName;
@@ -29,7 +35,6 @@ public class UserInfo {
     private String educationalQualification;
     private String institute;
     private String expertise;
-    //private String email;
     private String mobile;
     private String telephone;
     private String country;
@@ -38,6 +43,14 @@ public class UserInfo {
     private String facebookUrl;
     private String twitterUrl;
 
-    private LocalDateTime updateAt;
+    private String profileImage;
+
+    private LocalDateTime updatedAt;
+
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
 }

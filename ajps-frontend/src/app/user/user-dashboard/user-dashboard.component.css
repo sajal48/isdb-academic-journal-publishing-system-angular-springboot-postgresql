@@ -53,20 +53,3 @@ table > tbody > tr > td> button {
     text-decoration: none;
     font-weight: 600;
 }
-
-
-.toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1055;
-    min-width: 300px;
-}
-.toast {
-    margin-bottom: 10px;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-.toast.show {
-    opacity: 1;
-}

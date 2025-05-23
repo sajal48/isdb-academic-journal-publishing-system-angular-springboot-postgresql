@@ -61,7 +61,7 @@ export class RegisterComponent {
       next: (response) => {
 
         if (response.code === 200) {
-          this.serverSuccess = `<i class="bi bi-check-circle"></i> ${response.message}`;
+          this.serverSuccess = `<i class="bi bi-check-circle"></i> Registration successful. Please <a class="custom-link" href="/login">login</a>`;
           this.serverError = null;
 
           // clear form

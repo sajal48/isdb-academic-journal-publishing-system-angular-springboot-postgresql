@@ -1,12 +1,13 @@
 package com.himusharier.ajps_backend.advice;
 
+import com.himusharier.ajps_backend.exception.JwtUserAuthenticationException;
 import com.himusharier.ajps_backend.exception.LoginRequestException;
 import com.himusharier.ajps_backend.exception.RegisterRequestException;
+import com.himusharier.ajps_backend.exception.UserProfileException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.LinkedHashMap;
@@ -54,6 +55,24 @@ public class ApplicationExceptionHandler {
         response.put("status", "error");
         response.put("code", HttpStatus.UNAUTHORIZED.value());
         response.put("message", "Invalid email or password.");
+        return response;
+    }
+
+    @ExceptionHandler(UserProfileException.class)
+    public Map<String, Object> userProfileUpdateException(UserProfileException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.BAD_REQUEST.value());
+        response.put("message", ex.getMessage());
+        return response;
+    }
+
+    @ExceptionHandler(JwtUserAuthenticationException.class)
+    public Map<String, Object> jwtUserAuthenticationException(JwtUserAuthenticationException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.UNAUTHORIZED.value());
+        response.put("message", ex.getMessage());
         return response;
     }
 

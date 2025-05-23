@@ -71,6 +71,13 @@ export class AuthLoginRegisterService {
     return payload.email.toLowerCase();
   }
 
+  getUserID(): number {
+    const token = this.getToken();
+    if (!token) return 0;
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.id;
+  }
+
   logout(targetUrl?: string): void {
     localStorage.removeItem(this.tokenKey);
     this.roleSubject.next(null);

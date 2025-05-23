@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.config;
 
+import com.himusharier.ajps_backend.exception.JwtUserAuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,25 +38,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtTokenProvider jwtTokenProvider) throws Exception {
-        http
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST APIs, (Method Reference)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/public/**").permitAll()
-//                        .requestMatchers("/api/user/**").hasAnyRole("REGULAR_USER", "MANAGER", "ADMIN")
-//                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            JwtTokenProvider jwtTokenProvider) throws JwtUserAuthenticationException {
+        try {
+            http
+                    .cors(Customizer.withDefaults())
+                    .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST APIs, (Method Reference)
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/auth/**").permitAll()
+    //                        .requestMatchers("/api/public/**").permitAll()
+                            .requestMatchers("/api/user/**").hasAnyRole("USER", "EDITOR", "REVIEWER", "ADMIN")
+    //                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
+    //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .anyRequest().authenticated()
+                    )
+                    .addFilterBefore(jwtAuthenticationFilter,
+                            UsernamePasswordAuthenticationFilter.class)
+                    .httpBasic(Customizer.withDefaults())
+                    .sessionManagement(session ->
+                            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        return http.build();
+            return http.build();
+
+        } catch (Exception e) {
+            throw new JwtUserAuthenticationException("Invalid unauthenticated request.");
+        }
     }
 
     @Bean
