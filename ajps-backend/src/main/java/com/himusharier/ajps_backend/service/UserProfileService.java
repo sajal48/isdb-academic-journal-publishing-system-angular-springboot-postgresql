@@ -6,12 +6,30 @@ import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.UserProfile;
 import com.himusharier.ajps_backend.repository.AuthRepository;
 import com.himusharier.ajps_backend.repository.UserProfileRepository;
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserProfileService {
+
+    @Value("${app.base.url}")
+    private String baseUrl;
+
+    @Value("${upload.avatar.directory}")
+    private String uploadDirectory; // Define in application.properties/yml
 
     private final UserProfileRepository userProfileRepository;
     private final AuthRepository authRepository;
@@ -87,8 +105,63 @@ public class UserProfileService {
         Auth auth = optionalAuth.get();
 
         // Step 2: Find UserProfile by Auth ID
-        return userProfileRepository.findByAuth_Id(auth.getId())
+        UserProfile profile = userProfileRepository.findByAuth_Id(auth.getId())
                 .orElseThrow(() -> new UserProfileException("User profile not found for user id: " + userId));
 
+        // Convert image filename to full URL if exists
+        if (profile.getProfileImage() != null && !profile.getProfileImage().startsWith("http")) {
+            String fullImageUrl = baseUrl + "/" + uploadDirectory + "/" + profile.getProfileImage();
+            profile.setProfileImage(fullImageUrl);
+        }
+
+        return profile;
     }
+
+    public void saveUserAvatar(Long userId, MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new RuntimeException("Empty file.");
+        }
+
+        // Step 1: Get Auth
+        Auth auth = authRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Auth with userId " + userId + " not found"));
+
+        UserProfile userProfile = auth.getUserProfile();
+        if (userProfile == null) {
+            throw new RuntimeException("User profile not found for userId " + userId);
+        }
+
+        // Step 2: File info and target path
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
+
+        if (!fileExtension.matches("jpg|jpeg|png|gif|bmp")) {
+            throw new RuntimeException("Unsupported image format. Allowed: jpg, jpeg, png, gif, bmp");
+        }
+
+        String uniqueFilename = UUID.randomUUID().toString() + "." + fileExtension;
+        Path uploadPath = Paths.get(uploadDirectory);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Path filePath = uploadPath.resolve(uniqueFilename);
+
+        // Step 3: Compress and Save
+        try (InputStream input = file.getInputStream();
+             OutputStream output = Files.newOutputStream(filePath)) {
+
+            Thumbnails.of(input)
+                    .size(200, 200)               // Resize if needed
+                    .outputFormat(fileExtension)  // Preserve format
+                    .outputQuality(0.6f)          // Compression: 0.0 (highly compressed) to 1.0 (best quality)
+                    .toOutputStream(output);
+        }
+
+        // Step 4: Update DB
+        userProfile.setProfileImage(uniqueFilename);
+        userProfile.setUpdatedAt(LocalDateTime.now());
+        userProfileRepository.save(userProfile);
+    }
+
 }

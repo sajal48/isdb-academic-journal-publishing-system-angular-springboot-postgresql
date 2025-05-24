@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -73,6 +74,15 @@ public class ApplicationExceptionHandler {
         response.put("status", "error");
         response.put("code", HttpStatus.UNAUTHORIZED.value());
         response.put("message", ex.getMessage());
+        return response;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Map<String, Object> maxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.PAYLOAD_TOO_LARGE.value());
+        response.put("message", "File size too large!");
         return response;
     }
 

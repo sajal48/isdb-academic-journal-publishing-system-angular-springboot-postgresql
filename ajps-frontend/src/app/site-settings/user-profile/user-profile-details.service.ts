@@ -27,6 +27,14 @@ export class UserProfileDetailsService {
   profileUpdate(userProfileUpdateRequest: UserProfile): Observable<any> {
       const headers = new HttpHeaders({'Content-Type': 'application/json'});   
       return this.http.put<any>(`${apiConfig.apiBaseUrl}/user/profile/update`, userProfileUpdateRequest, {headers});
-    }
+  }
+
+  profilePictureUpdate(userId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('picture', file);
+    formData.append('userId', userId.toString());
+
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/profile/upload`, formData);
+  }
 
 }

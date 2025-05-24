@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 export class UserProfileComponent implements OnInit {
   user: UserProfile | null = null;
   loading = true;
+  profilePictureUrl: string | undefined;
 
   constructor(
     private userProfileDetailsService: UserProfileDetailsService
@@ -24,6 +25,7 @@ export class UserProfileComponent implements OnInit {
         this.user = response.data;
         this.loading = false;
         // console.log(this.user);
+        this.profilePictureUrl = this.user?.profileImage;
       },
       error: (err) => {
         // console.error('Failed to load profile', err);

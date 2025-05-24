@@ -5,7 +5,7 @@
         <div class="row">
             <!-- Profile Image -->
             <div class="col-md-2 text-left mb-4">
-                <img src="profile-image/avatar.gif" alt="Profile Picture" class="profile-img">
+                <img [src]="profilePictureUrl || 'profile-image/avatar.gif'" alt="Profile Picture" class="profile-img">
             </div>
             <!-- Profile Details -->
             <div class="col-md-10" style="max-width: 800px;">
