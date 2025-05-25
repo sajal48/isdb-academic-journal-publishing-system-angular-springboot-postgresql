@@ -95,6 +95,18 @@
     margin-left: 20px;
 }
 
+.custom-link {
+    color: #0d6efd;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 400;
+    font-size: 14px;
+    display: block;
+}
+.custom-link:hover {
+    color: #198754;
+}
+
 @media (max-width: 576px) {
     body {
         padding: 20px;

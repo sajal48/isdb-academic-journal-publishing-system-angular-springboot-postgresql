@@ -15,7 +15,8 @@ export interface UserProfile {
   facebookUrl?: string;
   twitterUrl?: string;
 
-  email: string;
+  email?: string;
   profileImage?: string;
+
   userId: number;
 }

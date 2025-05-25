@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-profile-edit',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './user-profile-edit.component.html',
   styleUrl: './user-profile-edit.component.css'
 })
@@ -37,7 +38,7 @@ export class UserProfileEditComponent implements OnInit {
     educationalQualification: '',
     institute: '',
     expertise: '',
-    email: '',
+    // email: '',
     mobile: '',
     telephone: '',
     country: '',

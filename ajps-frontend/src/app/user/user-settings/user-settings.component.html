@@ -67,7 +67,7 @@
     <!-- <hr> -->
 
     <!-- Email Notifications Card -->
-    <div class="card">
+    <!-- <div class="card">
         <div class="card-header">
             <h5>Email Notifications</h5>
         </div>
@@ -90,7 +90,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div> -->
 
     <!-- <hr> -->
 
@@ -105,11 +105,11 @@
                     <div class="col-md-8">
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="profileVisibility" id="publicProfile" value="public" checked>
-                            <label class="form-check-label" for="publicProfile">Public (visible to all)</label>
+                            <label class="form-check-label" for="publicProfile">Public (Public shareable link) <a routerLink="#" class="custom-link" target="_blank">Link <i class="bi bi-box-arrow-up-right"></i></a></label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="profileVisibility" id="privateProfile" value="private">
-                            <label class="form-check-label" for="privateProfile">Private (only you)</label>
+                            <label class="form-check-label" for="privateProfile">Private (Only visible to authority)</label>
                         </div>
                     </div>
                     <div class="col-md-4 button-column">
@@ -119,4 +119,39 @@
             </form>
         </div>
     </div>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#otpModal">
+    Launch static backdrop modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="otpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="otpModalLabel">Verify Your Request</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>We sent a 6-digit OTP to: <strong id="emailDisplay" style="display: block;">user&#64;example.com</strong></p>
+                    <div class="mb-3">
+                        <label for="otpInput" class="form-label">Enter OTP</label>
+                        <input type="text" class="form-control" id="otpInput" maxlength="6" pattern="\d{6}" placeholder="Enter 6-digit OTP (123456)" required>
+                        <div class="invalid-feedback">
+                            Please enter a valid 6-digit OTP.
+                        </div>
+                    </div>
+                    <!-- <div class="text-left font-size-sm">
+                        <p>Didn't receive the OTP? <a href="#" id="resendOtp" class="text-primary">Resend OTP</a></p>
+                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="verifyOtp">Verify & Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

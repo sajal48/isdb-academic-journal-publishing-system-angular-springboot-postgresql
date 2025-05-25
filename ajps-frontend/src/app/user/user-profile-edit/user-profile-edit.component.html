@@ -8,7 +8,7 @@
             <form id="avatarForm" enctype="multipart/form-data" (submit)="onPictureSubmit()">
                 <div class="d-flex align-items-center mb-3">
                     <div class="me-3">
-                        <img [src]="profilePictureUrl || 'profile-image/avatar.gif'" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;">
+                        <img [src]="profilePictureUrl || 'images/avatar.gif'" alt="Profile Avatar" class="profile-avatar" style="width: 150px; height: 150px;">
                     </div>
                     <div>
                         <label for="picture" class="form-label">Profile Picture</label>
@@ -65,7 +65,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="jane.doe@university.edu" [(ngModel)]="user.email" disabled>
+                    <p class="current-email">jane.doe&#64;university.edu <a class="custom-link" routerLink="/user/settings"><i class="bi bi-pencil"></i> Change Email</a></p>
+                    <!-- <input type="hidden" class="form-control" id="email" name="email" value="jane.doe@university.edu" [(ngModel)]="user.email" disabled> -->
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
