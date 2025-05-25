@@ -1,8 +1,7 @@
 package com.himusharier.ajps_backend.controller;
 
-import com.himusharier.ajps_backend.dto.EmailChangeOtpVerifyRequest;
-import com.himusharier.ajps_backend.dto.EmailChangeRequest;
-import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
+import com.himusharier.ajps_backend.dto.*;
+import com.himusharier.ajps_backend.exception.PasswordChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.UserProfile;
 import com.himusharier.ajps_backend.service.UserProfileService;
@@ -97,6 +96,31 @@ public class UserProfileController {
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("message", "Email changed successfully.");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> passwordChange(@RequestBody PasswordChangeRequest request) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        userProfileService.requestPasswordChange(request.userId(), request.userEmail());
+//            return ResponseEntity.ok("Password changed successfully");
+        response.put("status", "success");
+        response.put("code", HttpStatus.OK.value());
+        response.put("message", "OTP sent to: " + request.userEmail());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/verify-password-otp")
+    public ResponseEntity<?> verifyPasswordOtp(@RequestBody PasswordChangeOtpVerifyRequest request) {
+        userProfileService.verifyAndChangePassword(request.userId(), request.currentPassword(), request.newPassword(), request.otp());
+//        return ResponseEntity.ok("Email changed successfully");
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "success");
+        response.put("code", HttpStatus.OK.value());
+        response.put("message", "Password changed successfully.");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

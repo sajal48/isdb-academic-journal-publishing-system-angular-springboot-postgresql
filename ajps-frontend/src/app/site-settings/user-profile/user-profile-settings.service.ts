@@ -8,7 +8,7 @@ import { apiConfig } from '../configs/api-config';
   providedIn: 'root'
 })
 export class UserProfileSettingsService {
-  
+   
   private user_id: number;
 
   constructor(
@@ -30,5 +30,16 @@ export class UserProfileSettingsService {
     const body = { userId, newEmail, otp };
     return this.http.post<any>(`${apiConfig.apiBaseUrl}/user/profile/verify-email-otp`, body, { headers });
   }
+
+  changePassword(data: { userId: number, userEmail: string }): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/profile/change-password`, data, { headers });    
+  }
+
+  confirmPasswordChange(userId: number, currentPassword: string, newPassword: string, otp: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const body = { userId, currentPassword, newPassword, otp };
+    return this.http.post<any>(`${apiConfig.apiBaseUrl}/user/profile/verify-password-otp`, body, { headers });
+  } 
 
 }

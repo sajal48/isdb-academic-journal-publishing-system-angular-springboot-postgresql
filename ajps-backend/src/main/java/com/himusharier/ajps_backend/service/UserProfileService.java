@@ -1,7 +1,9 @@
 package com.himusharier.ajps_backend.service;
 
+import com.himusharier.ajps_backend.dto.PasswordChangeRequest;
 import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
 import com.himusharier.ajps_backend.exception.EmailChangeRequestException;
+import com.himusharier.ajps_backend.exception.PasswordChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.UserProfile;
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,9 +39,14 @@ public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final AuthRepository authRepository;
-    public UserProfileService(UserProfileRepository userProfileRepository, AuthRepository authRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public UserProfileService(
+            UserProfileRepository userProfileRepository,
+            AuthRepository authRepository,
+            PasswordEncoder passwordEncoder) {
         this.userProfileRepository = userProfileRepository;
         this.authRepository = authRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserProfile updateUserProfile(UserProfileUpdateRequest request) {
@@ -208,4 +216,46 @@ public class UserProfileService {
 
         authRepository.save(auth);
     }
+
+    public void requestPasswordChange(Long userId, String userEmail) {
+        Auth auth = authRepository.findByUserId(userId)
+                .orElseThrow(() -> new PasswordChangeRequestException("User not found."));
+
+        auth.generateNewOtp();
+
+        // TODO: send OTP to user's email
+        System.out.println("Generated OTP for " + userEmail + ": " + auth.getOtp());
+
+        authRepository.save(auth);
+    }
+
+
+    public void verifyAndChangePassword(Long userId, String currentPassword, String newPassword, Long otp) {
+        Auth auth = authRepository.findByUserId(userId)
+                .orElseThrow(() -> new PasswordChangeRequestException("User not found."));
+
+        if (auth.isOtpUsed() || auth.getOtpExpireTime() == null || auth.getOtpExpireTime().isBefore(LocalDateTime.now())) {
+            throw new PasswordChangeRequestException("OTP expired or already used.");
+        }
+
+        if (!auth.getOtp().equals(otp)) {
+            throw new PasswordChangeRequestException("Invalid OTP.");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, auth.getPassword())) {
+            throw new PasswordChangeRequestException("Incorrect current password.");
+        }
+
+        if (newPassword.length() < 6) {
+            throw new PasswordChangeRequestException("New password must be at least 6 characters.");
+        }
+
+        auth.setPassword(passwordEncoder.encode(newPassword));
+        auth.setOtp(null);
+        auth.setOtpUsed(true);
+        auth.setOtpExpireTime(null);
+
+        authRepository.save(auth);
+    }
+
 }
