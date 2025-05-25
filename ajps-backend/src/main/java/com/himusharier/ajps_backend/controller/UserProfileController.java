@@ -104,7 +104,7 @@ public class UserProfileController {
     public ResponseEntity<?> passwordChange(@RequestBody PasswordChangeRequest request) {
         Map<String, Object> response = new LinkedHashMap<>();
 
-        userProfileService.requestPasswordChange(request.userId(), request.userEmail());
+        userProfileService.requestPasswordChange(request.userId(), request.userEmail(), request.currentPassword());
 //            return ResponseEntity.ok("Password changed successfully");
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());

@@ -31,7 +31,7 @@ export class UserProfileSettingsService {
     return this.http.post<any>(`${apiConfig.apiBaseUrl}/user/profile/verify-email-otp`, body, { headers });
   }
 
-  changePassword(data: { userId: number, userEmail: string }): Observable<any> {
+  changePassword(data: { userId: number, userEmail: string, currentPassword: string }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(`${apiConfig.apiBaseUrl}/user/profile/change-password`, data, { headers });    
   }

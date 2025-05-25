@@ -217,9 +217,13 @@ public class UserProfileService {
         authRepository.save(auth);
     }
 
-    public void requestPasswordChange(Long userId, String userEmail) {
+    public void requestPasswordChange(Long userId, String userEmail, String currentPassword) {
         Auth auth = authRepository.findByUserId(userId)
                 .orElseThrow(() -> new PasswordChangeRequestException("User not found."));
+
+        if (!passwordEncoder.matches(currentPassword, auth.getPassword())) {
+            throw new PasswordChangeRequestException("Incorrect current password.");
+        }
 
         auth.generateNewOtp();
 

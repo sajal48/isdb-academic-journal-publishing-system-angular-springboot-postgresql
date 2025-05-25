@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { UserProfileSettingsService } from '../../site-settings/user-profile/user-profile-settings.service';
 import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
@@ -25,8 +24,7 @@ export class UserSettingsComponent implements OnInit {
   constructor(
     private authLoginRegisterService: AuthLoginRegisterService,
     private userProfileSettings: UserProfileSettingsService,
-    private userToastNotificationService: UserToastNotificationService,
-    private router: Router
+    private userToastNotificationService: UserToastNotificationService
 
   ) {}
 
@@ -53,6 +51,8 @@ export class UserSettingsComponent implements OnInit {
     this.userProfileSettings.requestEmailChange(this.userId, this.newEmail).subscribe({
       next: (response) => {
         if (response.code == 200) {
+          this.userToastNotificationService.showToast('Info', `${response.message}`, 'info');
+
           const modal = new bootstrap.Modal(document.getElementById('emailOtpModal')!);
           modal.show();
 
@@ -127,16 +127,17 @@ export class UserSettingsComponent implements OnInit {
 
     const payload = {
       userId: this.userId,
-      // currentPassword: this.currentPass,
+      currentPassword: this.currentPassword,
       // newPassword: this.newPass,
       userEmail: this.userEmail
     };
 
     this.userProfileSettings.changePassword(payload).subscribe({
       next: (response) => {
-        // this.userToastNotificationService.showToast('Success', 'Password changed successfully.', 'success');
+        // this.userToastNotificationService.showToast('Info', `${response.message}`, 'info');
         // this.currentPass = this.newPass = this.confirmNewPass = '';
         if (response.code == 200) {
+          this.userToastNotificationService.showToast('Info', `${response.message}`, 'info');
           const modal = new bootstrap.Modal(document.getElementById('passwordOtpModal')!);
           modal.show();
 

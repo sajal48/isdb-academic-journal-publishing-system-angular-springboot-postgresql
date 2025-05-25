@@ -9,12 +9,12 @@ public record PasswordChangeRequest (
 
         @NotBlank(message = "Email cannot be blank.")
         @Email(message = "Email should be valid.")
-        String userEmail
+        String userEmail,
 
-        /*@NotBlank(message = "Current password cannot be blank.")
-        String currentPassword,
+        @NotBlank(message = "Current password cannot be blank.")
+        String currentPassword
 
-        @NotBlank(message = "New password cannot be blank.")
+        /*@NotBlank(message = "New password cannot be blank.")
         String newPassword*/
 
 ) {}

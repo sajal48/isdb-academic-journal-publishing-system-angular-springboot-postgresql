@@ -136,10 +136,10 @@
                     <p>We sent a 6-digit OTP to: <strong id="emailDisplay" style="display: block;">{{ newEmail }}</strong></p>
                     <div class="mb-3">
                         <label for="otpInput" class="form-label">Enter OTP</label>
-                        <input type="text" class="form-control" id="otpInput" maxlength="6" pattern="\d{6}" placeholder="Enter 6-digit OTP (123456)" [(ngModel)]="otp">
-                        <div class="invalid-feedback">
+                        <input type="text" class="form-control" id="otpInput" maxlength="6" pattern="\d{6}" placeholder="Enter 6-digit OTP" [(ngModel)]="otp">
+                        <!-- <div class="invalid-feedback">
                             Please enter a valid 6-digit OTP.
-                        </div>
+                        </div> -->
                     </div>
                     <!-- <div class="text-left font-size-sm">
                         <p>Didn't receive the OTP? <a href="#" id="resendOtp" class="text-primary">Resend OTP</a></p>
@@ -165,10 +165,10 @@
                     <p>We sent a 6-digit OTP to: <strong id="emailDisplay" style="display: block;">{{ userEmail }}</strong></p>
                     <div class="mb-3">
                         <label for="otpInput" class="form-label">Enter OTP</label>
-                        <input type="text" class="form-control" id="otpInput" maxlength="6" pattern="\d{6}" placeholder="Enter 6-digit OTP (123456)" [(ngModel)]="otp">
-                        <div class="invalid-feedback">
+                        <input type="text" class="form-control" id="otpInput" maxlength="6" pattern="\d{6}" placeholder="Enter 6-digit OTP" [(ngModel)]="otp">
+                        <!-- <div class="invalid-feedback">
                             Please enter a valid 6-digit OTP.
-                        </div>
+                        </div> -->
                     </div>
                     <!-- <div class="text-left font-size-sm">
                         <p>Didn't receive the OTP? <a href="#" id="resendOtp" class="text-primary">Resend OTP</a></p>
