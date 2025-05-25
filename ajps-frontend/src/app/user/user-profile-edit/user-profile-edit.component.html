@@ -65,7 +65,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
-                    <p class="current-email">jane.doe&#64;university.edu <a class="custom-link" routerLink="/user/settings"><i class="bi bi-pencil"></i> Change Email</a></p>
+                    <p class="current-email">{{ userEmail }}</p>
+                    <a class="custom-link" routerLink="/user/settings"><i class="bi bi-pencil"></i> Change Email</a>
                     <!-- <input type="hidden" class="form-control" id="email" name="email" value="jane.doe@university.edu" [(ngModel)]="user.email" disabled> -->
                 </div>
                 <div class="row">

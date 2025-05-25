@@ -1,11 +1,14 @@
 package com.himusharier.ajps_backend.service;
 
 import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
+import com.himusharier.ajps_backend.exception.EmailChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.UserProfile;
 import com.himusharier.ajps_backend.repository.AuthRepository;
 import com.himusharier.ajps_backend.repository.UserProfileRepository;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -73,7 +76,7 @@ public class UserProfileService {
         return userProfileRepository.save(updateUserProfile);*/
 
         // Step 3: Update the fields
-        existingProfile.setEmail(request.email());
+//        existingProfile.setEmail(request.email());
         existingProfile.setNameTitle(request.nameTitle());
         existingProfile.setFirstName(request.firstName());
         existingProfile.setMiddleName(request.middleName());
@@ -164,4 +167,45 @@ public class UserProfileService {
         userProfileRepository.save(userProfile);
     }
 
+    public void requestEmailChange(Long userId, String newEmail) {
+        Auth auth = authRepository.findByUserId(userId)
+                .orElseThrow(() -> new EmailChangeRequestException("User not found."));
+
+        // Optionally check if the email is already taken
+        authRepository.findByEmail(newEmail).ifPresent(e -> {
+            throw new EmailChangeRequestException("Email is already in use.");
+        });
+
+        //auth.setEmail(newEmail); // Temporarily update if you want frontend to display it
+        auth.generateNewOtp();
+
+        // TODO: send OTP to newEmail
+        System.out.println("Generated OTP for " + newEmail + ": " + auth.getOtp());
+
+        authRepository.save(auth);
+    }
+
+    public void verifyAndChangeEmail(Long userId, String newEmail, Long otp) {
+        Auth auth = authRepository.findByUserId(userId)
+                .orElseThrow(() -> new EmailChangeRequestException("User not found."));
+
+        /*if (!auth.getEmail().equals(newEmail)) {
+            throw new EmailChangeRequestException("Email does not match the one under verification.");
+        }*/
+
+        if (auth.isOtpUsed() || auth.getOtpExpireTime().isBefore(LocalDateTime.now())) {
+            throw new EmailChangeRequestException("OTP expired or already used.");
+        }
+
+        if (!auth.getOtp().equals(otp)) {
+            throw new EmailChangeRequestException("Invalid OTP.");
+        }
+
+        auth.setEmail(newEmail);
+        auth.setOtp(null);
+        auth.setOtpUsed(false);
+        auth.setOtpExpireTime(null);
+
+        authRepository.save(auth);
+    }
 }

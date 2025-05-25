@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 })
 export class UserProfileEditComponent implements OnInit {
   userId = 0;
+  userEmail = '';
   selectedFile: File | null = null;
   profilePictureUrl: string | undefined;
 
@@ -26,6 +27,7 @@ export class UserProfileEditComponent implements OnInit {
 
   ) {
     this.userId = this.authLoginRegisterService.getUserID();
+    this.userEmail = this.authLoginRegisterService.getUserEmail();
   }
   
   user: UserProfile = {

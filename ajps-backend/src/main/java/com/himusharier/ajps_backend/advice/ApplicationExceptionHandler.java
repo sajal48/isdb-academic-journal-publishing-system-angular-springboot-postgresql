@@ -1,9 +1,6 @@
 package com.himusharier.ajps_backend.advice;
 
-import com.himusharier.ajps_backend.exception.JwtUserAuthenticationException;
-import com.himusharier.ajps_backend.exception.LoginRequestException;
-import com.himusharier.ajps_backend.exception.RegisterRequestException;
-import com.himusharier.ajps_backend.exception.UserProfileException;
+import com.himusharier.ajps_backend.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -83,6 +80,15 @@ public class ApplicationExceptionHandler {
         response.put("status", "error");
         response.put("code", HttpStatus.PAYLOAD_TOO_LARGE.value());
         response.put("message", "File size too large!");
+        return response;
+    }
+
+    @ExceptionHandler(EmailChangeRequestException.class)
+    public Map<String, Object> emailChangeRequestException(EmailChangeRequestException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.BAD_REQUEST.value());
+        response.put("message", ex.getMessage());
         return response;
     }
 

@@ -8,8 +8,8 @@ public record UserProfileUpdateRequest(
         Long userId,
 
         //@NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
-        String email,
+//        @Email(message = "Invalid email format")
+//        String email,
 
         String nameTitle,
         String firstName,

@@ -25,7 +25,7 @@ public class UserProfile {
     @JsonIgnore
     private Auth auth;
 
-    private String email;
+//    private String email;
 
     private String nameTitle;
     private String firstName;

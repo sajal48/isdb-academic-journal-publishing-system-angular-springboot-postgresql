@@ -1,6 +1,7 @@
 package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -40,12 +41,13 @@ public class Auth {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    //private Long otp;
-    //private boolean isOtpUsed;
+    private Long otp;
+    private boolean isOtpUsed;
+    private LocalDateTime otpExpireTime;
 
-    /*@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AuthStatus authStatus;*/
+    private UserStatus userStatus;
 
     @OneToOne(mappedBy = "auth", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private UserProfile userProfile;
@@ -61,14 +63,25 @@ public class Auth {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+//        updatedAt = LocalDateTime.now();
         userId = generateRandomUserId();
-        //otp = generateRandomOtp();
+//        otp = generateRandomOtp();
+//        otpExpireTime = LocalDateTime.now().plusMinutes(5);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+//        otpExpireTime = LocalDateTime.now().plusMinutes(5);
+    }
+
+    /**
+     * Call this method when a new OTP is requested.
+     */
+    public void generateNewOtp() {
+        this.otp = generateRandomOtp();
+        this.otpExpireTime = LocalDateTime.now().plusMinutes(10); // otp valid for 10 minutes
+        this.isOtpUsed = false;
     }
 
     private Long generateRandomUserId() {

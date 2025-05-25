@@ -1,6 +1,6 @@
 package com.himusharier.ajps_backend.service;
 
-import com.himusharier.ajps_backend.constants.AuthStatus;
+import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.Role;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
@@ -54,14 +54,14 @@ public class JwtAuthService {
         if (auth.getRole() == null) {
             auth.setRole(Role.USER);
         }
-        //auth.setAuthStatus(AuthStatus.REGISTERED);
-        //auth.setOtpUsed(false);
+        auth.setUserStatus(UserStatus.ACTIVE);
+        auth.setOtpUsed(false);
 
         Auth saveAuth = authRepository.save(auth);
 
         // create user profile:
         UserProfile userProfile = new UserProfile();
-        userProfile.setEmail(saveAuth.getEmail());
+//        userProfile.setEmail(saveAuth.getEmail());
         userProfile.setAuth(saveAuth);
 
         userProfileRepository.save(userProfile);

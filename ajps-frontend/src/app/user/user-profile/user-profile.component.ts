@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserProfileDetailsService } from '../../site-settings/user-profile/user-profile-details.service';
 import { UserProfile } from '../../site-settings/interface/user-profile-interface';
 import { CommonModule } from '@angular/common';
+import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -13,10 +14,15 @@ export class UserProfileComponent implements OnInit {
   user: UserProfile | null = null;
   loading = true;
   profilePictureUrl: string | undefined;
+  userEmail = '';
 
   constructor(
+    private authLoginRegisterService: AuthLoginRegisterService,
     private userProfileDetailsService: UserProfileDetailsService
-  ){}
+
+  ) {
+    this.userEmail = this.authLoginRegisterService.getUserEmail();
+  }
 
   ngOnInit(): void {
     

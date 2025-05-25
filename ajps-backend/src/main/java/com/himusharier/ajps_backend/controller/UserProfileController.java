@@ -1,5 +1,7 @@
 package com.himusharier.ajps_backend.controller;
 
+import com.himusharier.ajps_backend.dto.EmailChangeOtpVerifyRequest;
+import com.himusharier.ajps_backend.dto.EmailChangeRequest;
 import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.UserProfile;
@@ -73,6 +75,30 @@ public class UserProfileController {
 
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/change-email")
+    public ResponseEntity<?> requestEmailChange(@RequestBody EmailChangeRequest request) {
+        userProfileService.requestEmailChange(request.userId(), request.newEmail());
+//        return ResponseEntity.ok("OTP sent to new email");
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "success");
+        response.put("code", HttpStatus.OK.value());
+        response.put("message", "OTP sent to: " + request.newEmail());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/verify-email-otp")
+    public ResponseEntity<?> verifyEmailOtp(@RequestBody EmailChangeOtpVerifyRequest request) {
+        userProfileService.verifyAndChangeEmail(request.userId(), request.newEmail(), request.otp());
+//        return ResponseEntity.ok("Email changed successfully");
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "success");
+        response.put("code", HttpStatus.OK.value());
+        response.put("message", "Email changed successfully.");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
