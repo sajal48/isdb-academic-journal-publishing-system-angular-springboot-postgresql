@@ -53,13 +53,6 @@ export class OnlineSubmissionFullpageComponent {
     private userToastNotificationService: UserToastNotificationService
   ) { }
 
-  /**
-   * Handles the file input change event.
-   * Reads the selected file and converts it to a Base64 string.
-   * Stores the Base64 string and the original file name in the manuscript object.
-   * Clears any previous validation errors related to the file.
-   * @param event The DOM event from the file input.
-   */
   onFileChange(event: any) {
     const file = event.target.files[0];
     this.validationError = ''; // Clear previous error
@@ -93,11 +86,6 @@ export class OnlineSubmissionFullpageComponent {
     }
   }
 
-  /**
-   * Validates all required fields in the manuscript object.
-   * Returns true if all required fields are filled and valid, false otherwise.
-   * Sets validationError message if any field is blank or invalid.
-   */
   private validateForm(): boolean {
     this.validationError = ''; // Clear previous errors
 
@@ -169,20 +157,12 @@ export class OnlineSubmissionFullpageComponent {
     return true; // All validation checks passed
   }
 
-  /**
-   * Helper function for basic email format validation.
-   * @param email The email string to validate.
-   * @returns True if the email format is valid, false otherwise.
-   */
+  
   private isValidEmail(email: string): boolean {
     // Simple regex for email validation (can be enhanced for stricter validation)
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  /**
-   * Initiates the manuscript submission process.
-   * Performs client-side validation and then sends the manuscript object as JSON.
-   */
   submitManuscript() {
     // Prevent submission if file is still being read
     if (this.isReadingFile) {
