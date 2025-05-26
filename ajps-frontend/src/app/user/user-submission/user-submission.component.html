@@ -19,7 +19,7 @@
         <h4 class="card-title mb-4" style="color: #2e7d32;">Article Submission Form</h4>
 
         <!-- Step Indicator -->
-        <ul class="step-indicator">
+        <!-- <ul class="step-indicator">
             <li [ngClass]="{'active': currentRoute === '/user/submission/manuscript-details', 'completed': isStepCompleted('manuscript-details')}">
                 <a href="#" routerLink="./manuscript-details">1</a>
                 <span class="small">Manuscript Details</span>
@@ -44,14 +44,15 @@
                 <a href="#" routerLink="./submission-confirmation">6</a>
                 <span class="small">Confirmation</span>
             </li>
-        </ul>
+        </ul> -->
         
         <!-- Error Message Placeholder -->
         <div id="submissionError-messageQ" class="alert alert-danger d-none mb-3" role="alert">
             <!-- Dynamic error messages will appear here -->
         </div>
 
-        <router-outlet></router-outlet>
+        <!-- <router-outlet></router-outlet> -->
+         <app-online-submission-fullpage></app-online-submission-fullpage>
             
     </div>
 </div>

@@ -47,6 +47,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/ajps-uploads/**").permitAll()
                             .requestMatchers("/api/user/**").hasAnyRole("USER", "EDITOR", "REVIEWER", "ADMIN")
+                            .requestMatchers("/api/submission/**").hasAnyRole("USER", "EDITOR", "REVIEWER", "ADMIN")
     //                        .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
     //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated()

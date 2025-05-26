@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterModule, RouterOutlet } from '@angular/router';
+import { OnlineSubmissionFullpageComponent } from "./online-submission-fullpage/online-submission-fullpage.component";
 
 @Component({
   selector: 'app-user-submission',
-  imports: [RouterOutlet, CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, OnlineSubmissionFullpageComponent],
   templateUrl: './user-submission.component.html',
   styleUrl: './user-submission.component.css'
 })
