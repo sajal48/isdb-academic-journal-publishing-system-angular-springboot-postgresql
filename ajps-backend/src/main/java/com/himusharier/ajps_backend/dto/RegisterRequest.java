@@ -1,7 +1,6 @@
 package com.himusharier.ajps_backend.dto;
 
-import com.himusharier.ajps_backend.annotation.ValidRole;
-import com.himusharier.ajps_backend.constants.Role;
+import com.himusharier.ajps_backend.constants.UserRole;
 import jakarta.validation.constraints.*;
 
 public record RegisterRequest(
@@ -14,6 +13,6 @@ public record RegisterRequest(
         String password,
 
 //        @ValidRole(message = "Role must be valid.")
-        Role role
+        UserRole userRole
 ) {
 }

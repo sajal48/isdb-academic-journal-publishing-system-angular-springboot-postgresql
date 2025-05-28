@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { ExtraOptions, Routes } from '@angular/router';
 import { HomepageComponent } from './homepage/homepage.component';
 import { ErrorpageComponent } from './errorpage/errorpage.component';
 import { AboutUsComponent } from './about-us/about-us.component';
@@ -97,17 +97,17 @@ export const routes: Routes = [
             {path: 'submission', component: UserSubmissionComponent,
                 canActivate: [authGuardUserGuard], 
                 data: {roles: ['user','editor','reviewer','admin']},
-                // children: [
-                //     {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
-                //     {path: 'manuscript-details', component: SubmissionStepOneComponent, title: 'Manuscript Details Submission - ScholarPress'},
-                //     {path: 'author-informations', component: SubmissionStepTwoComponent, title: 'Author Informations Submission - ScholarPress'},
-                //     {path: 'manuscript-upload', component: SubmissionStepThreeComponent, title: 'Manuscript File Submission - ScholarPress'},
-                //     {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
-                //     {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
-                //     {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
-                //     {path: 'submission-view', component: SubmissionViewComponent, title: 'View Article Submission - ScholarPress'},
-                //     {path: 'submission-edit', component: SubmissionEditComponent, title: 'Edit Article Submission - ScholarPress'},
-                // ]
+                children: [
+                    {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
+                    {path: 'manuscript-details', component: SubmissionStepOneComponent, title: 'Manuscript Details Submission - ScholarPress'},
+                    {path: 'author-informations', component: SubmissionStepTwoComponent, title: 'Author Informations Submission - ScholarPress'},
+                    {path: 'manuscript-upload', component: SubmissionStepThreeComponent, title: 'Manuscript File Submission - ScholarPress'},
+                    {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
+                    {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
+                    {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
+                    {path: 'submission-view', component: SubmissionViewComponent, title: 'View Article Submission - ScholarPress'},
+                    {path: 'submission-edit', component: SubmissionEditComponent, title: 'Edit Article Submission - ScholarPress'},
+                ]
             },
             {path: 'view-profile', component: UserProfileComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Profile - ScholarPress'},
             {path: 'edit-profile', component: UserProfileEditComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Edit Profile - ScholarPress'},

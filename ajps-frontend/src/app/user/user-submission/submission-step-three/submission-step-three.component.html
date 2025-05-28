@@ -10,21 +10,21 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center">
                     <span class="file-name">example.pdf</span>
                     <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-2 rename-btn"><i class="bi bi-pencil"></i> Rename</button>
+                        <!-- <button type="button" class="btn btn-sm btn-outline-primary me-2 rename-btn"><i class="bi bi-pencil"></i> Rename</button> -->
                         <button type="button" class="btn btn-sm btn-outline-danger remove-btn"><i class="bi bi-trash3"></i> Remove</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="mb-3">
-            <label for="articleFile" class="form-label">Manuscript File (DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
+            <label for="articleFile" class="form-label">Manuscript File (ZIP, DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
             <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".doc,.docx,.pdf" required>
         </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
             <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/author-informations"><i class="bi bi-arrow-left-circle"></i> Back</button>
-            <button type="button" class="btn btn-primary" routerLink="/user/submission/suggested-reviewers">Next: Suggested Reviewers <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save</button>
+            <button type="button" class="btn btn-primary" routerLink="/user/submission/suggested-reviewers">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save & Exit</button>
         </div>
     </form>
 </div>

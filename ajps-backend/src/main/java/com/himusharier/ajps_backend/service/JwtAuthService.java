@@ -1,7 +1,7 @@
 package com.himusharier.ajps_backend.service;
 
 import com.himusharier.ajps_backend.constants.UserStatus;
-import com.himusharier.ajps_backend.constants.Role;
+import com.himusharier.ajps_backend.constants.UserRole;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
 import com.himusharier.ajps_backend.model.UserProfile;
@@ -39,8 +39,8 @@ public class JwtAuthService {
         return authRepository.findById(id);
     }
 
-    public List<Auth> getUsersByRole(Role role) {
-        return authRepository.findByRole(role);
+    public List<Auth> getUsersByRole(UserRole userRole) {
+        return authRepository.findByRole(userRole);
     }
 
     @Transactional
@@ -51,8 +51,8 @@ public class JwtAuthService {
 
         auth.setPassword(passwordEncoder.encode(auth.getPassword()));
         //auth.setRole(Role.USER); // setting default role as USER
-        if (auth.getRole() == null) {
-            auth.setRole(Role.USER);
+        if (auth.getUserRole() == null) {
+            auth.setUserRole(UserRole.USER);
         }
         auth.setUserStatus(UserStatus.ACTIVE);
         auth.setOtpUsed(false);
@@ -88,8 +88,8 @@ public class JwtAuthService {
         }
 
         // Update role if provided
-        if (authDetails.getRole() != null) {
-            auth.setRole(authDetails.getRole());
+        if (authDetails.getUserRole() != null) {
+            auth.setUserRole(authDetails.getUserRole());
         }
 
         return authRepository.save(auth);

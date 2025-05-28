@@ -12,9 +12,7 @@ import com.himusharier.ajps_backend.service.JwtAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -54,7 +52,7 @@ public class AuthController {
             Auth auth = new Auth(
                     registerRequest.email(),
                     registerRequest.password(),
-                    registerRequest.role()
+                    registerRequest.userRole()
             );
 
             Auth savedAuth = userService.createAuth(auth);
@@ -104,7 +102,7 @@ public class AuthController {
             Map<String, Object> userData = new HashMap<>();
             userData.put("id", auth.getUserId());
             userData.put("email", auth.getEmail());
-            userData.put("role", auth.getRole());
+            userData.put("role", auth.getUserRole());
 
             responseData.put("user", userData);
 
@@ -131,7 +129,7 @@ public class AuthController {
             AuthResponse authResponse = new AuthResponse();
             authResponse.setId(auth.getUserId());
             authResponse.setEmail(auth.getEmail());
-            authResponse.setRole(auth.getRole());
+            authResponse.setUserRole(auth.getUserRole());
 
             return ResponseEntity.ok(authResponse);
         }

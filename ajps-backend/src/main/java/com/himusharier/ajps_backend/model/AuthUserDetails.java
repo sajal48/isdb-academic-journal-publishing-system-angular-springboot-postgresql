@@ -1,6 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
-import com.himusharier.ajps_backend.constants.Role;
+import com.himusharier.ajps_backend.constants.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +12,7 @@ public record AuthUserDetails(Auth auth) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + auth.getRole().name()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + auth.getUserRole().name()));
     }
 
     @Override
@@ -28,8 +28,8 @@ public record AuthUserDetails(Auth auth) implements UserDetails {
         return auth.getEmail();
     }
 
-    public Role getRole() {
-        return auth.getRole();
+    public UserRole getRole() {
+        return auth.getUserRole();
     }
 
     @Override

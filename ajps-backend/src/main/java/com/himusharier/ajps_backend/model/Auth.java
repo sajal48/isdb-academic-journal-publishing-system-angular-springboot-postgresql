@@ -2,7 +2,7 @@ package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.himusharier.ajps_backend.constants.UserStatus;
-import com.himusharier.ajps_backend.constants.Role;
+import com.himusharier.ajps_backend.constants.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,7 +35,7 @@ public class Auth {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private UserRole userRole;
 
 
     private LocalDateTime createdAt;
@@ -53,11 +53,11 @@ public class Auth {
     private UserProfile userProfile;
 
 
-    public Auth(String email, String password, Role role) {
+    public Auth(String email, String password, UserRole userRole) {
         this.email = email;
         this.password = password;
         //this.role = role;
-        this.role = (role != null) ? role : Role.USER; // default value USER if null
+        this.userRole = (userRole != null) ? userRole : UserRole.USER; // default value USER if null
     }
 
     @PrePersist

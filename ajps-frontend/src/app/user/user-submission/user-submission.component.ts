@@ -5,7 +5,7 @@ import { OnlineSubmissionFullpageComponent } from "./online-submission-fullpage/
 
 @Component({
   selector: 'app-user-submission',
-  imports: [CommonModule, RouterModule, OnlineSubmissionFullpageComponent],
+  imports: [CommonModule, RouterModule], //OnlineSubmissionFullpageComponent
   templateUrl: './user-submission.component.html',
   styleUrl: './user-submission.component.css'
 })

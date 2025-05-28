@@ -15,7 +15,8 @@ export class UserToastNotificationService {
     const toastHtml = `
       <div id="${toastId}" class="toast bg-${type} text-white" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
-          <strong class="me-auto">${title}</strong>
+          <!--<strong class="me-auto">${title}</strong>-->
+          <strong class="me-auto"><i class="bi bi-bell-fill"></i> Notification</strong>
           <!--<small>Just now</small>-->
           <button type="button" class="btn-close btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>

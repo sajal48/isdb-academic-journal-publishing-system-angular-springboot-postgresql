@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NgxLoadingBar } from '@ngx-loading-bar/core';
+import { filter } from 'rxjs/internal/operators/filter';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,13 @@ import { NgxLoadingBar } from '@ngx-loading-bar/core';
 })
 export class AppComponent {
   title = 'ajps-frontend';
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      window.scrollTo(0, 0); // manual scroll to top
+    });
+  }
+
 }
