@@ -7,9 +7,9 @@ public record UserProfileUpdateRequest(
         @NotNull(message = "User id missing from the request.")
         Long userId,
 
-        //@NotBlank(message = "Email is required")
-//        @Email(message = "Invalid email format")
-//        String email,
+        /*@NotBlank(message = "Email is required")
+        @Email(message = "Invalid email format")
+        String email,*/
 
         String nameTitle,
         String firstName,
@@ -25,7 +25,6 @@ public record UserProfileUpdateRequest(
         @Pattern(regexp = "^$|^\\+?[0-9\\s]{7,15}$", message = "Invalid mobile number")
         String mobile,
 
-        // Modified: Accepts an empty string OR the phone number pattern
         @Pattern(regexp = "^$|^\\+?[0-9\\s]{7,15}$", message = "Invalid telephone number")
         String telephone,
 
@@ -39,7 +38,6 @@ public record UserProfileUpdateRequest(
         @Pattern(regexp = "^$|^(https?://)?(www\\.)?facebook\\.com/.*$", message = "Invalid Facebook URL")
         String facebookUrl,
 
-        // Modified: Accepts an empty string OR the Twitter URL pattern
         @Pattern(regexp = "^$|^(https?://)?(www\\.)?twitter\\.com/.*$", message = "Invalid Twitter URL")
         String twitterUrl
 

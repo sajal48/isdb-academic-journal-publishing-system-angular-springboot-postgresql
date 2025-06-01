@@ -4,9 +4,9 @@ import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.UserRole;
 import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.AuthUserDetails;
-import com.himusharier.ajps_backend.model.UserProfile;
+import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.repository.AuthRepository;
-import com.himusharier.ajps_backend.repository.UserProfileRepository;
+import com.himusharier.ajps_backend.repository.ProfileRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -22,13 +22,13 @@ public class JwtAuthService {
 
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserProfileRepository userProfileRepository;
+    private final ProfileRepository profileRepository;
 
     @Autowired
-    public JwtAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, UserProfileRepository userProfileRepository) {
+    public JwtAuthService(AuthRepository authRepository, PasswordEncoder passwordEncoder, ProfileRepository profileRepository) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userProfileRepository = userProfileRepository;
+        this.profileRepository = profileRepository;
     }
 
     public List<Auth> getAllUsers() {
@@ -50,6 +50,7 @@ public class JwtAuthService {
         }
 
         auth.setPassword(passwordEncoder.encode(auth.getPassword()));
+
         //auth.setRole(Role.USER); // setting default role as USER
         if (auth.getUserRole() == null) {
             auth.setUserRole(UserRole.USER);
@@ -60,11 +61,11 @@ public class JwtAuthService {
         Auth saveAuth = authRepository.save(auth);
 
         // create user profile:
-        UserProfile userProfile = new UserProfile();
+        Profile profile = new Profile();
 //        userProfile.setEmail(saveAuth.getEmail());
-        userProfile.setAuth(saveAuth);
+        profile.setAuth(saveAuth);
 
-        userProfileRepository.save(userProfile);
+        profileRepository.save(profile);
 
         return saveAuth;
     }

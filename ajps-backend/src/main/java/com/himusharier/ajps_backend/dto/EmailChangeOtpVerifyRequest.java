@@ -11,7 +11,7 @@ public record EmailChangeOtpVerifyRequest(
         @Email(message = "Email should be valid.")
         String newEmail,
 
-        @NotBlank(message = "OTP missing from the request.")
+        @NotBlank(message = "OTP code is required.")
         Long otp
 
 ) {}

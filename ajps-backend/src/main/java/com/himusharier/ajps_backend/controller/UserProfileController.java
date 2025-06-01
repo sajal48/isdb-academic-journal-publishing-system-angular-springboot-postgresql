@@ -1,9 +1,8 @@
 package com.himusharier.ajps_backend.controller;
 
 import com.himusharier.ajps_backend.dto.*;
-import com.himusharier.ajps_backend.exception.PasswordChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
-import com.himusharier.ajps_backend.model.UserProfile;
+import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.service.UserProfileService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class UserProfileController {
     public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestBody @Valid UserProfileUpdateRequest userProfileUpdateRequest) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
-            UserProfile updateProfile = userProfileService.updateUserProfile(userProfileUpdateRequest);
+            Profile updateProfile = userProfileService.updateUserProfile(userProfileUpdateRequest);
 
             response.put("status", "success");
             response.put("code", HttpStatus.CREATED.value());
@@ -44,11 +43,11 @@ public class UserProfileController {
     public ResponseEntity<Map<String, Object>> userProfileDetails(@PathVariable Long userId) {
         Map<String, Object> response = new LinkedHashMap<>();
 
-        UserProfile userProfile = userProfileService.userProfileDetailsByUserId(userId);
+        Profile profile = userProfileService.userProfileDetailsByUserId(userId);
 
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
-        response.put("data", userProfile);
+        response.put("data", profile);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

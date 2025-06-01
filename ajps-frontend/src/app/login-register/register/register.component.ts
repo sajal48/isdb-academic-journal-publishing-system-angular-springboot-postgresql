@@ -16,7 +16,8 @@ import { map } from 'rxjs/operators';
 export class RegisterComponent {
   user: AuthRegisterLoginRequest = {
     email: '',
-    password: ''
+    password: '',
+    userRole: 'USER'
   }
   confirm_password: string = '';
   passwordMismatch: boolean = false;
@@ -65,7 +66,7 @@ export class RegisterComponent {
           this.serverError = null;
 
           // clear form
-          this.user = {email: '', password: ''};
+          this.user = {email: '', password: '', userRole: ''};
           this.confirm_password = '';
 
         } else {

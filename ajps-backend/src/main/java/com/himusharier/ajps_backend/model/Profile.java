@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "AJPS_USER_PROFILE")
-public class UserProfile {
+@Table(name = "AJPS_PROFILE")
+public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

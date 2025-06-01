@@ -1,16 +1,13 @@
 package com.himusharier.ajps_backend.service;
 
-import com.himusharier.ajps_backend.dto.PasswordChangeRequest;
 import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
 import com.himusharier.ajps_backend.exception.EmailChangeRequestException;
 import com.himusharier.ajps_backend.exception.PasswordChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.Auth;
-import com.himusharier.ajps_backend.model.UserProfile;
+import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.repository.AuthRepository;
-import com.himusharier.ajps_backend.repository.UserProfileRepository;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.himusharier.ajps_backend.repository.ProfileRepository;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +20,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,19 +33,19 @@ public class UserProfileService {
     @Value("${upload.avatar.directory}")
     private String uploadDirectory; // Define in application.properties/yml
 
-    private final UserProfileRepository userProfileRepository;
+    private final ProfileRepository profileRepository;
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     public UserProfileService(
-            UserProfileRepository userProfileRepository,
+            ProfileRepository profileRepository,
             AuthRepository authRepository,
             PasswordEncoder passwordEncoder) {
-        this.userProfileRepository = userProfileRepository;
+        this.profileRepository = profileRepository;
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserProfile updateUserProfile(UserProfileUpdateRequest request) {
+    public Profile updateUserProfile(UserProfileUpdateRequest request) {
         // Step 1: Find Auth by userId
         Optional<Auth> optionalAuth = authRepository.findAll().stream()
                 .filter(a -> a.getUserId().equals(request.userId()))
@@ -60,7 +56,7 @@ public class UserProfileService {
         Auth auth = optionalAuth.get();
 
         // Step 2: Fetch existing UserProfile by Auth.id
-        UserProfile existingProfile = userProfileRepository.findByAuth_Id(auth.getId())
+        Profile existingProfile = profileRepository.findByAuth_Id(auth.getId())
                 .orElseThrow(() -> new UserProfileException("User profile not found for user id: " + request.userId()));
 
         /*UserProfile updateUserProfile = UserProfile.builder()
@@ -101,11 +97,11 @@ public class UserProfileService {
         existingProfile.setFacebookUrl(request.facebookUrl());
         existingProfile.setTwitterUrl(request.twitterUrl());
 
-        return userProfileRepository.save(existingProfile);
+        return profileRepository.save(existingProfile);
 
     }
 
-    public UserProfile userProfileDetailsByUserId(Long userId) {
+    public Profile userProfileDetailsByUserId(Long userId) {
         // Step 1: Find Auth by userId
         Optional<Auth> optionalAuth = authRepository.findByUserId(userId);
 
@@ -116,7 +112,7 @@ public class UserProfileService {
         Auth auth = optionalAuth.get();
 
         // Step 2: Find UserProfile by Auth ID
-        UserProfile profile = userProfileRepository.findByAuth_Id(auth.getId())
+        Profile profile = profileRepository.findByAuth_Id(auth.getId())
                 .orElseThrow(() -> new UserProfileException("User profile not found for user id: " + userId));
 
         // Convert image filename to full URL if exists
@@ -137,8 +133,8 @@ public class UserProfileService {
         Auth auth = authRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Auth with userId " + userId + " not found"));
 
-        UserProfile userProfile = auth.getUserProfile();
-        if (userProfile == null) {
+        Profile profile = auth.getProfile();
+        if (profile == null) {
             throw new RuntimeException("User profile not found for userId " + userId);
         }
 
@@ -170,9 +166,9 @@ public class UserProfileService {
         }
 
         // Step 4: Update DB
-        userProfile.setProfileImage(uniqueFilename);
-        userProfile.setUpdatedAt(LocalDateTime.now());
-        userProfileRepository.save(userProfile);
+        profile.setProfileImage(uniqueFilename);
+        profile.setUpdatedAt(LocalDateTime.now());
+        profileRepository.save(profile);
     }
 
     public void requestEmailChange(Long userId, String newEmail) {

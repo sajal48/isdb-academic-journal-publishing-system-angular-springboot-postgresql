@@ -50,7 +50,7 @@ public class Auth {
     private UserStatus userStatus;
 
     @OneToOne(mappedBy = "auth", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private UserProfile userProfile;
+    private Profile profile;
 
 
     public Auth(String email, String password, UserRole userRole) {
@@ -63,21 +63,14 @@ public class Auth {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-//        updatedAt = LocalDateTime.now();
         userId = generateRandomUserId();
-//        otp = generateRandomOtp();
-//        otpExpireTime = LocalDateTime.now().plusMinutes(5);
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-//        otpExpireTime = LocalDateTime.now().plusMinutes(5);
     }
 
-    /**
-     * Call this method when a new OTP is requested.
-     */
     public void generateNewOtp() {
         this.otp = generateRandomOtp();
         this.otpExpireTime = LocalDateTime.now().plusMinutes(10); // otp valid for 10 minutes
