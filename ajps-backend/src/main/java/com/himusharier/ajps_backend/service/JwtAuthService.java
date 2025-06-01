@@ -40,7 +40,7 @@ public class JwtAuthService {
     }
 
     public List<Auth> getUsersByRole(UserRole userRole) {
-        return authRepository.findByRole(userRole);
+        return authRepository.findByUserRole(userRole);
     }
 
     @Transactional

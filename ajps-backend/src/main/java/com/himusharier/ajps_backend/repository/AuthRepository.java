@@ -15,7 +15,7 @@ public interface AuthRepository extends JpaRepository<Auth, Long> {
 
     boolean existsByEmail(String email);
 
-    List<Auth> findByRole(UserRole userRole);
+    List<Auth> findByUserRole(UserRole userRole);
 
     Optional<Auth> findByUserId(Long userId);
 }
