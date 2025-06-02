@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserProfileService {
+public class ProfileService {
 
     @Value("${app.base.url}")
     private String baseUrl;
@@ -36,7 +36,7 @@ public class UserProfileService {
     private final ProfileRepository profileRepository;
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
-    public UserProfileService(
+    public ProfileService(
             ProfileRepository profileRepository,
             AuthRepository authRepository,
             PasswordEncoder passwordEncoder) {

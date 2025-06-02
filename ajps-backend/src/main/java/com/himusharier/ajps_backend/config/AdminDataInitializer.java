@@ -26,23 +26,25 @@ public class AdminDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String adminEmail = "admin@ajps.com";
+        String adminEmail = "admin@mail.com";
         String adminPass = "admin123";
 
-        if (authRepository.findByEmail(adminEmail).isEmpty()) {
-            Auth admin = new Auth();
-            admin.setEmail(adminEmail);
-            admin.setPassword(passwordEncoder.encode(adminPass)); // use a strong password in real apps
-            admin.setUserRole(UserRole.ADMIN);
-            admin.setUserStatus(UserStatus.ACTIVE);
-            authRepository.save(admin);
+        try {
+            if (authRepository.findByEmail(adminEmail).isEmpty()) {
+                Auth admin = new Auth();
+                admin.setEmail(adminEmail);
+                admin.setPassword(passwordEncoder.encode(adminPass));
+                admin.setUserRole(UserRole.ADMIN);
+                admin.setUserStatus(UserStatus.ACTIVE);
+                authRepository.save(admin);
 
-            Profile profile = Profile.builder()
-                    .auth(admin)
-                    .build();
-            profileRepository.save(profile);
+                Profile profile = Profile.builder()
+                        .auth(admin)
+                        .build();
+                profileRepository.save(profile);
+            }
 
-        } else {
+        } catch (RuntimeException e) {
             throw new RegisterRequestException("Admin account not created!");
         }
     }

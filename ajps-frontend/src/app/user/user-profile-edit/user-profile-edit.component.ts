@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserProfile } from '../../site-settings/interface/user-profile-interface';
+import { UserProfile } from '../../site-settings/interfaces/user-profile-interface';
 import { UserProfileDetailsService } from '../../site-settings/user-profile/user-profile-details.service';
 import { FormsModule } from '@angular/forms';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';

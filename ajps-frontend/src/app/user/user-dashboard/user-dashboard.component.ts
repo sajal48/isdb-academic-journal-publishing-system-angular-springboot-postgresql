@@ -1,6 +1,8 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, NgIf } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { UserSubmissionDetailsService } from '../../site-settings/submission/user-submission-details.service';
+import { SubmissionList } from '../../site-settings/interfaces/submission-list-interface';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -8,6 +10,26 @@ import { RouterLink } from '@angular/router';
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.css'
 })
-export class UserDashboardComponent {
+export class UserDashboardComponent implements OnInit {
+  userId = 0;
+  submissions: SubmissionList[] = [];
+
+  constructor(
+    private userSubmissionDetailsService: UserSubmissionDetailsService
+
+  ) {}
+
+  ngOnInit(): void {
+    this.userSubmissionDetailsService.getSubmissionList().subscribe({
+      next: (response) => {
+        this.submissions = response.data;
+        // console.log(response);
+
+      },
+      error: (error) => {
+        console.error('Error fetching submissions', error)
+      }
+    });
+  }
 
 }

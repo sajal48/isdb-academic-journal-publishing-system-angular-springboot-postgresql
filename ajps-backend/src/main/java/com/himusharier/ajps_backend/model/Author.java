@@ -14,4 +14,19 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String affiliation;
+
+    @Column(nullable = false)
+    private String email;
+
+    private String orcidId;
+
+    @ManyToOne
+    @JoinColumn(name = "submission_id", nullable = false)
+    private Submission submission;
 }

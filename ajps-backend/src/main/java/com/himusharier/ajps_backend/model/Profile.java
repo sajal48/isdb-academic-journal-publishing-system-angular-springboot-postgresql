@@ -1,6 +1,8 @@
 package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.himusharier.ajps_backend.util.TimeUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,7 +29,6 @@ public class Profile {
     private Auth auth;
 
 //    private String email;
-
     private String nameTitle;
     private String firstName;
     private String middleName;
@@ -34,23 +36,36 @@ public class Profile {
     private String professionalTitle;
     private String educationalQualification;
     private String institute;
+
     private String expertise;
+
     private String mobile;
     private String telephone;
     private String country;
+
     private String address;
+
     private String zipCode;
     private String facebookUrl;
     private String twitterUrl;
 
     private String profileImage;
 
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Submission> submissionList;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = TimeUtil.timeInBDT();
+    }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = TimeUtil.timeInBDT();
     }
 
 }

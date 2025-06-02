@@ -3,17 +3,16 @@ package com.himusharier.ajps_backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.UserRole;
+import com.himusharier.ajps_backend.util.TimeUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Random;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,27 +52,28 @@ public class Auth {
     private Profile profile;
 
 
-    public Auth(String email, String password, UserRole userRole) {
+    /*public Auth(String email, String password, UserRole userRole) {
         this.email = email;
         this.password = password;
         //this.role = role;
         this.userRole = (userRole != null) ? userRole : UserRole.USER; // default value USER if null
-    }
+    }*/
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = TimeUtil.timeInBDT();
+        updatedAt = TimeUtil.timeInBDT();
         userId = generateRandomUserId();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = TimeUtil.timeInBDT();
     }
 
     public void generateNewOtp() {
         this.otp = generateRandomOtp();
-        this.otpExpireTime = LocalDateTime.now().plusMinutes(10); // otp valid for 10 minutes
+        this.otpExpireTime = TimeUtil.timeInBDT().plusMinutes(10); // otp valid for 10 minutes
         this.isOtpUsed = false;
     }
 

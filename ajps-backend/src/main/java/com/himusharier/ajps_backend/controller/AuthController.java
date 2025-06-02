@@ -45,15 +45,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(
-            @Valid @RequestBody RegisterRequest registerRequest
-    ) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            Auth auth = new Auth(
-                    registerRequest.email(),
-                    registerRequest.password(),
-                    registerRequest.userRole()
-            );
+            Auth auth = Auth.builder()
+                    .email(registerRequest.email())
+                    .password(registerRequest.password())
+                    .userRole(registerRequest.userRole())
+                    .build();
 
             Auth savedAuth = userService.createAuth(auth);
 

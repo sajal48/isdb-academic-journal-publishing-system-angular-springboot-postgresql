@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthRegisterLoginRequest } from '../../site-settings/interface/auth-register-login-request';
+import { AuthRegisterLoginRequest } from '../../site-settings/interfaces/auth-register-login-request';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { CommonModule } from '@angular/common';
 import { SafeHtml } from '@angular/platform-browser';

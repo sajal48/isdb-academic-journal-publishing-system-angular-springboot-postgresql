@@ -101,4 +101,13 @@ public class ApplicationExceptionHandler {
         return response;
     }
 
+    @ExceptionHandler(SubmissionRequestException.class)
+    public Map<String, Object> submissionRequestException(SubmissionRequestException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.BAD_REQUEST.value());
+        response.put("message", ex.getMessage());
+        return response;
+    }
+
 }

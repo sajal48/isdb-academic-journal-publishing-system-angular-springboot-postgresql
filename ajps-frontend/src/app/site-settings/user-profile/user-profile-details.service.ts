@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { UserProfile } from '../interface/user-profile-interface';
+import { UserProfile } from '../interfaces/user-profile-interface';
 import { Observable } from 'rxjs';
 import { apiConfig } from '../configs/api-config';
 import { AuthLoginRegisterService } from '../auth/auth-login-register.service';
