@@ -9,4 +9,7 @@ public class TimeUtil {
     public static LocalDateTime timeInBDT() {
         return LocalDateTime.now(BDT_ZONE);
     }
+    /*public static LocalDateTime timeInBDT() {
+        return LocalDateTime.now();
+    }*/
 }

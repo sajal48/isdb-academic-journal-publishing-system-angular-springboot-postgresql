@@ -17,9 +17,14 @@ export class UserSubmissionDetailsService {
   ) {}
 
   getSubmissionList(): Observable<{status: string, code: number, data: SubmissionList[]}> {
-  const headers = new HttpHeaders({'Content-Type': 'application/json'});
-  const userId = this.authLoginRegisterService.getUserID();
-  return this.http.get<{status: string, code: number, data: SubmissionList[]}>(`${apiConfig.apiBaseUrl}/user/submission/submission-list/${userId}`, {headers});
-}
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    const userId = this.authLoginRegisterService.getUserID();
+    return this.http.get<{status: string, code: number, data: SubmissionList[]}>(`${apiConfig.apiBaseUrl}/user/submission/submission-list/${userId}`, {headers});
+  }
+
+  saveManuscriptDetails(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript-details`, payload, { headers });
+  }
 
 }

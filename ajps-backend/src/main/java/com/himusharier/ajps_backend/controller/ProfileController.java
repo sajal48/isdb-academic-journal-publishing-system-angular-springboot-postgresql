@@ -23,13 +23,12 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    Map<String, Object> response = new LinkedHashMap<>();
-
     @PutMapping("/update")
     public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestBody @Valid UserProfileUpdateRequest userProfileUpdateRequest) {
         try {
             profileService.updateUserProfile(userProfileUpdateRequest);
 
+            Map<String, Object> response = new LinkedHashMap<>();
             response.put("status", "success");
             response.put("code", HttpStatus.CREATED.value());
             response.put("message", "User profile updated successfully.");
@@ -44,6 +43,7 @@ public class ProfileController {
     public ResponseEntity<Map<String, Object>> userProfileDetails(@PathVariable Long userId) {
         Profile profile = profileService.userProfileDetailsByUserId(userId);
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("data", profile);
@@ -56,12 +56,14 @@ public class ProfileController {
         try {
             profileService.saveUserAvatar(userId, file);
 
+            Map<String, Object> response = new LinkedHashMap<>();
             response.put("status", "success");
             response.put("code", HttpStatus.OK.value());
             response.put("message", "Profile picture uploaded successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception e) {
+            Map<String, Object> response = new LinkedHashMap<>();
             response.put("status", "error");
             response.put("code", HttpStatus.BAD_REQUEST.value());
             response.put("message", "Failed to upload profile picture.");
@@ -73,6 +75,7 @@ public class ProfileController {
     public ResponseEntity<?> requestEmailChange(@RequestBody EmailChangeRequest request) {
         profileService.requestEmailChange(request.userId(), request.newEmail());
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("message", "OTP sent to: " + request.newEmail());
@@ -83,6 +86,7 @@ public class ProfileController {
     public ResponseEntity<?> verifyEmailOtp(@RequestBody EmailChangeOtpVerifyRequest request) {
         profileService.verifyAndChangeEmail(request.userId(), request.newEmail(), request.otp());
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("message", "Email changed successfully.");
@@ -93,6 +97,7 @@ public class ProfileController {
     public ResponseEntity<?> passwordChange(@RequestBody PasswordChangeRequest request) {
         profileService.requestPasswordChange(request.userId(), request.userEmail(), request.currentPassword());
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("message", "OTP sent to: " + request.userEmail());
@@ -103,6 +108,7 @@ public class ProfileController {
     public ResponseEntity<?> verifyPasswordOtp(@RequestBody PasswordChangeOtpVerifyRequest request) {
         profileService.verifyAndChangePassword(request.userId(), request.currentPassword(), request.newPassword(), request.otp());
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("message", "Password changed successfully.");

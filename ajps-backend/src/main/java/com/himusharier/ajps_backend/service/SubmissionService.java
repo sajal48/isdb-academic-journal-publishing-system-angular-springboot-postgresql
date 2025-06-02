@@ -25,6 +25,7 @@ public class SubmissionService {
                 .manuscriptCategory(request.manuscriptCategory())
                 .abstractContent(request.abstractContent())
                 .manuscriptKeywords(request.manuscriptKeywords())
+                .completedSteps(request.completedSteps())
                 .submissionStatus(SubmissionStatus.SAVED)
                 .profile(profile)
                 .build();

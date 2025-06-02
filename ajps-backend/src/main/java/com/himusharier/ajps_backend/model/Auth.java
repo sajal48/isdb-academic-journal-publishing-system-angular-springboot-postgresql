@@ -36,7 +36,6 @@ public class Auth {
     @Column(nullable = false)
     private UserRole userRole;
 
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -51,13 +50,6 @@ public class Auth {
     @OneToOne(mappedBy = "auth", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Profile profile;
 
-
-    /*public Auth(String email, String password, UserRole userRole) {
-        this.email = email;
-        this.password = password;
-        //this.role = role;
-        this.userRole = (userRole != null) ? userRole : UserRole.USER; // default value USER if null
-    }*/
 
     @PrePersist
     protected void onCreate() {

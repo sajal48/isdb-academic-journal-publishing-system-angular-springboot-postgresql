@@ -19,7 +19,9 @@ public record ManuscriptDetailsRequest(
         String abstractContent,
 
         @NotBlank(message = "Keywords should not left blank.")
-        String manuscriptKeywords
+        String manuscriptKeywords,
+
+        String completedSteps
 
 ) {
 }

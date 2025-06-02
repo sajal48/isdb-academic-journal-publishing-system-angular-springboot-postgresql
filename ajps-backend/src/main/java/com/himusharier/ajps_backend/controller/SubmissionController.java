@@ -26,9 +26,6 @@ public class SubmissionController {
         this.profileService = profileService;
     }
 
-    Map<String, Object> response = new LinkedHashMap<>();
-
-
     @GetMapping("/submission-list/{userId}")
     public ResponseEntity<?> submissionList(@PathVariable Long userId) {
         Profile profile = profileService.userProfileDetailsByUserId(userId);
@@ -46,6 +43,7 @@ public class SubmissionController {
                 )
                 .toList();
 
+        Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", "success");
         response.put("code", HttpStatus.OK.value());
         response.put("data", submissionList);
@@ -59,6 +57,7 @@ public class SubmissionController {
         try {
             submissionService.saveManuscriptDetails(request, profile);
 
+            Map<String, Object> response = new LinkedHashMap<>();
             response.put("status", "success");
             response.put("code", HttpStatus.CREATED.value());
             response.put("message", "Manuscript details saved successfully.");

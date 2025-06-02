@@ -108,7 +108,6 @@ public class ProfileService {
         if (optionalAuth.isEmpty()) {
             throw new UserProfileException("User not found with user id: " + userId);
         }
-
         Auth auth = optionalAuth.get();
 
         // Step 2: Find UserProfile by Auth ID
