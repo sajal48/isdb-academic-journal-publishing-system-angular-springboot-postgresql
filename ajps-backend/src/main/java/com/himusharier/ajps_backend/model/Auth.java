@@ -3,7 +3,7 @@ package com.himusharier.ajps_backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.UserRole;
-import com.himusharier.ajps_backend.util.TimeUtil;
+import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -53,19 +53,19 @@ public class Auth {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = TimeUtil.timeInBDT();
-        updatedAt = TimeUtil.timeInBDT();
+        createdAt = BdtZoneTimeUtil.timeInBDT();
+        updatedAt = BdtZoneTimeUtil.timeInBDT();
         userId = generateRandomUserId();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = TimeUtil.timeInBDT();
+        updatedAt = BdtZoneTimeUtil.timeInBDT();
     }
 
     public void generateNewOtp() {
         this.otp = generateRandomOtp();
-        this.otpExpireTime = TimeUtil.timeInBDT().plusMinutes(10); // otp valid for 10 minutes
+        this.otpExpireTime = BdtZoneTimeUtil.timeInBDT().plusMinutes(10); // otp valid for 10 minutes
         this.isOtpUsed = false;
     }
 

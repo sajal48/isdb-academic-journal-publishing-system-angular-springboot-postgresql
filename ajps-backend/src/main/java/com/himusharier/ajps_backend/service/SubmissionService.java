@@ -9,7 +9,7 @@ import com.himusharier.ajps_backend.repository.SubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SubmissionService {
@@ -28,6 +28,17 @@ public class SubmissionService {
 
         } else {
             throw new SubmissionRequestException("Submission not found for given user and submission ID.");
+        }
+    }
+
+    public Submission returnSubmission(Long submissionId) {
+        Optional<Submission> optionalSubmission = submissionRepository.findById(submissionId);
+
+        if (optionalSubmission.isPresent()) {
+            return optionalSubmission.get();
+
+        } else {
+            throw new SubmissionRequestException("Submission not found for given submission ID.");
         }
     }
 
@@ -68,6 +79,34 @@ public class SubmissionService {
 //        Submission updateSubmission = submissionRepository.save(existingSubmission);
         return submissionRepository.save(existingSubmission);
     }
+
+    @Transactional
+    public void updateCompletedSteps(Long submissionId, List<String> completedSteps) {
+        Submission existingSubmission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + submissionId));
+
+        // Use LinkedHashSet to preserve insertion order and avoid duplicates
+        Set<String> steps = new LinkedHashSet<>();
+
+        // Load existing steps (split by comma)
+        if (existingSubmission.getCompletedSteps() != null && !existingSubmission.getCompletedSteps().isEmpty()) {
+            Arrays.stream(existingSubmission.getCompletedSteps().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .forEach(steps::add);
+        }
+
+        // Add new steps, trim and filter empty strings
+        completedSteps.stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .forEach(steps::add);
+
+        // Set updated comma-separated steps back to entity
+        existingSubmission.setCompletedSteps(String.join(",", steps));
+        submissionRepository.save(existingSubmission);
+    }
+
 
 
 }

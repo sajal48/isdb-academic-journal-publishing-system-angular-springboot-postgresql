@@ -7,27 +7,27 @@
         <ul class="step-indicator">
             <li [ngClass]="{'active': currentRoute === '/user/submission/manuscript-details', 'completed': isStepCompleted('manuscript-details')}">
                 <a>1</a>
-                <span class="small">Manuscript Details</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/manuscript-details', 'small': true}">Manuscript Details</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/author-informations', 'completed': isStepCompleted('author-informations')}">
                 <a>2</a>
-                <span class="small">Author Information</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/author-informations', 'small': true}">Author Information</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/manuscript-upload', 'completed': isStepCompleted('manuscript-upload')}">
                 <a>3</a>
-                <span class="small">Manuscript Upload</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/manuscript-upload', 'small': true}">Manuscript Upload</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/suggested-reviewers', 'completed': isStepCompleted('suggested-reviewers')}">
                 <a>4</a>
-                <span class="small">Suggested Reviewers</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/suggested-reviewers', 'small': true}">Suggested Reviewers</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/additional-informations', 'completed': isStepCompleted('additional-informations')}">
                 <a>5</a>
-                <span class="small">Additional Information</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/additional-informations', 'small': true}">Additional Information</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/submission-confirmation'}">
                 <a>6</a>
-                <span class="small">Confirmation</span>
+                <span [ngClass]="{'text-primary': currentRoute === '/user/submission/submission-confirmation', 'small': true}">Confirmation</span>
             </li>
         </ul>
 

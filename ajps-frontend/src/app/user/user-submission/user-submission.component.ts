@@ -30,7 +30,7 @@ export class UserSubmissionComponent implements OnInit {
     });
 
     this.submissionId = this.userSubmissionDetailsService.getSubmissionId();
-    
+
     if (this.submissionId) {
       this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(this.submissionId)
         .subscribe({next: (response: any) => {

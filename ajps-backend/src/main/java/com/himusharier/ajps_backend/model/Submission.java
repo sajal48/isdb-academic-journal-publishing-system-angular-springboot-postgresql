@@ -1,20 +1,19 @@
 package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
-import com.himusharier.ajps_backend.util.TimeUtil;
+import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -54,6 +53,7 @@ public class Submission implements Serializable {
     private String completedSteps;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Author> authors;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -69,16 +69,16 @@ public class Submission implements Serializable {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = TimeUtil.timeInBDT();
+        createdAt = BdtZoneTimeUtil.timeInBDT();
 //        updatedAt = TimeUtil.timeInBDT();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = TimeUtil.timeInBDT();
+        updatedAt = BdtZoneTimeUtil.timeInBDT();
     }
 
     public void setSubmissionDateTime() {
-        this.submittedAt = TimeUtil.timeInBDT();
+        this.submittedAt = BdtZoneTimeUtil.timeInBDT();
     }
 }

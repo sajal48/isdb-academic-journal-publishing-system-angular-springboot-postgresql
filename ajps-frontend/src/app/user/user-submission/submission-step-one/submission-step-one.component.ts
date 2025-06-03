@@ -22,8 +22,7 @@ interface ManuscriptDetails {
 })
 export class SubmissionStepOneComponent implements OnInit {
   userId: number = 0;
-  // submissionId: number = 0;
-  
+  // submissionId: number = 0;  
   validationError: string = '';
 
   manuscript: ManuscriptDetails = {
@@ -118,8 +117,8 @@ export class SubmissionStepOneComponent implements OnInit {
     };
 
     const request = existingSubmissionId
-      ? this.userSubmissionDetailsService.updateManuscriptDetails(payload) // 👈 update request
-      : this.userSubmissionDetailsService.saveManuscriptDetails(payload); // 👈 insert request
+      ? this.userSubmissionDetailsService.updateManuscriptDetails(payload) 
+      : this.userSubmissionDetailsService.saveManuscriptDetails(payload); 
 
     request.subscribe({
       next: (response) => {
@@ -127,11 +126,14 @@ export class SubmissionStepOneComponent implements OnInit {
           this.userToastNotificationService.showToast('Success', `${response.message}`, 'success');
 
           if (!existingSubmissionId) {
-            this.userSubmissionDetailsService.setSubmissionId(response.submissionId); // only set if insert
+            this.userSubmissionDetailsService.setSubmissionId(response.data.submissionId); // only set if insert
           }
 
           // this.router.navigate(['/user/submission/author-informations']);
-          window.location.href="/user/submission/author-informations";
+          // window.location.href="/user/submission/author-informations";
+          setInterval(() => {
+            window.location.href="/user/submission/author-informations";
+          }, 500);
         } else {
           this.userToastNotificationService.showToast('Error', `${response.message}`, 'danger');
         }

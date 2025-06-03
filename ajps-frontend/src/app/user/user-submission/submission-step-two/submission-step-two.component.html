@@ -1,45 +1,58 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Author Information</h5>
     
-    <!-- Display list of added authors -->
-    <div class="mb-3" *ngIf="authors && authors.length > 0">
-        <h6>Added Authors</h6>
-        <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let author of authors; let i = index">
-                <span>{{ author.name }} ({{ author.email }}) - {{ author.institution }} {{ author.isCorresponding ? '(Corresponding Author)' : '' }}</span>
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAuthor(i)">Remove</button>
-            </li>
-        </ul>
+    <!-- Display list of added authors in cards side by side -->
+    <div class="mb-3" *ngIf="authors && authors.length > 0" style="padding-bottom: 20px;">
+        <!-- <h6>Added Authors</h6> -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="col" *ngFor="let author of authors; let i = index">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h6>{{ author.name }}</h6>
+                        <p class="card-text">
+                            {{ author.email }}<br>
+                            {{ author.institution }}<br>
+                            <span *ngIf="author.corresponding" class="badge bg-primary" style="font-weight: 400; border-radius: 25px;">Corresponding Author</span>
+                        </p>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAuthor(i)"><i class="bi bi-trash"></i> Remove</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <form id="authorInformationForm" #authorInformationForm="ngForm" (ngSubmit)="onSubmit(authorInformationForm)">
         <div class="mb-3">
-            <label for="corresponding-author" class="form-label">Author Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="corresponding-author" name="corresponding-author" placeholder="Enter full name" [(ngModel)]="newAuthor.name" required>
+            <label for="authorName" class="form-label">Author Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name" [(ngModel)]="authorDetails.name" required>
         </div>
-        <div class="mb-3">
-            <label for="author-email" class="form-label">Author Email <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="author-email" name="author-email" placeholder="Enter institutional email" [(ngModel)]="newAuthor.email" required>
-        </div>
-        <div class="mb-3">
-            <label for="institution" class="form-label">Institution/Organization <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" [(ngModel)]="newAuthor.institution" required>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="authorEmail" class="form-label">Author Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" [(ngModel)]="authorDetails.email" required>
+            </div>
+            <div class="col-md-6">
+                <label for="institution" class="form-label">Institution/Organization <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" [(ngModel)]="authorDetails.institution" required>
+            </div>
         </div>
         <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="is-corresponding" name="is-corresponding" [(ngModel)]="newAuthor.isCorresponding">
-            <label class="form-check-label" for="is-corresponding">Mark as Corresponding Author</label>
+            <input type="checkbox" class="form-check-input" id="corresponding" name="corresponding" [(ngModel)]="authorDetails.corresponding">
+            <label class="form-check-label" for="corresponding">Mark as Corresponding Author</label>
         </div>
         
         <!-- Add Author Button -->
         <div class="mb-3">
-            <button type="button" class="btn btn-outline-primary" (click)="addAuthor()">Add Author</button>
+            <button type="button" class="btn btn-outline-primary" (click)="addAuthor()"><i class="bi bi-person-add"></i> Add Author</button>
         </div>
 
         <hr class="my-4">
         <div class="d-flex gap-3">
             <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/manuscript-details"><i class="bi bi-arrow-left-circle"></i> Back</button>
-            <button type="submit" class="btn btn-primary" routerLink="/user/submission/manuscript-upload">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary" (click)="onSaveAndExit(authorInformationForm)"><i class="bi bi-floppy"></i> Save & Exit</button>
+            <button type="submit" class="btn btn-primary">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary" (click)="exitToDashboard()"><i class="bi bi-signpost"></i> Exit to Dashboard</button>
         </div>
     </form>
 </div>

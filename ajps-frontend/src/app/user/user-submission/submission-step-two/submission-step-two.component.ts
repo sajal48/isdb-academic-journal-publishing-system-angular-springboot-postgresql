@@ -6,20 +6,11 @@ import { UserSubmissionDetailsService } from '../../../site-settings/submission/
 import { UserToastNotificationService } from '../../../site-settings/user-profile/user-toast-notification.service';
 import { CommonModule } from '@angular/common';
 
-interface ManuscriptDetails {
-  journalName: string;
-  manuscriptTitle: string;
-  manuscriptCategory: string;
-  abstractContent: string;
-  manuscriptKeywords: string;
-  completedSteps: string;
-}
-
-interface Author {
+interface AuthorDetails {
   name: string;
   email: string;
   institution: string;
-  isCorresponding: boolean;
+  corresponding: boolean;
 }
 
 @Component({
@@ -30,36 +21,25 @@ interface Author {
 })
 export class SubmissionStepTwoComponent implements OnInit {
   userId: number = 0;
-  submissionId: number = 0;
+  submissionId: string | null = '';
   validationError: string = '';
 
-  manuscript: ManuscriptDetails = {
-    journalName: '',
-    manuscriptTitle: '',
-    manuscriptCategory: '',
-    abstractContent: '',
-    manuscriptKeywords: '',
-    completedSteps: 'manuscript-details'
-  };
-
-  authors: Author[] = [];
-  newAuthor: Author = {
+  authors: AuthorDetails[] = [];
+  
+  authorDetails: AuthorDetails = {
     name: '',
     email: '',
     institution: '',
-    isCorresponding: false
+    corresponding: false
   };
 
   private fieldDisplayNames: { [key: string]: string } = {
-    journalName: 'Journal Selection',
-    manuscriptTitle: 'Manuscript Title',
-    manuscriptCategory: 'Manuscript Category',
-    abstractContent: 'Abstract',
-    manuscriptKeywords: 'Keywords',
-    authorName: 'Author Name',
-    authorEmail: 'Author Email',
-    authorInstitution: 'Institution/Organization'
+    name: 'Author Name',
+    email: 'Author Email',
+    institution: 'Institution'
   };
+
+  private emailRegex: RegExp = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   constructor(
     private userSubmissionDetailsService: UserSubmissionDetailsService,
@@ -71,102 +51,126 @@ export class SubmissionStepTwoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Initialize component, potentially fetch existing submission data if needed
+    this.submissionId = this.userSubmissionDetailsService.getSubmissionId();
+
+    if (this.submissionId) {
+      this.loadAuthors();
+    }
+  }
+
+  loadAuthors(): void {
+    this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(this.submissionId)
+      .subscribe({
+        next: (response) => {
+          if (response.code === 200 && Array.isArray(response.data.authors)) {
+            this.authors = response.data.authors.map((author: any) => ({
+              name: author.name || '',
+              email: author.email || '',
+              institution: author.institution || '',
+              corresponding: author.corresponding || false
+            }));
+          }
+        },
+        error: (err) => {
+          console.error('Error loading authors:', err);
+        }
+      });
   }
 
   addAuthor() {
-    if (this.newAuthor.name && this.newAuthor.email && this.newAuthor.institution) {
-      // Check if another author is already marked as corresponding
-      if (this.newAuthor.isCorresponding && this.authors.some(author => author.isCorresponding)) {
-        this.validationError = 'Only one author can be marked as the corresponding author.';
-        this.userToastNotificationService.showToast('Error', this.validationError, 'danger');
-        return;
-      }
-      this.authors.push({ ...this.newAuthor });
-      this.newAuthor = { name: '', email: '', institution: '', isCorresponding: false }; // Reset form
-      this.validationError = '';
-    } else {
+    // Check if all fields are filled
+    if (!this.authorDetails.name || !this.authorDetails.email || !this.authorDetails.institution) {
       this.validationError = 'Please fill out all author fields.';
       this.userToastNotificationService.showToast('Error', this.validationError, 'danger');
-    }
-  }
-
-  removeAuthor(index: number) {
-    this.authors.splice(index, 1);
-  }
-
-  private validateForm(): boolean {
-    this.validationError = ''; // Clear previous errors
-
-    // Define the list of required manuscript fields to check
-    const requiredFields: (keyof ManuscriptDetails)[] = [
-      'journalName',
-      'manuscriptTitle',
-      'manuscriptCategory',
-      'abstractContent',
-      'manuscriptKeywords'
-    ];
-
-    for (const field of requiredFields) {
-      const displayName = this.fieldDisplayNames[field] || field;
-      if (typeof this.manuscript[field] === 'string' && (this.manuscript[field] as string).trim() === '') {
-        this.validationError = `Please fill out the '${displayName}' field.`;
-        return false;
-      }
+      return;
     }
 
-    // Validate that at least one author is added
-    if (this.authors.length === 0) {
-      this.validationError = 'Please add at least one author.';
-      return false;
+    // Validate email format
+    if (!this.emailRegex.test(this.authorDetails.email)) {
+      this.validationError = 'Please enter a valid email address.';
+      this.userToastNotificationService.showToast('Error', this.validationError, 'danger');
+      return;
     }
 
-    // Validate that exactly one author is marked as corresponding
-    const correspondingAuthors = this.authors.filter(author => author.isCorresponding);
-    if (correspondingAuthors.length !== 1) {
-      this.validationError = 'Exactly one author must be marked as the corresponding author.';
-      return false;
+    // Check if another author is already marked as corresponding
+    if (this.authorDetails.corresponding && this.authors.some(author => author.corresponding)) {
+      this.validationError = 'Only one author can be marked as the corresponding author.';
+      this.userToastNotificationService.showToast('Error', this.validationError, 'danger');
+      return;
     }
-
-    return true;
-  }
-
-  onSubmit(form: NgForm): boolean {
-    if (!this.validateForm()) {
-      this.userToastNotificationService.showToast('Error', `${this.validationError}`, 'danger');
-      return false;
-    }
-
+    
     const payload = {
-      userId: this.userId,
-      ...this.manuscript,
-      authors: this.authors
+      submissionId: this.submissionId,
+      authors: [{ ...this.authorDetails }] // Send as array with single author
     };
 
-    this.userSubmissionDetailsService.saveManuscriptDetails(payload).subscribe({
+    this.userSubmissionDetailsService.saveAuthorInformations(payload).subscribe({
       next: (response) => {
         if (response.code === 200 || response.code === 201) {
-          this.userToastNotificationService.showToast('Success', `${response.message}`, 'success');
-          this.submissionId = response.submissionId;
-          this.router.navigate(['/user/submission/manuscript-upload']);
-          return true;
+          this.authors.push({ ...this.authorDetails });
+          this.authorDetails = { name: '', email: '', institution: '', corresponding: false };
+          this.validationError = '';
+          this.userToastNotificationService.showToast('Success', 'Author added successfully.', 'success');
         } else {
-          this.userToastNotificationService.showToast('Error', `${response.message}`, 'danger');
-          return false;
+          this.userToastNotificationService.showToast('Error', 'Failed to add author.', 'danger');
         }
       },
       error: (error) => {
         console.error(error);
-        this.userToastNotificationService.showToast('Error', 'An error occurred while submitting.', 'danger');
-        return false;
+        this.userToastNotificationService.showToast('Error', 'An error occurred while adding author.', 'danger');
+      }
+    });
+  }
+
+  removeAuthor(index: number) {
+    const authorToRemove = this.authors[index];
+    
+    this.userSubmissionDetailsService.removeAuthor(this.submissionId, authorToRemove.email).subscribe({
+      next: (response) => {
+        if (response.code === 200) {
+          this.authors.splice(index, 1);
+          this.userToastNotificationService.showToast('Success', 'Author removed successfully.', 'success');
+        } else {
+          this.userToastNotificationService.showToast('Error', 'Failed to remove author.', 'danger');
+        }
+      },
+      error: (error) => {
+        console.error(error);
+        this.userToastNotificationService.showToast('Error', 'An error occurred while removing author.', 'danger');
+      }
+    });
+  }
+
+  onSubmit(form: NgForm): boolean {
+    if (this.authors.length < 1 || !this.authors.some(author => author.corresponding)) {
+      this.userToastNotificationService.showToast('Error', 'Add at least one corresponding author.', 'danger');
+      return false;
+    }
+    
+    const payload = {
+      submissionId: this.submissionId,
+      completedSteps: ["author-informations"] // Mark this step as completed
+    };
+
+    this.userSubmissionDetailsService.updateSubmissionSteps(payload).subscribe({
+      next: (response) => {
+        if (response.code === 200) {
+          this.userToastNotificationService.showToast('Success', 'Author information saved successfully.', 'success');
+          this.router.navigate(['/user/submission/manuscript-upload']);
+        } else {
+          this.userToastNotificationService.showToast('Error', 'Failed to save author informations.', 'danger');
+        }
+      },
+      error: (error) => {
+        console.error(error);
+        this.userToastNotificationService.showToast('Error', 'An error occurred while saving.', 'danger');
       }
     });
     return true;
   }
 
-  onSaveAndExit(form: NgForm) {
-    if (this.onSubmit(form)) {
-      this.router.navigate(['/user/dashboard']);
-    }
+  exitToDashboard(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+    this.router.navigate(['/user/dashboard']);
   }
 }

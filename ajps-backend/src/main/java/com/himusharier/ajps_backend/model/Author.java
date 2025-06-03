@@ -1,11 +1,11 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,17 +16,18 @@ public class Author {
     private Long id;
 
     @Column(nullable = false)
-    private String fullName;
-
-    @Column(nullable = false)
-    private String affiliation;
+    private String name;
 
     @Column(nullable = false)
     private String email;
 
-    private String orcidId;
+    @Column(nullable = false)
+    private String institution;
+
+    private boolean isCorresponding;
 
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
+    @JsonBackReference
     private Submission submission;
 }

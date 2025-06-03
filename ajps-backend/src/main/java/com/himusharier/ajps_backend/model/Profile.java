@@ -2,17 +2,15 @@ package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.himusharier.ajps_backend.util.TimeUtil;
+import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Entity
 @AllArgsConstructor
@@ -60,12 +58,12 @@ public class Profile {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = TimeUtil.timeInBDT();
+        createdAt = BdtZoneTimeUtil.timeInBDT();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = TimeUtil.timeInBDT();
+        updatedAt = BdtZoneTimeUtil.timeInBDT();
     }
 
 }

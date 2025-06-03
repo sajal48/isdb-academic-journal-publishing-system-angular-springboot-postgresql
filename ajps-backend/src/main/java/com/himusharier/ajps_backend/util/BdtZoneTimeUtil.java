@@ -3,7 +3,7 @@ package com.himusharier.ajps_backend.util;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-public class TimeUtil {
+public class BdtZoneTimeUtil {
     private static final ZoneId BDT_ZONE = ZoneId.of("Asia/Dhaka");
 
     public static LocalDateTime timeInBDT() {
