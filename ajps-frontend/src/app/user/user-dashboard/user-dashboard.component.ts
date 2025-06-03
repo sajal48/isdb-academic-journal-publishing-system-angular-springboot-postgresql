@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../site-settings/submission/user-submission-details.service';
@@ -20,6 +20,8 @@ export class UserDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+
     this.userSubmissionDetailsService.getSubmissionList().subscribe({
       next: (response) => {
         this.submissions = response.data;

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -20,8 +20,9 @@ interface ManuscriptDetails {
   templateUrl: './submission-step-one.component.html',
   styleUrl: '../user-submission.component.css'
 })
-export class SubmissionStepOneComponent {
-  userId = 0;
+export class SubmissionStepOneComponent implements OnInit {
+  userId: number = 0;
+  // submissionId: number = 0;
   
   validationError: string = '';
 
@@ -35,7 +36,7 @@ export class SubmissionStepOneComponent {
   };
   
   private fieldDisplayNames: { [key: string]: string } = {
-    journalName: 'Journal',
+    journalName: 'Journal Selection',
     manuscriptTitle: 'Manuscript Title',
     manuscriptCategory: 'Manuscript Category',
     abstractContent: 'Abstract',
@@ -43,12 +44,38 @@ export class SubmissionStepOneComponent {
   };
 
   constructor(
-    private submissionService: UserSubmissionDetailsService,
+    private userSubmissionDetailsService: UserSubmissionDetailsService,
     private authService: AuthLoginRegisterService,
-    private userToastNotificationService: UserToastNotificationService
+    private userToastNotificationService: UserToastNotificationService,
+    private router: Router
 
   ) {
     this.userId = authService.getUserID();
+  }
+
+  ngOnInit(): void {
+    const existingSubmissionId = this.userSubmissionDetailsService.getSubmissionId();
+    if (existingSubmissionId) {
+      this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(existingSubmissionId)
+        .subscribe({
+          next: (response) => {
+            if (response.code === 200 && response.data) {
+              const data = response.data;
+              this.manuscript = {
+                journalName: data.journalName || '',
+                manuscriptTitle: data.manuscriptTitle || '',
+                manuscriptCategory: data.manuscriptCategory || '',
+                abstractContent: data.abstractContent || '',
+                manuscriptKeywords: data.manuscriptKeywords || '',
+                completedSteps: data.completedSteps || 'manuscript-details'
+              };
+            }
+          },
+          error: (err) => {
+            console.error('Error loading manuscript details:', err);
+          }
+        });
+    }
   }
 
   private validateForm(): boolean {
@@ -82,16 +109,28 @@ export class SubmissionStepOneComponent {
       return;
     }
 
+    const existingSubmissionId = this.userSubmissionDetailsService.getSubmissionId();
+
     const payload = {
       userId: this.userId,
+      submissionId: existingSubmissionId,
       ...this.manuscript
     };
 
-    this.submissionService.saveManuscriptDetails(payload).subscribe({
+    const request = existingSubmissionId
+      ? this.userSubmissionDetailsService.updateManuscriptDetails(payload) // 👈 update request
+      : this.userSubmissionDetailsService.saveManuscriptDetails(payload); // 👈 insert request
+
+    request.subscribe({
       next: (response) => {
         if (response.code === 200 || response.code === 201) {
           this.userToastNotificationService.showToast('Success', `${response.message}`, 'success');
 
+          if (!existingSubmissionId) {
+            this.userSubmissionDetailsService.setSubmissionId(response.submissionId); // only set if insert
+          }
+
+          this.router.navigate(['/user/submission/author-informations']);
         } else {
           this.userToastNotificationService.showToast('Error', `${response.message}`, 'danger');
         }
@@ -100,6 +139,12 @@ export class SubmissionStepOneComponent {
         console.error(error);
       }
     });
+
+  }
+
+  exitToDashboard(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+    this.router.navigate(['/user/dashboard']);
   }
 
 }

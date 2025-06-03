@@ -1,9 +1,9 @@
 package com.himusharier.ajps_backend.controller;
 
 import com.himusharier.ajps_backend.config.JwtTokenProvider;
-import com.himusharier.ajps_backend.dto.LoginRequest;
-import com.himusharier.ajps_backend.dto.RegisterRequest;
-import com.himusharier.ajps_backend.dto.AuthResponse;
+import com.himusharier.ajps_backend.dto.request.LoginRequest;
+import com.himusharier.ajps_backend.dto.request.RegisterRequest;
+import com.himusharier.ajps_backend.dto.response.AuthResponse;
 import com.himusharier.ajps_backend.exception.LoginRequestException;
 import com.himusharier.ajps_backend.exception.RegisterRequestException;
 import com.himusharier.ajps_backend.model.Auth;

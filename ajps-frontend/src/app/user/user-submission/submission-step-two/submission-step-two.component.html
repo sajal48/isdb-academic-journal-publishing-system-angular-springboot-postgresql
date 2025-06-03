@@ -1,6 +1,6 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Author Information</h5>
-    <form id="authorInformationForm">
+    <form id="authorInformationForm"  #authorInformationForm="ngForm" (ngSubmit)="onSubmit(authorInformationForm)">
         <div class="mb-3">
             <label for="corresponding-author" class="form-label">Corresponding Author Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="corresponding-author" name="corresponding-author" placeholder="Enter full name" required>
@@ -16,8 +16,8 @@
         <hr class="my-4">
         <div class="d-flex gap-3">
             <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/manuscript-details"><i class="bi bi-arrow-left-circle"></i> Back</button>
-            <button type="button" class="btn btn-primary" routerLink="/user/submission/manuscript-upload">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save & Exit</button>
+            <button type="submit" class="btn btn-primary" routerLink="/user/submission/manuscript-upload">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onSaveAndExit(authorInformationForm)"><i class="bi bi-floppy"></i> Save & Exit</button>
         </div>
     </form>
 </div>

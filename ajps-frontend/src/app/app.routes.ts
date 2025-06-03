@@ -52,7 +52,6 @@ import { SubmissionStepFiveComponent } from './user/user-submission/submission-s
 import { SubmissionStepFourComponent } from './user/user-submission/submission-step-four/submission-step-four.component';
 import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
 import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
-import { SubmissionEditComponent } from './user/user-submission/submission-edit/submission-edit.component';
 import { authGuardUserGuard } from './site-settings/auth/auth-guard-user.guard';
 
 export const routes: Routes = [
@@ -106,7 +105,6 @@ export const routes: Routes = [
                     {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
                     {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
                     {path: 'submission-view', component: SubmissionViewComponent, title: 'View Article Submission - ScholarPress'},
-                    {path: 'submission-edit', component: SubmissionEditComponent, title: 'Edit Article Submission - ScholarPress'},
                 ]
             },
             {path: 'view-profile', component: UserProfileComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Profile - ScholarPress'},

@@ -7,8 +7,14 @@
 <div class="row mb-4 px-2">
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Submitted Papers</h6>
-            <h3>0</h3>
+            <h6>Your Manuscripts</h6>
+            <h3>
+                @if (submissions.length > 0) {
+                    {{ submissions.length }}
+                } @else {
+                    0
+                }
+            </h3>
             <small>All time</small>
         </div>
     </div>
@@ -21,7 +27,7 @@
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Accepted Papers</h6>
+            <h6>Accepted Manuscripts</h6>
             <h3>0</h3>
             <small>Published</small>
         </div>
@@ -42,34 +48,37 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Journal</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
+                    <th>Manuscript Title</th>
+                    <th>Journal Name</th>
+                    <th>Manuscript Status</th>
+                    <th>Submission Date</th>
                     <th>Last Update</th>
                 </tr>
             </thead>
             <tbody  *ngFor="let submission of submissions">
                 <tr style="border: 1px solid #fff;">
-                    <td>{{ submission.manuscriptTitle }}</td>
-                    <td>{{ submission.journalName }}</td>
-                    <td>
-                    <span class="badge bg-warning text-dark">{{ submission.submissionStatus }}</span>
-                    </td>
-                    <td>{{ submission.submittedAt | date: 'yyyy-MM-dd' }}</td>
-                    <td>{{ submission.updatedAt | date: 'yyyy-MM-dd' }}</td>
+                    <td class="text-nowrap text-truncate" style="max-width: 200px;">{{ submission.manuscriptTitle }}</td>
+                    <td class="text-nowrap">{{ submission.journalName }}</td>
+                    <td><span class="badge">{{ submission.submissionStatus }}</span></td>
+                    <!-- <td>{{ submission.submittedAt | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ submission.updatedAt | date: 'yyyy-MM-dd' }}</td> -->
                 </tr>
                 <tr>
                     <td colspan="5">
-                    <button routerLink="/user/submission/submission-edit" class="btn btn-sm btn-link" style="padding-left: 0;"><i class="bi bi-pencil"></i> Edit Submission</button>
+                    <button routerLink="/user/submission/submission-edit" class="btn btn-sm btn-link" style="padding-left: 0;"><i class="bi bi-pencil"></i> Edit Manuscript</button>
                     <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
                     <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
                     <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button>
                     <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button>
+                    <button class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
+                    <button class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
                     </td>
-                </tr>
+                </tr>                
             </tbody>
         </table>
+            @if (submissions.length < 1) {
+                <a style="text-align: center; display: block; font-size: 18px; color: #ccc; font-style: italic;">No Submission Found</a>
+            }
     </div>
 </div>
 

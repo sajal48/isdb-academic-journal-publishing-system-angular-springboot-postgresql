@@ -82,6 +82,7 @@ form {
 .step-indicator li.completed a::before {
     content: '\f26e'; /* Bootstrap Icons checkmark */
     font-family: 'bootstrap-icons';
+    margin-left: -5px;
 }
 .step-indicator li:not(:last-child)::after {
     content: '';
@@ -98,10 +99,10 @@ form {
 .step-indicator li.completed:not(:last-child)::after {
     background-color: #2e7d32;
 } */
-.step-indicator li a:hover {
+/* .step-indicator li a:hover {
     background-color: #2e7d32;
     color: white;
-}
+} */
 .step-indicator li.completed a:hover::before {
     content: '\f26e'; /* Ensure checkmark persists on hover */
     font-family: 'bootstrap-icons';

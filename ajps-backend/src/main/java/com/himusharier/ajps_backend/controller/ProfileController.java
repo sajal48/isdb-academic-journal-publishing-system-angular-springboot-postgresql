@@ -1,6 +1,6 @@
 package com.himusharier.ajps_backend.controller;
 
-import com.himusharier.ajps_backend.dto.*;
+import com.himusharier.ajps_backend.dto.request.*;
 import com.himusharier.ajps_backend.exception.UserProfileException;
 import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.service.ProfileService;
@@ -50,7 +50,7 @@ public class ProfileController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/picture-upload")
     public ResponseEntity<?> uploadAvatar(@RequestParam("userId") Long userId,
                                           @RequestParam("picture") MultipartFile file) {
         try {

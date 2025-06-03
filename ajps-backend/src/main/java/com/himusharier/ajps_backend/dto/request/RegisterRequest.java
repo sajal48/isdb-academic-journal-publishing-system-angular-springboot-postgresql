@@ -1,4 +1,4 @@
-package com.himusharier.ajps_backend.dto;
+package com.himusharier.ajps_backend.dto.request;
 
 import com.himusharier.ajps_backend.annotation.ValidRole;
 import com.himusharier.ajps_backend.constants.UserRole;

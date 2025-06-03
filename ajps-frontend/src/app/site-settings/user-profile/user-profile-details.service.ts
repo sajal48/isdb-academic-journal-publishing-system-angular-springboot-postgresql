@@ -34,7 +34,7 @@ export class UserProfileDetailsService {
     formData.append('picture', file);
     formData.append('userId', userId.toString());
 
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/profile/upload`, formData);
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/profile/picture-upload`, formData);
   }
 
 }

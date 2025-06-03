@@ -1,6 +1,5 @@
-package com.himusharier.ajps_backend.dto;
+package com.himusharier.ajps_backend.dto.request;
 
-import com.himusharier.ajps_backend.model.Auth;
 import jakarta.validation.constraints.*;
 
 public record UserProfileUpdateRequest(

@@ -1,4 +1,4 @@
-package com.himusharier.ajps_backend.dto;
+package com.himusharier.ajps_backend.dto.response;
 
 import com.himusharier.ajps_backend.constants.UserRole;
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.himusharier.ajps_backend.service;
 
-import com.himusharier.ajps_backend.dto.UserProfileUpdateRequest;
+import com.himusharier.ajps_backend.dto.request.UserProfileUpdateRequest;
 import com.himusharier.ajps_backend.exception.EmailChangeRequestException;
 import com.himusharier.ajps_backend.exception.PasswordChangeRequestException;
 import com.himusharier.ajps_backend.exception.UserProfileException;
@@ -153,7 +153,18 @@ public class ProfileService {
 
         Path filePath = uploadPath.resolve(uniqueFilename);
 
-        // Step 3: Compress and Save
+        // Step 3: Delete previous image if exists
+        String previousImage = profile.getProfileImage();
+        if (previousImage != null && !previousImage.isBlank()) {
+            Path previousImagePath = uploadPath.resolve(previousImage);
+            try {
+                Files.deleteIfExists(previousImagePath);
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to delete previous image");
+            }
+        }
+
+        // Step 4: Compress and Save
         try (InputStream input = file.getInputStream();
              OutputStream output = Files.newOutputStream(filePath)) {
 
@@ -165,6 +176,7 @@ public class ProfileService {
         }
 
         // Step 4: Update DB
+        // delete previous picture first then save the new one
         profile.setProfileImage(uniqueFilename);
         profile.setUpdatedAt(LocalDateTime.now());
         profileRepository.save(profile);

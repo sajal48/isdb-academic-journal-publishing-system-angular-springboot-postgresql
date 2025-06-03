@@ -6,27 +6,27 @@
         <!-- Step Indicator -->
         <ul class="step-indicator">
             <li [ngClass]="{'active': currentRoute === '/user/submission/manuscript-details', 'completed': isStepCompleted('manuscript-details')}">
-                <a href="#" routerLink="./manuscript-details">1</a>
+                <a>1</a>
                 <span class="small">Manuscript Details</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/author-informations', 'completed': isStepCompleted('author-informations')}">
-                <a href="#" routerLink="./author-informations">2</a>
+                <a>2</a>
                 <span class="small">Author Information</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/manuscript-upload', 'completed': isStepCompleted('manuscript-upload')}">
-                <a href="#" routerLink="./manuscript-upload">3</a>
+                <a>3</a>
                 <span class="small">Manuscript Upload</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/suggested-reviewers', 'completed': isStepCompleted('suggested-reviewers')}">
-                <a href="#" routerLink="./suggested-reviewers">4</a>
+                <a>4</a>
                 <span class="small">Suggested Reviewers</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/additional-informations', 'completed': isStepCompleted('additional-informations')}">
-                <a href="#" routerLink="./additional-informations">5</a>
+                <a>5</a>
                 <span class="small">Additional Information</span>
             </li>
             <li [ngClass]="{'active': currentRoute === '/user/submission/submission-confirmation'}">
-                <a href="#" routerLink="./submission-confirmation">6</a>
+                <a>6</a>
                 <span class="small">Confirmation</span>
             </li>
         </ul>

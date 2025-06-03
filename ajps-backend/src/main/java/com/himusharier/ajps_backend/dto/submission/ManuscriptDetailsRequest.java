@@ -3,7 +3,7 @@ package com.himusharier.ajps_backend.dto.submission;
 import jakarta.validation.constraints.NotBlank;
 
 public record ManuscriptDetailsRequest(
-        @NotBlank(message = "User id is not found in request")
+        @NotBlank(message = "User Id is not found in request")
         Long userId,
 
         @NotBlank(message = "Journal name should not left blank.")
@@ -21,7 +21,9 @@ public record ManuscriptDetailsRequest(
         @NotBlank(message = "Keywords should not left blank.")
         String manuscriptKeywords,
 
-        String completedSteps
+        String completedSteps,
+
+        Long submissionId
 
 ) {
 }

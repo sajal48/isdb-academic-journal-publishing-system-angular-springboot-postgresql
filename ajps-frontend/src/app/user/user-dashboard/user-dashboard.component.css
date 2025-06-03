@@ -30,6 +30,10 @@ table > tbody > tr > td> button {
     box-shadow: none;
     border-radius: 2px;
     font-size: 12px;
+    border: 1px solid #6e8efb;
+    border-radius: 25px;
+    color: #6e8efb;
+    font-weight: bold;
 }
 
 .page-title {
