@@ -1,18 +1,40 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Author Information</h5>
-    <form id="authorInformationForm"  #authorInformationForm="ngForm" (ngSubmit)="onSubmit(authorInformationForm)">
+    
+    <!-- Display list of added authors -->
+    <div class="mb-3" *ngIf="authors && authors.length > 0">
+        <h6>Added Authors</h6>
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let author of authors; let i = index">
+                <span>{{ author.name }} ({{ author.email }}) - {{ author.institution }} {{ author.isCorresponding ? '(Corresponding Author)' : '' }}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeAuthor(i)">Remove</button>
+            </li>
+        </ul>
+    </div>
+
+    <form id="authorInformationForm" #authorInformationForm="ngForm" (ngSubmit)="onSubmit(authorInformationForm)">
         <div class="mb-3">
-            <label for="corresponding-author" class="form-label">Corresponding Author Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="corresponding-author" name="corresponding-author" placeholder="Enter full name" required>
+            <label for="corresponding-author" class="form-label">Author Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="corresponding-author" name="corresponding-author" placeholder="Enter full name" [(ngModel)]="newAuthor.name" required>
         </div>
         <div class="mb-3">
-            <label for="author-email" class="form-label">Corresponding Author Email <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="author-email" name="author-email" placeholder="Enter institutional email" required>
+            <label for="author-email" class="form-label">Author Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="author-email" name="author-email" placeholder="Enter institutional email" [(ngModel)]="newAuthor.email" required>
         </div>
         <div class="mb-3">
             <label for="institution" class="form-label">Institution/Organization <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" required>
+            <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" [(ngModel)]="newAuthor.institution" required>
         </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="is-corresponding" name="is-corresponding" [(ngModel)]="newAuthor.isCorresponding">
+            <label class="form-check-label" for="is-corresponding">Mark as Corresponding Author</label>
+        </div>
+        
+        <!-- Add Author Button -->
+        <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary" (click)="addAuthor()">Add Author</button>
+        </div>
+
         <hr class="my-4">
         <div class="d-flex gap-3">
             <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/manuscript-details"><i class="bi bi-arrow-left-circle"></i> Back</button>

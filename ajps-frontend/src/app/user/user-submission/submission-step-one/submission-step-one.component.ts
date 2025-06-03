@@ -130,7 +130,8 @@ export class SubmissionStepOneComponent implements OnInit {
             this.userSubmissionDetailsService.setSubmissionId(response.submissionId); // only set if insert
           }
 
-          this.router.navigate(['/user/submission/author-informations']);
+          // this.router.navigate(['/user/submission/author-informations']);
+          window.location.href="/user/submission/author-informations";
         } else {
           this.userToastNotificationService.showToast('Error', `${response.message}`, 'danger');
         }

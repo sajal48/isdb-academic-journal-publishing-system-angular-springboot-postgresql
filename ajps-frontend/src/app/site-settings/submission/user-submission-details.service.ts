@@ -45,7 +45,7 @@ export class UserSubmissionDetailsService {
     return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/update/manuscript-details`, payload, { headers });
   }
 
-  getManuscriptDetailsBySubmissionId(submissionId: string): Observable<any> {
+  getManuscriptDetailsBySubmissionId(submissionId: string | null): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const userId = this.authLoginRegisterService.getUserID();
     return this.http.get(`${apiConfig.apiBaseUrl}/user/submission/submission-details/${userId}/${submissionId}`, { headers });
