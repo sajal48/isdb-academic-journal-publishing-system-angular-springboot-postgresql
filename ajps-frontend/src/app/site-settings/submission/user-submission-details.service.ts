@@ -64,4 +64,13 @@ export class UserSubmissionDetailsService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/update/manuscript-details`, payload, { headers });
   }
+
+  uploadManuscriptFile(formData: FormData): Observable<any> {
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/upload/manuscript-files`, formData);
+  }
+
+  removeManuscriptFile(submissionId: string | null, fileName: string): Observable<any> {
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove/manuscript/${submissionId}/${fileName}`);
+  }
+
 }

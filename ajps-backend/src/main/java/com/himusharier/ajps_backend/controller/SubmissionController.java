@@ -15,6 +15,7 @@ import com.himusharier.ajps_backend.util.UserSubmissionListMapperUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -194,6 +195,27 @@ public class SubmissionController {
                         HttpStatus.OK.value(),
                         "Author information saved successfully."),
                 HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/upload/manuscript-files")
+    public ResponseEntity<SuccessResponseModel<Void>> uploadManuscript(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("submissionId") Long submissionId) {
+        // Implement file storage logic
+        submissionService.saveManuscriptFile(submissionId, file);
+        return ResponseEntity.ok(
+                new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File uploaded successfully"));
+    }
+
+    @DeleteMapping("/remove/manuscript/{submissionId}/{fileName}")
+    public ResponseEntity<SuccessResponseModel<Void>> removeManuscript(
+            @PathVariable Long submissionId,
+            @PathVariable String fileName) {
+        submissionService.removeManuscriptFile(submissionId, fileName);
+        return ResponseEntity.ok(
+                new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File removed successfully"));
     }
 
 
