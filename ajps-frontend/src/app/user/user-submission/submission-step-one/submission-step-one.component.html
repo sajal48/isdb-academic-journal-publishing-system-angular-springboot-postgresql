@@ -2,7 +2,7 @@
     <h5 class="mb-3 text-primary">Manuscript Details</h5>
     <form id="manuscriptDetailsForm"  #manuscriptForm="ngForm" (ngSubmit)="onSubmit(manuscriptForm)">
         <div class="mb-3">
-            <label class="form-label">Select Journal</label>
+            <label class="form-label">Select Journal <span class="text-danger">*</span></label>
             <select class="form-select" name="journalName" [(ngModel)]="manuscript.journalName">
             <option value="" disabled>Select a journal</option>
             <option value="plants-and-ecosystem">Plants and Ecosystem</option>
@@ -14,12 +14,12 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Manuscript Title</label>
+            <label class="form-label">Manuscript Title <span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="manuscriptTitle" [(ngModel)]="manuscript.manuscriptTitle">
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Category</label>
+            <label class="form-label">Category <span class="text-danger">*</span></label>
             <select class="form-select" name="manuscriptCategory" [(ngModel)]="manuscript.manuscriptCategory">
             <option value="" disabled>Select a category</option>
             <option value="research">Research Article</option>
@@ -31,12 +31,12 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Abstract</label>
+            <label class="form-label">Abstract <span class="text-danger">*</span></label>
             <textarea class="form-control" name="abstractContent" rows="5" [(ngModel)]="manuscript.abstractContent"></textarea>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Keywords</label>
+            <label class="form-label">Keywords <span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="manuscriptKeywords" [(ngModel)]="manuscript.manuscriptKeywords">
         </div>
         <hr class="my-4">

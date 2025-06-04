@@ -156,7 +156,11 @@ export class SubmissionStepTwoComponent implements OnInit {
       next: (response) => {
         if (response.code === 200) {
           this.userToastNotificationService.showToast('Success', 'Author information saved successfully.', 'success');
-          this.router.navigate(['/user/submission/manuscript-upload']);
+          // this.router.navigate(['/user/submission/manuscript-upload']);
+          setInterval(() => {
+            window.location.href="/user/submission/manuscript-upload";
+          }, 500);
+
         } else {
           this.userToastNotificationService.showToast('Error', 'Failed to save author informations.', 'danger');
         }

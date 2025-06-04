@@ -189,9 +189,10 @@ public class SubmissionController {
     public ResponseEntity<SuccessResponseModel<Map<String, Object>>> updateCompletedSteps(@RequestBody AuthorInformationRequest request) {
         submissionService.updateCompletedSteps(request.submissionId(), request.completedSteps());
 
-        return new ResponseEntity<>(new SuccessResponseModel<>(
-                HttpStatus.OK.value(),
-                "Author information saved successfully."),
+        return new ResponseEntity<>(
+                new SuccessResponseModel<>(
+                        HttpStatus.OK.value(),
+                        "Author information saved successfully."),
                 HttpStatus.OK);
     }
 
