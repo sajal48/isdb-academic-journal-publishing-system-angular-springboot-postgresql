@@ -166,27 +166,8 @@ userId: number = 0;
       });
   }
 
-  saveAndExit(): void {
-    if (this.uploadedFiles.length > 0) {
-      const payload = {
-        submissionId: this.submissionId,
-        completedSteps: ['manuscript-upload']
-      };
-
-      this.userSubmissionDetailsService.updateSubmissionSteps(payload)
-        .subscribe({
-          next: () => {
-            this.userSubmissionDetailsService.clearSubmissionId();
-            this.router.navigate(['/user/dashboard']);
-          },
-          error: (error) => {
-            console.error(error);
-            this.userToastNotificationService.showToast('Error', 'Failed to save progress.', 'danger');
-          }
-        });
-    } else {
-      this.userSubmissionDetailsService.clearSubmissionId();
-      this.router.navigate(['/user/dashboard']);
-    }
+  exitToDashboard(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+    this.router.navigate(['/user/dashboard']);
   }
 }
