@@ -6,4 +6,6 @@ export interface SubmissionList {
   submissionStatus: string;
   submittedAt: string;
   updatedAt: string;
+  paymentDue: boolean;
+  editable: boolean;
 }

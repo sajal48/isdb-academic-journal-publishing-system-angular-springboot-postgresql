@@ -63,6 +63,7 @@ public class SubmissionService {
                 .manuscriptKeywords(request.manuscriptKeywords())
                 .completedSteps(request.completedSteps())
                 .submissionStatus(SubmissionStatus.SAVED)
+                .isEditable(true)
                 .profile(profile)
                 .build();
 
@@ -121,7 +122,7 @@ public class SubmissionService {
 
 
 
-
+/*
     @Transactional
     public void saveManuscriptFile(Long submissionId, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -177,7 +178,7 @@ public class SubmissionService {
             submissionRepository.save(submission);
         }
     }
-
+*/
 
 
 }

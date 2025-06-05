@@ -57,8 +57,8 @@ public class AuthorService {
     }
 
     @Transactional
-    public void removeAuthor(Long submissionId, String authorEmail) {
-        authorRepository.deleteBySubmissionIdAndEmail(submissionId, authorEmail);
+    public void removeAuthor(Long submissionId, Long authorId) {
+        authorRepository.deleteBySubmissionIdAndId(submissionId, authorId);
     }
 
 }

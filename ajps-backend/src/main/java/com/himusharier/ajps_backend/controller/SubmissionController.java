@@ -3,7 +3,7 @@ package com.himusharier.ajps_backend.controller;
 import com.himusharier.ajps_backend.dto.response.SuccessResponseModel;
 import com.himusharier.ajps_backend.dto.submission.AuthorInformationRequest;
 import com.himusharier.ajps_backend.dto.submission.ManuscriptDetailsRequest;
-import com.himusharier.ajps_backend.dto.submission.SubmissionListResponse;
+import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.Author;
 import com.himusharier.ajps_backend.model.Profile;
@@ -173,11 +173,11 @@ public class SubmissionController {
                 HttpStatus.OK);
     }
 
-    @DeleteMapping("/remove-author/{submissionId}/{authorEmail}")
+    @DeleteMapping("/remove-author/{submissionId}/{authorId}")
     public ResponseEntity<SuccessResponseModel<Void>> removeAuthor(
             @PathVariable Long submissionId,
-            @PathVariable String authorEmail) {
-        authorService.removeAuthor(submissionId, authorEmail);
+            @PathVariable Long authorId) {
+        authorService.removeAuthor(submissionId, authorId);
         return new ResponseEntity<>(
                 new SuccessResponseModel<>(
                         HttpStatus.OK.value(),
@@ -204,16 +204,16 @@ public class SubmissionController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("submissionId") Long submissionId) {
         // Implement file storage logic
-        submissionService.saveManuscriptFile(submissionId, file);
+//        submissionService.saveManuscriptFile(submissionId, file);
         return ResponseEntity.ok(
                 new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File uploaded successfully"));
     }
 
-    @DeleteMapping("/remove/manuscript/{submissionId}/{fileName}")
+    @DeleteMapping("/remove/manuscript/{submissionId}/{fileId}")
     public ResponseEntity<SuccessResponseModel<Void>> removeManuscript(
             @PathVariable Long submissionId,
             @PathVariable String fileName) {
-        submissionService.removeManuscriptFile(submissionId, fileName);
+//        submissionService.removeManuscriptFile(submissionId, fileName);
         return ResponseEntity.ok(
                 new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File removed successfully"));
     }

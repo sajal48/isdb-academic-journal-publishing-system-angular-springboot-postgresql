@@ -16,12 +16,19 @@
     /* border-radius: 10px; */
     overflow: hidden;
 }
+table th {
+    font-weight: bold;
+    color: #0063A9;
+}
 table, tr, th, td {
-    font-size: 14px !important;
-    vertical-align: middle;
+    font-size: 16px !important;
+    vertical-align: top;
 }
 table > tbody > tr > td> button {
     margin-right: 5px;
+}
+table > tbody > tr > td> button:first-child {
+    padding-left: 0;
 }
 
 .badge {
@@ -32,7 +39,7 @@ table > tbody > tr > td> button {
     font-size: 12px;
     border: 1px solid #6e8efb;
     border-radius: 25px;
-    color: #6e8efb;
+    color: #a777e3;
     font-weight: bold;
 }
 
@@ -56,4 +63,17 @@ table > tbody > tr > td> button {
 .btn-link {
     text-decoration: none;
     font-weight: 400;
+}
+
+.journal-name {
+    font-size: 14px;
+    color: #858484;
+}
+
+.manuscript-name {
+    text-decoration: none;
+    color: inherit;
+}
+.manuscript-name:hover {
+    text-decoration: underline;
 }

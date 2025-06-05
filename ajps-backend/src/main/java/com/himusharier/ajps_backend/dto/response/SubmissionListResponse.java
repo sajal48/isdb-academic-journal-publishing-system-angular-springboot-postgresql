@@ -1,4 +1,4 @@
-package com.himusharier.ajps_backend.dto.submission;
+package com.himusharier.ajps_backend.dto.response;
 
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import java.time.LocalDateTime;
@@ -10,6 +10,7 @@ public record SubmissionListResponse(
         String manuscriptCategory,
         SubmissionStatus submissionStatus,
         LocalDateTime submittedAt,
-        LocalDateTime updatedAt
-
+        LocalDateTime updatedAt,
+        boolean paymentDue,
+        boolean editable
 ) {}

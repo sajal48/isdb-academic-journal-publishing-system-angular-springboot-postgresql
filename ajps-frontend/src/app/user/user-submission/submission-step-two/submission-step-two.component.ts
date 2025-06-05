@@ -7,6 +7,7 @@ import { UserToastNotificationService } from '../../../site-settings/user-profil
 import { CommonModule } from '@angular/common';
 
 interface AuthorDetails {
+  id: number;
   name: string;
   email: string;
   institution: string;
@@ -27,6 +28,7 @@ export class SubmissionStepTwoComponent implements OnInit {
   authors: AuthorDetails[] = [];
   
   authorDetails: AuthorDetails = {
+    id: 0,
     name: '',
     email: '',
     institution: '',
@@ -64,6 +66,7 @@ export class SubmissionStepTwoComponent implements OnInit {
         next: (response) => {
           if (response.code === 200 && Array.isArray(response.data.authors)) {
             this.authors = response.data.authors.map((author: any) => ({
+              id: author.id || 0,
               name: author.name || '',
               email: author.email || '',
               institution: author.institution || '',
@@ -108,7 +111,7 @@ export class SubmissionStepTwoComponent implements OnInit {
       next: (response) => {
         if (response.code === 200 || response.code === 201) {
           this.authors.push({ ...this.authorDetails });
-          this.authorDetails = { name: '', email: '', institution: '', corresponding: false };
+          this.authorDetails = {id: 0, name: '', email: '', institution: '', corresponding: false };
           this.validationError = '';
           this.userToastNotificationService.showToast('Success', 'Author added successfully.', 'success');
         } else {
@@ -123,9 +126,9 @@ export class SubmissionStepTwoComponent implements OnInit {
   }
 
   removeAuthor(index: number) {
-    const authorToRemove = this.authors[index];
-    
-    this.userSubmissionDetailsService.removeAuthor(this.submissionId, authorToRemove.email).subscribe({
+    const authorId = this.authors[index].id;
+    debugger
+    this.userSubmissionDetailsService.removeAuthor(this.submissionId, authorId).subscribe({
       next: (response) => {
         if (response.code === 200) {
           this.authors.splice(index, 1);

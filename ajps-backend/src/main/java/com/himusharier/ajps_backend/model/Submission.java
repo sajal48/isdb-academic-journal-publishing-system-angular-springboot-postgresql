@@ -10,6 +10,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 @Entity
 @Getter
@@ -23,6 +24,9 @@ public class Submission implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(updatable = false, nullable = false, unique = true)
+    private Long submissionNumber;
 
     @Column(nullable = false)
     private String journalName;
@@ -51,13 +55,14 @@ public class Submission implements Serializable {
 
     private boolean isPaymentDue;
     private String completedSteps;
+    private boolean isEditable;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Author> authors;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Files> files;
+    private List<FileUpload> files;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reviewer> reviewers;
@@ -71,6 +76,7 @@ public class Submission implements Serializable {
     protected void onCreate() {
         createdAt = BdtZoneTimeUtil.timeInBDT();
 //        updatedAt = TimeUtil.timeInBDT();
+        submissionNumber = generateRandomSubmissionNumber();
     }
 
     @PreUpdate
@@ -80,5 +86,9 @@ public class Submission implements Serializable {
 
     public void setSubmissionDateTime() {
         this.submittedAt = BdtZoneTimeUtil.timeInBDT();
+    }
+
+    private Long generateRandomSubmissionNumber() {
+        return 100000L + new Random().nextInt(900000); // 6-digit number
     }
 }

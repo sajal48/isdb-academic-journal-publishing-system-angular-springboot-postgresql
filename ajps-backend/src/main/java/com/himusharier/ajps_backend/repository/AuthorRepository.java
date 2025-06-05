@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
 
-    void deleteBySubmissionIdAndEmail(Long submissionId, String authorEmail);
+    void deleteBySubmissionIdAndId(Long submissionId, Long authorId);
 
 //    List<Author> findBySubmissionId(String submissionId);
 

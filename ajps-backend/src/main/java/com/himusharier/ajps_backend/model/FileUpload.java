@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.himusharier.ajps_backend.constants.FileUploadOrigin;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,10 +10,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "AJPS_FILES")
-public class Files {
+public class FileUpload {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private FileUploadOrigin fileOrigin;
 
     @Column(nullable = false)
     private String fileName;

@@ -61,7 +61,7 @@ export const routes: Routes = [
             {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'home', component: HomepageComponent, title: 'Welcome - ScholarPress'},
             {path: 'about-us', component: AboutUsComponent, title: 'About Us - ScholarPress'},
-            {path: 'journals', component: JournalsComponent, title: 'Our Journals - ScholarPress'},
+            {path: 'journal', component: JournalsComponent, title: 'Our Journals - ScholarPress'},
             {path: 'services', component: ServicesComponent, title: 'Our Services - ScholarPress'},
             {path: 'contact-us', component: ContactUsComponent, title: 'Contact Us - ScholarPress'},
             {path: 'login', component: LoginComponent, title: 'Login to Your Account - ScholarPress'},
@@ -70,7 +70,7 @@ export const routes: Routes = [
         ]
     },
     // journal site:
-    {path: 'journals/:journalName', component: JournalViewComponent,    
+    {path: 'journal/:journalName', component: JournalViewComponent,    
         children: [
             {path: '', redirectTo: 'homepage', pathMatch: 'full'},
             {path: 'homepage', component: JournalHomepageComponent, title: 'Homepage - ScholarPress'},
@@ -82,7 +82,7 @@ export const routes: Routes = [
             {path: 'processing-charge', component: JournalProcessingChargeComponent, title: 'Article Processing Charge - ScholarPress'},
             {path: 'online-submission', component: JournalSubmissionComponent, title: 'Online Submission - ScholarPress'},
             {path: ':issueNumber', component: JournalIssueArticlesComponent, title: 'Article List - ScholarPress'},
-            {path: ':issueNumber/:articleName', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'},
+            {path: ':issueNumber/article/:articleNumber', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'},
         ]        
     },
     // user site:

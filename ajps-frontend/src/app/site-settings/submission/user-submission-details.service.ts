@@ -50,9 +50,9 @@ export class UserSubmissionDetailsService {
     return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/author-informations`, payload, { headers });
   }
 
-  removeAuthor(submissionId: string | null, authorEmail: string): Observable<any> {
+  removeAuthor(submissionId: string | null, authorId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-author/${submissionId}/${authorEmail}`, { headers });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-author/${submissionId}/${authorId}`, { headers });
   }
 
   updateSubmissionSteps(payload: any): Observable<any> {

@@ -7,7 +7,7 @@
 <div class="row mb-4 px-2">
     <div class="col-md-3">
         <div class="stat-card">
-            <h6>Your Manuscripts</h6>
+            <h6>Total Manuscripts</h6>
             <h3>
                 @if (submissions.length > 0) {
                     {{ submissions.length }}
@@ -45,42 +45,54 @@
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title" style="color: #2e7d32;">My Submissions</h5>
-        <table class="table">
+
+        <table class="table" *ngIf="submissions.length > 0; else noSubmissions">
             <thead>
                 <tr>
-                    <th>Manuscript Title</th>
-                    <th>Journal Name</th>
-                    <th>Manuscript Status</th>
-                    <th>Submission Date</th>
-                    <th>Last Update</th>
+                    <th style="width: 80%;">Manuscript Title</th>
+                    <th style="width: 20%;">Manuscript Status</th>
                 </tr>
             </thead>
-            <tbody  *ngFor="let submission of submissions">
-                <tr style="border: 1px solid #fff;">
-                    <td class="text-nowrap text-truncate" style="max-width: 200px;">{{ submission.manuscriptTitle }}</td>
-                    <td class="text-nowrap">{{ submission.journalName }}</td>
-                    <td><span class="badge">{{ submission.submissionStatus }}</span></td>
-                    <!-- <td>{{ submission.submittedAt | date: 'yyyy-MM-dd' }}</td>
-                    <td>{{ submission.updatedAt | date: 'yyyy-MM-dd' }}</td> -->
-                </tr>
-                <tr>
-                    <td colspan="5">
-                    <button (click)="editManuscript(submission.id)" routerLink="/user/submission/submission-edit" class="btn btn-sm btn-link" style="padding-left: 0;"><i class="bi bi-pencil"></i> Edit Manuscript</button>
-                    <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
-                    <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
-                    <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button>
-                    <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button>
-                    <button class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
-                    <button class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
-                    </td>
-                </tr>                
+            <tbody>
+                <ng-container *ngFor="let submission of submissions">
+                    <!-- Row 1: Submission Info -->
+                    <tr style="border: 1px solid #fff;">
+                        <td> <!-- style="font-size: 18px !important;" class="text-nowrap text-truncate" -->
+                            <a routerLink="/user/manuscript-details" class="manuscript-name">{{ submission.manuscriptTitle }}</a>
+                            <br>
+                            <span class="journal-name">{{ submission.journalName }}</span>
+                        </td>
+                        <td>
+                            <span class="badge">{{ submission.submissionStatus }}</span>
+                        </td>
+                    </tr>
+
+                    <!-- Row 2: Action Buttons -->
+                    <tr>
+                        <td colspan="2">
+                            <button *ngIf="submission.editable" (click)="editManuscript(submission.id)" routerLink="/user/submission/submission-edit" class="btn btn-sm btn-link"><i class="bi bi-pencil"></i> Edit Manuscript</button>
+                            
+                            @if (submission.submissionStatus != 'SAVED') {
+                            <button *ngIf="submission.paymentDue" routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
+                            <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
+                            <button *ngIf="submission.submissionStatus == 'PUBLISHED'" class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
+                            <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button>
+                            <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button>
+                            }
+                            
+                            <button *ngIf="submission.submissionStatus == 'SAVED'" class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
+                        </td>
+                    </tr>
+                </ng-container>
             </tbody>
         </table>
-            @if (submissions.length < 1) {
-                <a style="text-align: center; display: block; font-size: 18px; color: #ccc; font-style: italic;">No Submission Found</a>
-            }
+
+        <ng-template #noSubmissions>
+            <a style="text-align: left; display: block; font-size: 16px; color: #ccc; font-style: italic; padding: 10px 0;"><i class="bi bi-exclamation-circle"></i> No Submission Found</a>
+        </ng-template>
     </div>
 </div>
+
 
 <!-- Review Tasks -->
 <!-- <div class="card mb-4">

@@ -1,6 +1,6 @@
 package com.himusharier.ajps_backend.util;
 
-import com.himusharier.ajps_backend.dto.submission.SubmissionListResponse;
+import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.model.Submission;
 
 public class UserSubmissionListMapperUtil {
@@ -13,6 +13,8 @@ public class UserSubmissionListMapperUtil {
                 submission.getManuscriptCategory(),
                 submission.getSubmissionStatus(),
                 submission.getSubmittedAt(),
-                submission.getUpdatedAt());
+                submission.getUpdatedAt(),
+                submission.isPaymentDue(),
+                submission.isEditable());
     }
 }

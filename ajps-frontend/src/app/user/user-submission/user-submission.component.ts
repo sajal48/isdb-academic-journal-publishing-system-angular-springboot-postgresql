@@ -44,7 +44,6 @@ export class UserSubmissionComponent implements OnInit {
 
             // Append new steps to existing completedSteps array
             this.completedSteps.push(...newSteps);
-            debugger
           },
           error: (err) => {
             console.error('Error loading submission details:', err);
