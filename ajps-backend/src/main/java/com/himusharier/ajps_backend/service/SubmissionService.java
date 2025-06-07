@@ -1,10 +1,13 @@
 package com.himusharier.ajps_backend.service;
 
+import com.himusharier.ajps_backend.constants.FileUploadOrigin;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.dto.submission.ManuscriptDetailsRequest;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
+import com.himusharier.ajps_backend.model.FileUpload;
 import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.model.Submission;
+import com.himusharier.ajps_backend.repository.FileUploadRepository;
 import com.himusharier.ajps_backend.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Service
@@ -24,11 +28,11 @@ public class SubmissionService {
     private String uploadDirectory;
 
     private final SubmissionRepository submissionRepository;
-    private final FileStorageService fileStorageService;
+    private final FileUploadRepository fileUploadRepository;
 
-    public SubmissionService(SubmissionRepository submissionRepository, FileStorageService fileStorageService) {
+    public SubmissionService(SubmissionRepository submissionRepository, FileUploadRepository fileUploadRepository) {
         this.submissionRepository = submissionRepository;
-        this.fileStorageService = fileStorageService;
+        this.fileUploadRepository = fileUploadRepository;
     }
 
     public Submission returnSubmissionDetails(Profile profile, Long submissionId) {
@@ -122,63 +126,50 @@ public class SubmissionService {
 
 
 
-/*
-    @Transactional
-    public void saveManuscriptFile(Long submissionId, MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            throw new RuntimeException("Empty file.");
+
+    public FileUpload saveFile(Long submissionId, MultipartFile file) throws IOException {
+        if (file.isEmpty() || file.getOriginalFilename() == null) {
+            throw new IOException("Invalid file: file is empty or has no original name");
         }
+        String originalName = file.getOriginalFilename();
+        String storedName = UUID.randomUUID() + "_" + originalName;
 
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new RuntimeException("Submission not found"));
-
-        if (submission == null) {
-            throw new RuntimeException("User profile not found for submission Id: " + submissionId);
-        }
-
-        // Step 2: File info and target path
-        String originalFilename = file.getOriginalFilename();
-        String fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
-
-        if (!fileExtension.matches("doc|docx|pdf|zip")) {
-            throw new RuntimeException("Unsupported image format. Allowed: jpg, jpeg, png, gif, bmp");
-        }
-
-        String uniqueFilename = UUID.randomUUID().toString() + "." + fileExtension;
         Path uploadPath = Paths.get(uploadDirectory);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        Path filePath = uploadPath.resolve(uniqueFilename);
+        Path filePath = uploadPath.resolve(storedName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        Submission existingSubmission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + submissionId));
 
 
+        FileUpload fileUpload = FileUpload.builder()
+                .submission(existingSubmission)
+                .fileOrigin(FileUploadOrigin.MANUSCRIPT)
+                .originalName(originalName)
+                .storedName(storedName)
+                .type(file.getContentType())
+                .size(file.getSize())
+                .path(filePath.toString())
+                .build();
 
-
-
-        List<String> files = submission.getManuscriptFiles();
-        if (files == null) {
-            files = new ArrayList<>();
-        }
-
-        files.add(fileName);
-        submission.setManuscriptFiles(files);
-        submissionRepository.save(submission);
+        return fileUploadRepository.save(fileUpload);
     }
 
-    @Transactional
-    public void removeManuscriptFile(Long submissionId, String fileName) {
-        Submission submission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new RuntimeException("Submission not found"));
-
-        List<String> files = submission.getManuscriptFiles();
-        if (files != null) {
-            files.remove(fileName);
-            submission.setManuscriptFiles(files);
-            submissionRepository.save(submission);
+    public void deleteFile(Long submissionId, Long fileId) throws IOException {
+        List<FileUpload> files = fileUploadRepository.findBySubmissionId(submissionId);
+        for (FileUpload file : files) {
+            if (file.getId().equals(fileId)) {
+                Files.deleteIfExists(Paths.get(file.getPath()));
+                fileUploadRepository.delete(file);
+                break;
+            }
         }
     }
-*/
+
 
 
 }

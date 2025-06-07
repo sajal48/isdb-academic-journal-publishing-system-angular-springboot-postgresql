@@ -22,7 +22,7 @@ interface AuthorDetails {
 })
 export class SubmissionStepTwoComponent implements OnInit {
   userId: number = 0;
-  submissionId: string | null = '';
+  submissionId: number = 0;
   validationError: string = '';
 
   authors: AuthorDetails[] = [];

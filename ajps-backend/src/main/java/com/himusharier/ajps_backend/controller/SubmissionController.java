@@ -6,9 +6,11 @@ import com.himusharier.ajps_backend.dto.submission.ManuscriptDetailsRequest;
 import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.Author;
+import com.himusharier.ajps_backend.model.FileUpload;
 import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.model.Submission;
 import com.himusharier.ajps_backend.service.AuthorService;
+import com.himusharier.ajps_backend.service.FileStorageService;
 import com.himusharier.ajps_backend.service.ProfileService;
 import com.himusharier.ajps_backend.service.SubmissionService;
 import com.himusharier.ajps_backend.util.UserSubmissionListMapperUtil;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,23 +203,34 @@ public class SubmissionController {
 
 
 
-    @PostMapping("/upload/manuscript-files")
-    public ResponseEntity<SuccessResponseModel<Void>> uploadManuscript(
+    @PostMapping("/manuscript/upload")
+    public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("submissionId") Long submissionId) {
-        // Implement file storage logic
-//        submissionService.saveManuscriptFile(submissionId, file);
-        return ResponseEntity.ok(
-                new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File uploaded successfully"));
+            @RequestParam("submissionId") Long submissionId
+    ) {
+        try {
+            FileUpload savedFile = submissionService.saveFile(submissionId, file);
+            Map<String, Object> data = new HashMap<>();
+            data.put("fileName", savedFile.getStoredName());
+            data.put("originalName", savedFile.getOriginalName());
+            data.put("size", savedFile.getSize());
+            return ResponseEntity.ok(Map.of("code", 200, "data", data));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(Map.of("code", 500, "message", "File upload failed"));
+        }
     }
 
-    @DeleteMapping("/remove/manuscript/{submissionId}/{fileId}")
-    public ResponseEntity<SuccessResponseModel<Void>> removeManuscript(
-            @PathVariable Long submissionId,
-            @PathVariable String fileName) {
-//        submissionService.removeManuscriptFile(submissionId, fileName);
-        return ResponseEntity.ok(
-                new SuccessResponseModel<>(HttpStatus.OK.value(), null, "File removed successfully"));
+    @DeleteMapping("/manuscript/remove/{submissionId}/{fileId}")
+    public ResponseEntity<?> deleteFile(
+            @PathVariable("submissionId") Long submissionId,
+            @PathVariable("fileId") Long fileId
+    ) {
+        try {
+            submissionService.deleteFile(submissionId, fileId);
+            return ResponseEntity.ok(Map.of("code", 200, "message", "File deleted"));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(Map.of("code", 500, "message", "Delete failed"));
+        }
     }
 
 

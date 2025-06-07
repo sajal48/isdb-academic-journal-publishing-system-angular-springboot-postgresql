@@ -12,7 +12,7 @@ import { UserSubmissionDetailsService } from '../../site-settings/submission/use
 export class UserSubmissionComponent implements OnInit {
   currentRoute: string = '';
   submissionDetails: any[] = [];
-  submissionId: string | null = '';
+  submissionId: number = 0;
   completedSteps: string[] = [];
 
   constructor(

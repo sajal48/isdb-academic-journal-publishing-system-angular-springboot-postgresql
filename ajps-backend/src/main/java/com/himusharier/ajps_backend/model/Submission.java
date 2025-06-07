@@ -62,6 +62,7 @@ public class Submission implements Serializable {
     private List<Author> authors;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<FileUpload> files;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

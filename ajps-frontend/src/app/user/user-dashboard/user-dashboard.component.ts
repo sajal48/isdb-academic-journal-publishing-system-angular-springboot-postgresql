@@ -36,7 +36,7 @@ export class UserDashboardComponent implements OnInit {
   }
 
   editManuscript(id: number) {
-    this.userSubmissionDetailsService.setSubmissionId(id.toString());
+    this.userSubmissionDetailsService.setSubmissionId(id);
     this.router.navigate(['/user/submission']);
   }
 

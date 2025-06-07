@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
-import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { UserToastNotificationService } from '../../../site-settings/user-profile/user-toast-notification.service';
-import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 interface UploadedFile {
-  name: string;
+  id: number;
+  storedName: string;
+  originalName: string;
   size: number;
   type: string;
 }
@@ -19,8 +20,8 @@ interface UploadedFile {
   styleUrl: '../user-submission.component.css'
 })
 export class SubmissionStepThreeComponent implements OnInit {
-userId: number = 0;
-  submissionId: string | null = '';
+
+  submissionId: number = 0;
   isLoading: boolean = false;
   fileError: string = '';
   selectedFile: File | null = null;
@@ -28,12 +29,9 @@ userId: number = 0;
 
   constructor(
     private userSubmissionDetailsService: UserSubmissionDetailsService,
-    private authService: AuthLoginRegisterService,
     private userToastNotificationService: UserToastNotificationService,
     private router: Router
-  ) {
-    this.userId = authService.getUserID();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.submissionId = this.userSubmissionDetailsService.getSubmissionId();
@@ -42,15 +40,24 @@ userId: number = 0;
 
   loadUploadedFiles(): void {
     if (this.submissionId) {
+      this.isLoading = true;
       this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(this.submissionId)
         .subscribe({
           next: (response) => {
             if (response.code === 200 && response.data.files) {
-              this.uploadedFiles = response.data.files;
+              this.uploadedFiles = response.data.files.map((file: any) => ({
+                id: file.id,
+                storedName: file.storedName,
+                originalName: file.originalName,
+                size: file.size,
+                type: file.type
+              }));
             }
+            this.isLoading = false;
           },
           error: (err) => {
             console.error('Error loading uploaded files:', err);
+            this.isLoading = false;
           }
         });
     }
@@ -60,16 +67,20 @@ userId: number = 0;
     const file = event.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ['application/pdf', 'application/msword', 
-                           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                           'application/zip'];
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/zip'
+      ];
+      
       if (!allowedTypes.includes(file.type)) {
         this.fileError = 'Invalid file type. Please upload DOC, DOCX, PDF, or ZIP files only.';
         return;
       }
 
-      // Validate file size (e.g., 10MB limit)
-      const maxSize = 10 * 1024 * 1024; // 10MB
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
         this.fileError = 'File size exceeds 10MB limit.';
         return;
@@ -86,17 +97,15 @@ userId: number = 0;
     }
 
     this.isLoading = true;
-    const formData = new FormData();
-    formData.append('file', this.selectedFile);
-    formData.append('submissionId', this.submissionId);
-
-    this.userSubmissionDetailsService.uploadManuscriptFile(formData)
+    this.userSubmissionDetailsService.uploadManuscriptFile(this.submissionId, this.selectedFile)
       .subscribe({
         next: (response) => {
           if (response.code === 200) {
             this.uploadedFiles.push({
-              name: this.selectedFile!.name,
-              size: this.selectedFile!.size,
+              id: response.data.id,
+              storedName: response.data.fileName,
+              originalName: response.data.originalName,
+              size: response.data.size,
               type: this.selectedFile!.type
             });
             this.selectedFile = null;
@@ -112,19 +121,17 @@ userId: number = 0;
       });
   }
 
-  removeFile(index: number): void {
+  removeFile(fileId: number): void {
     if (!this.submissionId) {
       return;
     }
 
-    const fileToRemove = this.uploadedFiles[index];
     this.isLoading = true;
-
-    this.userSubmissionDetailsService.removeManuscriptFile(this.submissionId, fileToRemove.name)
+    this.userSubmissionDetailsService.removeManuscriptFile(this.submissionId, fileId)
       .subscribe({
         next: (response) => {
           if (response.code === 200) {
-            this.uploadedFiles.splice(index, 1);
+            this.uploadedFiles = this.uploadedFiles.filter(file => file.id !== fileId);
             this.userToastNotificationService.showToast('Success', 'File removed successfully.', 'success');
           }
           this.isLoading = false;
@@ -146,7 +153,7 @@ userId: number = 0;
     this.isLoading = true;
     const payload = {
       submissionId: this.submissionId,
-      completedSteps: ['manuscript-upload'] // Mark this step as completed
+      completedSteps: ['manuscript-upload']
     };
 
     this.userSubmissionDetailsService.updateSubmissionSteps(payload)
@@ -166,8 +173,27 @@ userId: number = 0;
       });
   }
 
-  exitToDashboard(): void {
-    this.userSubmissionDetailsService.clearSubmissionId();
-    this.router.navigate(['/user/dashboard']);
+  saveAndExit(): void {
+    if (this.uploadedFiles.length > 0) {
+      const payload = {
+        submissionId: this.submissionId,
+        completedSteps: ['manuscript-upload']
+      };
+
+      this.userSubmissionDetailsService.updateSubmissionSteps(payload)
+        .subscribe({
+          next: () => {
+            this.userSubmissionDetailsService.clearSubmissionId();
+            this.router.navigate(['/user/dashboard']);
+          },
+          error: (error) => {
+            console.error(error);
+            this.userToastNotificationService.showToast('Error', 'Failed to save progress.', 'danger');
+          }
+        });
+    } else {
+      this.userSubmissionDetailsService.clearSubmissionId();
+      this.router.navigate(['/user/dashboard']);
+    }
   }
 }

@@ -1,14 +1,16 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Manuscript Upload</h5>
     
-    <!-- Display upload status if files exist -->
+    <!-- Uploaded Files List -->
     <div class="mb-3" *ngIf="uploadedFiles && uploadedFiles.length > 0" style="padding-bottom: 20px;">
-        <h6>Uploaded Files</h6>
+        <h6 class="mb-2">Uploaded Files</h6>
         <div class="list-group">
-            <div class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let file of uploadedFiles; let i = index">
-                <span class="file-name">{{ file.name }}</span>
+            <div class="list-group-item d-flex justify-content-between align-items-center" 
+                 *ngFor="let file of uploadedFiles; let i = index">
+                <span class="file-name">{{ file.originalName }}</span>
                 <div>
-                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeFile(i)">
+                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                            (click)="removeFile(file.id)" [disabled]="isLoading">
                         <i class="bi bi-trash3"></i> Remove
                     </button>
                 </div>
@@ -16,26 +18,38 @@
         </div>
     </div>
 
-    <form id="manuscriptUploadForm" #manuscriptUploadForm="ngForm" (ngSubmit)="onSubmit(manuscriptUploadForm)" enctype="multipart/form-data">
+    <form id="manuscriptUploadForm" #manuscriptUploadForm="ngForm" 
+          (ngSubmit)="onSubmit(manuscriptUploadForm)">
         <div class="mb-3">
-            <label for="articleFile" class="form-label">Manuscript File (ZIP, DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
+            <label for="articleFile" class="form-label">
+                Manuscript File (DOC, DOCX, PDF, ZIP Only) 
+                <span class="text-danger">*</span>
+            </label>
             <input type="file" class="form-control" id="articleFile" name="articleFile" 
                    accept=".doc,.docx,.pdf,.zip" 
                    (change)="onFileSelected($event)" required>
             <div *ngIf="fileError" class="text-danger mt-2">{{ fileError }}</div>
         </div>
         
+        <div class="mb-3">
+            <button type="button" class="btn btn-outline-primary" 
+                    (click)="uploadFile()" [disabled]="!selectedFile || isLoading">
+                <i class="bi bi-upload"></i> Upload File
+            </button>
+        </div>
+        
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/author-informations">
+            <button type="button" class="btn btn-outline-secondary" 
+                    routerLink="/user/submission/author-informations">
                 <i class="bi bi-arrow-left-circle"></i> Back
             </button>
-            <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+            <button type="submit" class="btn btn-primary" [disabled]="isLoading || uploadedFiles.length === 0">
                 <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Save & Continue <i class="bi bi-arrow-right-circle"></i>
             </button>
-            <button type="button" class="btn btn-outline-secondary" (click)="exitToDashboard()">
-                <i class="bi bi-signpost"></i> Exit to Dashboard
+            <button type="button" class="btn btn-outline-secondary" (click)="saveAndExit()">
+                <i class="bi bi-floppy"></i> Save & Exit
             </button>
         </div>
     </form>

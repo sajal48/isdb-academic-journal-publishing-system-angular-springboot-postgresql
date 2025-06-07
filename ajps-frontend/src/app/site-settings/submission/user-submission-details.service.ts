@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { SubmissionList } from '../interfaces/submission-list-interface';
@@ -16,12 +16,13 @@ export class UserSubmissionDetailsService {
     private authLoginRegisterService: AuthLoginRegisterService
   ) {}
 
-  getSubmissionId(): string | null {
-    return sessionStorage.getItem(this.storageKey);
+  getSubmissionId(): number {
+    const id = sessionStorage.getItem(this.storageKey);
+    return id ? +id: 0;
   }
   
-  setSubmissionId(id: string): void {
-    sessionStorage.setItem(this.storageKey, id);
+  setSubmissionId(id: number): void {
+    sessionStorage.setItem(this.storageKey, id.toString());
   }
   
   clearSubmissionId(): void {
@@ -34,7 +35,7 @@ export class UserSubmissionDetailsService {
     return this.http.get<{status: string, code: number, data: SubmissionList[]}>(`${apiConfig.apiBaseUrl}/user/submission/submission-list/${userId}`, {headers});
   }
 
-  getManuscriptDetailsBySubmissionId(submissionId: string | null): Observable<any> {
+  getManuscriptDetailsBySubmissionId(submissionId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const userId = this.authLoginRegisterService.getUserID();
     return this.http.get(`${apiConfig.apiBaseUrl}/user/submission/submission-details/${userId}/${submissionId}`, { headers });
@@ -50,7 +51,7 @@ export class UserSubmissionDetailsService {
     return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/author-informations`, payload, { headers });
   }
 
-  removeAuthor(submissionId: string | null, authorId: number): Observable<any> {
+  removeAuthor(submissionId: number, authorId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-author/${submissionId}/${authorId}`, { headers });
   }
@@ -65,12 +66,26 @@ export class UserSubmissionDetailsService {
     return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/update/manuscript-details`, payload, { headers });
   }
 
-  uploadManuscriptFile(formData: FormData): Observable<any> {
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/upload/manuscript-files`, formData);
+  /*uploadManuscriptFile(submissionId: string, formData: FormData): Observable<any> {
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/upload/manuscript`, formData);
+  }*/
+
+  /*removeManuscriptFile(submissionId: string, fileName: string): Observable<any> {
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove/manuscript/${submissionId}/${fileName}`);
+  }*/
+
+  uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
+    // const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('submissionId', submissionId.toString());
+    debugger
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript/upload`, formData);
   }
 
-  removeManuscriptFile(submissionId: string | null, fileName: string): Observable<any> {
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove/manuscript/${submissionId}/${fileName}`);
+  removeManuscriptFile(submissionId: number, fileId: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/manuscript/remove/${submissionId}/${fileId}`, {headers});
   }
 
 }
