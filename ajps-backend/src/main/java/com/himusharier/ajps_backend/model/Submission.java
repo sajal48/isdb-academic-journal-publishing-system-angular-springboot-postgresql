@@ -43,7 +43,11 @@ public class Submission implements Serializable {
     @Column(nullable = false)
     private String manuscriptKeywords;
 
+    @Column(columnDefinition = "TEXT")
     private String comments;
+
+    @Column(nullable = false)
+    private boolean submissionConfirmation;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -66,6 +70,7 @@ public class Submission implements Serializable {
     private List<FileUpload> files;
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Reviewer> reviewers;
 
     @ManyToOne

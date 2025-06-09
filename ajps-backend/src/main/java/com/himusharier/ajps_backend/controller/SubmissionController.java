@@ -1,8 +1,8 @@
 package com.himusharier.ajps_backend.controller;
 
+import com.himusharier.ajps_backend.dto.response.ApiResponse;
 import com.himusharier.ajps_backend.dto.response.SuccessResponseModel;
-import com.himusharier.ajps_backend.dto.submission.AuthorInformationRequest;
-import com.himusharier.ajps_backend.dto.submission.ManuscriptDetailsRequest;
+import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.Author;
@@ -231,6 +231,50 @@ public class SubmissionController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of("code", 500, "message", "Delete failed"));
         }
+    }
+
+
+
+
+
+
+    @PostMapping("/submit/reviewer-informations")
+    public ApiResponse<?> saveReviewerInformations(@RequestBody ReviewerSubmissionRequest request) {
+        submissionService.saveReviewers(request);
+        return new ApiResponse<>(200, "Reviewers saved successfully");
+    }
+
+    @DeleteMapping("/remove-reviewer/{submissionId}/{reviewerId}")
+    public ApiResponse<?> deleteReviewer(@PathVariable Long submissionId, @PathVariable Long reviewerId) {
+        submissionService.removeReviewer(submissionId, reviewerId);
+        return new ApiResponse<>(200, "Reviewer deleted successfully");
+    }
+
+    @GetMapping("/reviewers/{submissionId}")
+    public ApiResponse<List<ReviewerDTO>> getReviewers(@PathVariable Long submissionId) {
+        List<ReviewerDTO> reviewers = submissionService.getReviewersBySubmissionId(submissionId);
+        return new ApiResponse<>(200, "Fetched successfully", reviewers);
+    }
+
+
+
+
+
+
+
+    @PostMapping("/submit/additional-informations")
+    public ApiResponse<?> saveAdditionalInformation(@RequestBody AdditionalInformationRequest request) {
+        Submission saved = submissionService.saveAdditionalInformation(request);
+        return new ApiResponse<>(201, "Additional information saved successfully", Map.of("submissionId", saved.getId()));
+    }
+
+
+
+
+    @PutMapping("/submit-manuscript")
+    public ApiResponse<?> submitManuscript(@RequestBody SubmitManuscriptRequest request) {
+        Submission saved = submissionService.submitManuscript(request);
+        return new ApiResponse<>(200, "Manuscript submitted successfully", Map.of("submissionId", saved.getId()));
     }
 
 

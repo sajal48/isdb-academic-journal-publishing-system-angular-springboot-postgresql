@@ -1,46 +1,55 @@
 <div class="mb-4">
-    <h5 class="mb-2 text-primary">Suggested Reviewers</h5>
-    <p class="text-muted mb-2 small">Provide at least two reviewers (not collaborators or co-authors, from different institutions with institutional emails).</p>
-    <form id="suggestedReviewersForm">
-        <div class="row g-3">
-            <!-- Reviewer 1 -->
-            <div class="col-md-6">
-                <h6 class="mb-2">Reviewer 1</h6>
-                <div class="mb-2">
-                    <label for="reviewer1-name" class="form-label small">Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer1-name" name="reviewer1-name" placeholder="Name" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer1-email" class="form-label small">Email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control form-control-sm" id="reviewer1-email" name="reviewer1-email" placeholder="Institutional email" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer1-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer1-institution" name="reviewer1-institution" placeholder="Institution name" required>
-                </div>
-            </div>
-            <!-- Reviewer 2 -->
-            <div class="col-md-6">
-                <h6 class="mb-2">Reviewer 2</h6>
-                <div class="mb-2">
-                    <label for="reviewer2-name" class="form-label small">Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer2-name" name="reviewer2-name" placeholder="Name" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer2-email" class="form-label small">Email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control form-control-sm" id="reviewer2-email" name="reviewer2-email" placeholder="Institutional email" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer2-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer2-institution" name="reviewer2-institution" placeholder="Institution name" required>
-                </div>
-            </div>
+  <h5 class="mb-3 text-primary">Suggested Reviewers</h5>
+  <p class="text-muted mb-2 small">
+    Provide at least two reviewers (not collaborators or co-authors, from different institutions with institutional emails).
+  </p>
+
+  <!-- Display list of added reviewers in cards side by side -->
+  <div class="mb-3" *ngIf="reviewers && reviewers.length > 0" style="padding-bottom: 20px;">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <div class="col" *ngFor="let reviewer of reviewers; let i = index">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6>{{ reviewer.name }}</h6>
+            <p class="card-text">
+              {{ reviewer.email }}<br>
+              {{ reviewer.institution }}<br>
+            </p>
+          </div>
+          <div class="card-footer text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeReviewer(i)"><i class="bi bi-trash"></i> Remove</button>
+          </div>
         </div>
-        <hr class="my-4">
-        <div class="d-flex gap-3">
-            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/manuscript-upload"><i class="bi bi-arrow-left-circle"></i> Back</button>
-            <button type="button" class="btn btn-primary" routerLink="/user/submission/additional-informations">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Save & Exit</button>
-        </div>
-    </form>
+      </div>
+    </div>
+  </div>
+
+  <form id="suggestedReviewersForm" #suggestedReviewersForm="ngForm" (ngSubmit)="onSubmit(suggestedReviewersForm)">
+    <div class="mb-3">
+      <label for="reviewerName" class="form-label">Reviewer Name <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="name" name="name" placeholder="Enter full name" [(ngModel)]="reviewerDetails.name" required>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="reviewerEmail" class="form-label">Reviewer Email <span class="text-danger">*</span></label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Enter institutional email" [(ngModel)]="reviewerDetails.email" required>
+      </div>
+      <div class="col-md-6">
+        <label for="institution" class="form-label">Institution <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" [(ngModel)]="reviewerDetails.institution" required>
+      </div>
+    </div>
+
+    <!-- Add Reviewer Button -->
+    <div class="mb-3">
+      <button type="button" class="btn btn-outline-primary" (click)="addReviewer()"><i class="bi bi-person-add"></i> Add Reviewer</button>
+    </div>
+
+    <hr class="my-4">
+    <div class="d-flex gap-3">
+      <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/manuscript-upload"><i class="bi bi-arrow-left-circle"></i> Back</button>
+      <button type="submit" class="btn btn-primary">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
+      <button type="button" class="btn btn-outline-secondary" (click)="exitToDashboard()"><i class="bi bi-signpost"></i> Exit to Dashboard</button>
+    </div>
+  </form>
 </div>

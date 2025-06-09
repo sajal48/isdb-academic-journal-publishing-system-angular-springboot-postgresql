@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,16 +16,26 @@ public class Reviewer {
     private Long id;
 
     @Column(nullable = false)
-    private String reviewerName;
+    private String name;
 
     @Column(nullable = false)
     private String email;
 
     private String institution;
 
-    private String expertiseArea;
-
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
+    @JsonBackReference
     private Submission submission;
+
+
+//    public Reviewer() {}
+
+    public Reviewer(String name, String email, String institution, Submission submission) {
+        this.name = name;
+        this.email = email;
+        this.institution = institution;
+        this.submission = submission;
+    }
+
 }

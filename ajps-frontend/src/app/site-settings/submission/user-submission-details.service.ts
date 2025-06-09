@@ -88,4 +88,40 @@ export class UserSubmissionDetailsService {
     return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/manuscript/remove/${submissionId}/${fileId}`, {headers});
   }
 
+
+
+
+
+  saveReviewerInformations(payload: {
+    submissionId: number;
+    reviewers: { name: string; email: string; institution: string }[];
+  }): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/reviewer-informations`, payload, { headers });
+  }
+
+  removeReviewer(submissionId: number, reviewerId: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-reviewer/${submissionId}/${reviewerId}`, { headers });
+  }
+
+
+
+
+
+  saveAdditionalInformation(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/additional-informations`, payload, { headers });
+  }
+
+
+
+
+  submitManuscript(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/submit-manuscript`, payload, { headers });
+  }
+
+
+
 }

@@ -1,14 +1,20 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Submission Confirmation</h5>
-    <form id="submissionConfirmationForm">
+    <form id="submissionConfirmationForm" (ngSubmit)="onSubmit()">
         <div class="alert alert-info mb-3" role="alert">
             <p>Please review all provided information before final submission. Click "Submit" to complete the process.</p>
         </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/additional-informations"><i class="bi bi-arrow-left-circle"></i> Back</button>
-            <button type="submit" class="btn btn-primary" id="submissionSubmit-btn"><i class="bi bi-upload me-2"></i>Submit Manuscript</button>
-            <button type="button" class="btn btn-outline-secondary"><i class="bi bi-floppy"></i> Submit Later</button>
+            <button type="button" class="btn btn-outline-secondary" routerLink="/user/submission/additional-informations">
+                <i class="bi bi-arrow-left-circle"></i> Back
+            </button>
+            <button type="submit" class="btn btn-primary" id="submissionSubmit-btn">
+                <i class="bi bi-upload me-2"></i>Submit Manuscript
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="onSubmitLater()">
+                <i class="bi bi-floppy"></i> Submit Later
+            </button>
         </div>
     </form>
 </div>

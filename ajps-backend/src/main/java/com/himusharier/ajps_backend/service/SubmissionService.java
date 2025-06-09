@@ -2,12 +2,14 @@ package com.himusharier.ajps_backend.service;
 
 import com.himusharier.ajps_backend.constants.FileUploadOrigin;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
-import com.himusharier.ajps_backend.dto.submission.ManuscriptDetailsRequest;
+import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.FileUpload;
 import com.himusharier.ajps_backend.model.Profile;
+import com.himusharier.ajps_backend.model.Reviewer;
 import com.himusharier.ajps_backend.model.Submission;
 import com.himusharier.ajps_backend.repository.FileUploadRepository;
+import com.himusharier.ajps_backend.repository.ReviewerRepository;
 import com.himusharier.ajps_backend.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
@@ -29,10 +32,15 @@ public class SubmissionService {
 
     private final SubmissionRepository submissionRepository;
     private final FileUploadRepository fileUploadRepository;
+    private final ReviewerRepository reviewerRepository;
 
-    public SubmissionService(SubmissionRepository submissionRepository, FileUploadRepository fileUploadRepository) {
+    public SubmissionService(
+            SubmissionRepository submissionRepository,
+            FileUploadRepository fileUploadRepository,
+            ReviewerRepository reviewerRepository) {
         this.submissionRepository = submissionRepository;
         this.fileUploadRepository = fileUploadRepository;
+        this.reviewerRepository = reviewerRepository;
     }
 
     public Submission returnSubmissionDetails(Profile profile, Long submissionId) {
@@ -168,6 +176,81 @@ public class SubmissionService {
                 break;
             }
         }
+    }
+
+
+
+
+
+
+    public void saveReviewers(ReviewerSubmissionRequest request) {
+        Submission submission = submissionRepository.findById(request.submissionId())
+                .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
+
+        for (ReviewerDTO dto : request.reviewers()) {
+            Reviewer reviewer = new Reviewer(
+                    dto.name(),
+                    dto.email(),
+                    dto.institution(),
+                    submission
+            );
+            reviewerRepository.save(reviewer);
+        }
+    }
+
+    public List<ReviewerDTO> getReviewersBySubmissionId(Long submissionId) {
+        return reviewerRepository.findBySubmissionId(submissionId)
+                .stream()
+                .map(r -> new ReviewerDTO(
+                        r.getId(),
+                        r.getName(),
+                        r.getEmail(),
+                        r.getInstitution()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public void removeReviewer(Long submissionId, Long reviewerId) {
+        reviewerRepository.deleteByIdAndSubmissionId(reviewerId, submissionId);
+    }
+
+
+
+
+
+
+    @Transactional
+    public Submission saveAdditionalInformation(AdditionalInformationRequest request) {
+        Submission submission = submissionRepository.findById(request.submissionId())
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + request.submissionId()));
+
+        submission.setComments(request.comments());
+        submission.setSubmissionConfirmation(request.confirmed());
+        if (request.completedSteps() != null && !request.completedSteps().isEmpty()) {
+            updateCompletedSteps(request.submissionId(), request.completedSteps());
+        }
+
+        return submissionRepository.save(submission);
+    }
+
+
+
+
+    @Transactional
+    public Submission submitManuscript(SubmitManuscriptRequest request) {
+        Submission submission = submissionRepository.findById(request.submissionId())
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + request.submissionId()));
+
+        try {
+            submission.setSubmissionStatus(SubmissionStatus.valueOf(request.submissionStatus()));
+        } catch (IllegalArgumentException e) {
+            throw new SubmissionRequestException("Invalid submission status: " + request.submissionStatus());
+        }
+
+        submission.setSubmissionDateTime(); // Sets submittedAt using BdtZoneTimeUtil
+        submission.setEditable(false); // Lock submission after final submission
+
+        return submissionRepository.save(submission);
     }
 
 
