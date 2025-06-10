@@ -153,9 +153,11 @@ public class SubmissionController {
         try {
             FileUpload savedFile = submissionService.saveFile(submissionId, file);
             Map<String, Object> data = new HashMap<>();
+            data.put("id", savedFile.getId());
             data.put("fileName", savedFile.getStoredName());
             data.put("originalName", savedFile.getOriginalName());
             data.put("size", savedFile.getSize());
+            data.put("fileUrl", savedFile.getFileUrl());
             return ResponseEntity.ok(Map.of("code", 200, "data", data));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of("code", 500, "message", "File upload failed"));

@@ -34,7 +34,7 @@ public class FileUpload {
     private String type;
 
     @Column(nullable = false)
-    private String path;
+    private String fileUrl;
 
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)

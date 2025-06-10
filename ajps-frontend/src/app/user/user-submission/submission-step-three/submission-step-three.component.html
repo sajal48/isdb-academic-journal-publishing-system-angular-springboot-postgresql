@@ -7,8 +7,14 @@
         <div class="list-group">
             <div class="list-group-item d-flex justify-content-between align-items-center" 
                  *ngFor="let file of uploadedFiles; let i = index">
-                <span class="file-name">{{ file.originalName }}</span>
+                <div> <span class="file-name">{{ file.originalName }}</span>
+                <br> <small class="text-muted">{{ formatFileSize(file.size) }}</small>
+            </div>
                 <div>
+                    <button type="button" class="btn btn-sm btn-outline-primary me-2"
+                        (click)="downloadFile(file.fileUrl, file.originalName)" [disabled]="isLoading">
+                        <i class="bi bi-download"></i> Download
+                    </button>
                     <button type="button" class="btn btn-sm btn-outline-danger" 
                             (click)="removeFile(file.id)" [disabled]="isLoading">
                         <i class="bi bi-trash3"></i> Remove

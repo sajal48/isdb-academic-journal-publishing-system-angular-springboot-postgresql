@@ -1,7 +1,7 @@
 package com.himusharier.ajps_backend.constants;
 
 public enum FileUploadOrigin {
-    MANUSCRIPT,
+    SUBMISSION,
     PRE_REVIEW,
     REVIEW,
     COPY_EDIT,

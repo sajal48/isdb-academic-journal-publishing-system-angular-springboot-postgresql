@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
 import { UserToastNotificationService } from '../../../site-settings/user-profile/user-toast-notification.service';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 interface UploadedFile {
   id: number;
@@ -11,6 +12,7 @@ interface UploadedFile {
   originalName: string;
   size: number;
   type: string;
+  fileUrl: string;
 }
 
 @Component({
@@ -30,7 +32,8 @@ export class SubmissionStepThreeComponent implements OnInit {
   constructor(
     private userSubmissionDetailsService: UserSubmissionDetailsService,
     private userToastNotificationService: UserToastNotificationService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +53,8 @@ export class SubmissionStepThreeComponent implements OnInit {
                 storedName: file.storedName,
                 originalName: file.originalName,
                 size: file.size,
-                type: file.type
+                type: file.type,
+                fileUrl: file.fileUrl
               }));
             }
             this.isLoading = false;
@@ -71,7 +75,8 @@ export class SubmissionStepThreeComponent implements OnInit {
         'application/pdf',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/zip'
+        'application/zip',
+        'application/x-zip-compressed'
       ];
       
       if (!allowedTypes.includes(file.type)) {
@@ -106,7 +111,8 @@ export class SubmissionStepThreeComponent implements OnInit {
               storedName: response.data.fileName,
               originalName: response.data.originalName,
               size: response.data.size,
-              type: this.selectedFile!.type
+              type: this.selectedFile!.type,
+              fileUrl: response.data.fileUrl
             });
             this.selectedFile = null;
             this.userToastNotificationService.showToast('Success', 'File uploaded successfully.', 'success');
@@ -172,6 +178,46 @@ export class SubmissionStepThreeComponent implements OnInit {
           console.error(error);
           this.userToastNotificationService.showToast('Error', 'Failed to complete manuscript upload.', 'danger');
           this.isLoading = false;
+        }
+      });
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) {
+      return '0 Bytes';
+    }
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  downloadFile(fileUrl: string, originalFileName: string): void {
+    this.isLoading = true;
+
+    const downloadUrl = fileUrl;
+
+    this.http.get(downloadUrl, { responseType: 'blob' })
+      .subscribe({
+        next: (response: Blob) => {
+          // Create a blob URL and trigger the download
+          const blob = new Blob([response], { type: response.type });
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = originalFileName; // Use the original file name
+          document.body.appendChild(a); // Append to body (required for Firefox)
+          a.click(); // Programmatically click the link to trigger download
+          window.URL.revokeObjectURL(url); // Clean up the URL object
+
+          this.isLoading = false; // Re-enable buttons
+        },
+        error: (error: any) => {
+          // console.error('Error downloading file:', error);
+          // alert('Failed to download file. Please try again.');
+          this.userToastNotificationService.showToast('Error', 'Failed to download file. Please try again.', 'danger');
+          this.isLoading = false; // Re-enable buttons even on error
         }
       });
   }

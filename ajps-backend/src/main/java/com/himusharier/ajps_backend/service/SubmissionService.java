@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class SubmissionService {
 
+    @Value("${app.base.url}")
+    private String baseUrl;
+
     @Value("${file.upload-dir}")
     private String uploadDirectory;
 
@@ -168,7 +171,8 @@ public class SubmissionService {
             throw new IOException("Invalid file: file is empty or has no original name");
         }
         String originalName = file.getOriginalFilename();
-        String storedName = UUID.randomUUID() + "_" + originalName;
+        String fileExtension = originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase();
+        String storedName = UUID.randomUUID() + "." + fileExtension;
 
         Path uploadPath = Paths.get(uploadDirectory);
         if (!Files.exists(uploadPath)) {
@@ -178,18 +182,21 @@ public class SubmissionService {
         Path filePath = uploadPath.resolve(storedName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
+        String fullFileUrl = baseUrl + "/" + uploadDirectory + "/" + storedName;
+
         Submission existingSubmission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + submissionId));
 
 
         FileUpload fileUpload = FileUpload.builder()
                 .submission(existingSubmission)
-                .fileOrigin(FileUploadOrigin.MANUSCRIPT)
+                .fileOrigin(FileUploadOrigin.SUBMISSION)
                 .originalName(originalName)
                 .storedName(storedName)
                 .type(file.getContentType())
                 .size(file.getSize())
-                .path(filePath.toString())
+//                .path(filePath.toString())
+                .fileUrl(fullFileUrl)
                 .build();
 
         return fileUploadRepository.save(fileUpload);
@@ -199,7 +206,9 @@ public class SubmissionService {
         List<FileUpload> files = fileUploadRepository.findBySubmissionId(submissionId);
         for (FileUpload file : files) {
             if (file.getId().equals(fileId)) {
-                Files.deleteIfExists(Paths.get(file.getPath()));
+                Path uploadPath = Paths.get(uploadDirectory);
+                Path filePath = uploadPath.resolve(file.getStoredName());
+                Files.deleteIfExists(Paths.get(filePath.toString()));
                 fileUploadRepository.delete(file);
                 break;
             }
@@ -238,6 +247,7 @@ public class SubmissionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void removeReviewer(Long submissionId, Long reviewerId) {
         reviewerRepository.deleteByIdAndSubmissionId(reviewerId, submissionId);
     }
