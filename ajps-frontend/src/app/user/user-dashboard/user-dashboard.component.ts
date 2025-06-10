@@ -40,4 +40,53 @@ export class UserDashboardComponent implements OnInit {
     this.router.navigate(['/user/submission']);
   }
 
+  // Method to map submission status to color
+  getSubmissionStatusColor(status: string): { 'background-color': string, color: string } {
+    let bgColor = '#808080'; // Default gray for unknown or initial states
+    let textColor = '#FFFFFF'; // Default white text for readability
+
+    switch (status) {
+      case 'SAVED':
+        bgColor = '#808080'; // Gray
+        textColor = '#FFFFFF';
+        break;
+      case 'SUBMITTED':
+        bgColor = '#4682B4'; // Steel Blue
+        textColor = '#FFFFFF';
+        break;
+      case 'UNDER_REVIEW':
+        bgColor = '#FFD700'; // Gold
+        textColor = '#333333'; // Darker text for readability on yellow
+        break;
+      case 'REVISION_REQUIRED':
+        bgColor = '#FFA500'; // Orange
+        textColor = '#FFFFFF';
+        break;
+      case 'ACCEPTED':
+        bgColor = '#228B22'; // Forest Green
+        textColor = '#FFFFFF';
+        break;
+      case 'DUE_PAYMENT':
+        bgColor = '#DC143C'; // Crimson
+        textColor = '#FFFFFF';
+        break;
+      case 'COPY_EDITING':
+        bgColor = '#1E90FF'; // Dodger Blue
+        textColor = '#FFFFFF';
+        break;
+      case 'PUBLICATION':
+        bgColor = '#8A2BE2'; // Blue Violet
+        textColor = '#FFFFFF';
+        break;
+      case 'PUBLISHED':
+        bgColor = '#008000'; // Green
+        textColor = '#FFFFFF';
+        break;
+      default:
+        // Keep default gray if status is not recognized
+        break;
+    }
+    return { 'background-color': bgColor, color: textColor };
+  }
+
 }

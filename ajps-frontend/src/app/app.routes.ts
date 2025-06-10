@@ -53,6 +53,7 @@ import { SubmissionStepFourComponent } from './user/user-submission/submission-s
 import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
 import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
 import { authGuardUserGuard } from './site-settings/auth/auth-guard-user.guard';
+import { UserPaymentsComponent } from './user/user-payments/user-payments.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -110,6 +111,7 @@ export const routes: Routes = [
             {path: 'view-profile', component: UserProfileComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Profile - ScholarPress'},
             {path: 'edit-profile', component: UserProfileEditComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Edit Profile - ScholarPress'},
             {path: 'settings', component: UserSettingsComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Profile Settings - ScholarPress'},
+            {path: 'payments', component: UserPaymentsComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Payments - ScholarPress'},
             
             // editorial panel:
             {path: 'journal-overview', component: EditorOverviewComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Overview - ScholarPress'},

@@ -63,7 +63,7 @@
                             <span class="journal-name">{{ submission.journalName }}</span>
                         </td>
                         <td>
-                            <span class="badge">{{ submission.submissionStatus }}</span>
+                            <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">{{ submission.submissionStatus }}</span>
                         </td>
                     </tr>
                     <!-- Row 2: Action Buttons -->
