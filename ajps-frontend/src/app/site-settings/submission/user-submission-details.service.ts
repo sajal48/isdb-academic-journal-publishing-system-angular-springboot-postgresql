@@ -16,110 +16,92 @@ export class UserSubmissionDetailsService {
     private authLoginRegisterService: AuthLoginRegisterService
   ) {}
 
+  // handle submission id:
   getSubmissionId(): number {
     const id = sessionStorage.getItem(this.storageKey);
     return id ? +id: 0;
-  }
-  
+  }  
   setSubmissionId(id: number): void {
     sessionStorage.setItem(this.storageKey, id.toString());
-  }
-  
+  }  
   clearSubmissionId(): void {
     sessionStorage.removeItem(this.storageKey);
   }
 
+  // getting submissions:
   getSubmissionList(): Observable<{status: string, code: number, data: SubmissionList[]}> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     const userId = this.authLoginRegisterService.getUserID();
-    return this.http.get<{status: string, code: number, data: SubmissionList[]}>(`${apiConfig.apiBaseUrl}/user/submission/submission-list/${userId}`, {headers});
+    return this.http.get<{status: string, code: number, data: SubmissionList[]}>(`${apiConfig.apiBaseUrl}/user/submission/list/${userId}`, {headers});
   }
-
   getManuscriptDetailsBySubmissionId(submissionId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const userId = this.authLoginRegisterService.getUserID();
-    return this.http.get(`${apiConfig.apiBaseUrl}/user/submission/submission-details/${userId}/${submissionId}`, { headers });
+    return this.http.get(`${apiConfig.apiBaseUrl}/user/submission/details/${userId}/${submissionId}`, { headers });
   }
 
-  saveManuscriptDetails(payload: any): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/manuscript-details`, payload, { headers });
-  }
-
-  saveAuthorInformations(payload: any): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/author-informations`, payload, { headers });
-  }
-
-  removeAuthor(submissionId: number, authorId: number): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-author/${submissionId}/${authorId}`, { headers });
-  }
-
+  // handling user manuscript submission:
+  // update completed steps:
   updateSubmissionSteps(payload: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/update/completed-steps`, payload, { headers });
+    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/steps/update`, payload, { headers });
   }
 
+  // step-1: manuscript details:
+  saveManuscriptDetails(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript-details/save`, payload, { headers });
+  }
   updateManuscriptDetails(payload: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/update/manuscript-details`, payload, { headers });
+    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/manuscript-details/update`, payload, { headers });
   }
 
-  /*uploadManuscriptFile(submissionId: string, formData: FormData): Observable<any> {
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/upload/manuscript`, formData);
-  }*/
+  // step-2: author information:
+  saveAuthorInformations(payload: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/author-informations/save`, payload, { headers });
+  }
+  removeAuthor(submissionId: number, authorId: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/author/remove/${submissionId}/${authorId}`, { headers });
+  }
 
-  /*removeManuscriptFile(submissionId: string, fileName: string): Observable<any> {
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove/manuscript/${submissionId}/${fileName}`);
-  }*/
-
+  // step-3: upload manuscript files:
   uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
-    // const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     const formData = new FormData();
     formData.append('file', file);
     formData.append('submissionId', submissionId.toString());
-    debugger
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript/upload`, formData);
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript-files/upload`, formData);
   }
-
   removeManuscriptFile(submissionId: number, fileId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/manuscript/remove/${submissionId}/${fileId}`, {headers});
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/manuscript-files/remove/${submissionId}/${fileId}`, {headers});
   }
 
-
-
-
-
+  // step-4: suggested reviewers:
   saveReviewerInformations(payload: {
     submissionId: number;
     reviewers: { name: string; email: string; institution: string }[];
   }): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/reviewer-informations`, payload, { headers });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/reviewer-informations/save`, payload, { headers });
   }
-
   removeReviewer(submissionId: number, reviewerId: number): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/remove-reviewer/${submissionId}/${reviewerId}`, { headers });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/reviewer/remove/${submissionId}/${reviewerId}`, { headers });
   }
 
-
-
-
-
+  // step-5: additional information:
   saveAdditionalInformation(payload: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/submit/additional-informations`, payload, { headers });
+    return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/additional-informations/save`, payload, { headers });
   }
 
-
-
-
+  // step-6: confirm submission:
   submitManuscript(payload: any): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/submit-manuscript`, payload, { headers });
+    return this.http.put(`${apiConfig.apiBaseUrl}/user/submission/submit-manuscript/save`, payload, { headers });
   }
 
 

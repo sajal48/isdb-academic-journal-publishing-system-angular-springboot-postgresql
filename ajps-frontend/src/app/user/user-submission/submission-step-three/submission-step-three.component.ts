@@ -161,7 +161,10 @@ export class SubmissionStepThreeComponent implements OnInit {
         next: (response) => {
           if (response.code === 200) {
             this.userToastNotificationService.showToast('Success', 'Manuscript uploaded successfully.', 'success');
-            this.router.navigate(['/user/submission/suggested-reviewers']);
+            // this.router.navigate(['/user/submission/suggested-reviewers']);
+            setInterval(() => {
+            window.location.href="/user/submission/suggested-reviewers";
+          }, 500);
           }
           this.isLoading = false;
         },
@@ -173,27 +176,8 @@ export class SubmissionStepThreeComponent implements OnInit {
       });
   }
 
-  saveAndExit(): void {
-    if (this.uploadedFiles.length > 0) {
-      const payload = {
-        submissionId: this.submissionId,
-        completedSteps: ['manuscript-upload']
-      };
-
-      this.userSubmissionDetailsService.updateSubmissionSteps(payload)
-        .subscribe({
-          next: () => {
-            this.userSubmissionDetailsService.clearSubmissionId();
-            this.router.navigate(['/user/dashboard']);
-          },
-          error: (error) => {
-            console.error(error);
-            this.userToastNotificationService.showToast('Error', 'Failed to save progress.', 'danger');
-          }
-        });
-    } else {
-      this.userSubmissionDetailsService.clearSubmissionId();
-      this.router.navigate(['/user/dashboard']);
-    }
+  exitToDashboard(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+    this.router.navigate(['/user/dashboard']);
   }
 }

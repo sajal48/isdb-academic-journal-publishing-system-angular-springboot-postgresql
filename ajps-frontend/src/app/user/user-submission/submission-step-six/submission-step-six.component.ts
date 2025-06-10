@@ -38,7 +38,8 @@ export class SubmissionStepSixComponent implements OnInit {
 
     const payload = {
       submissionId: this.submissionId,
-      submissionStatus: 'SUBMITTED'
+      submissionStatus: 'SUBMITTED',
+      completedSteps: ["submission-confirmation"] // Mark this step as completed
     };
 
     this.userSubmissionDetailsService.submitManuscript(payload).subscribe({
@@ -60,9 +61,8 @@ export class SubmissionStepSixComponent implements OnInit {
     });
   }
 
-  onSubmitLater(): void {
+  exitToDashboard(): void {
     this.userSubmissionDetailsService.clearSubmissionId();
-    this.userToastNotificationService.showToast('Success', 'Submission saved as draft. Returning to dashboard.', 'success');
     this.router.navigate(['/user/dashboard']);
   }
 }

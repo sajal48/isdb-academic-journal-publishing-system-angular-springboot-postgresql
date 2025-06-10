@@ -75,7 +75,8 @@ export class SubmissionStepFiveComponent implements OnInit {
         if (response.code === 200 || response.code === 201) {
           this.userToastNotificationService.showToast('Success', 'Additional information saved successfully.', 'success');
           setTimeout(() => {
-            this.router.navigate(['/user/submission/submission-confirmation']);
+            // this.router.navigate(['/user/submission/submission-confirmation']);
+            window.location.href="/user/submission/submission-confirmation";
           }, 500);
         } else {
           this.userToastNotificationService.showToast('Error', 'Failed to save additional information.', 'danger');
@@ -87,30 +88,6 @@ export class SubmissionStepFiveComponent implements OnInit {
       }
     });
     return true;
-  }
-
-  onSaveAndExit(): void {
-    const payload = {
-      submissionId: this.submissionId,
-      comments: this.additionalInfo.comment,
-      confirmed: this.additionalInfo.submissionConfirmation
-    };
-
-    this.userSubmissionDetailsService.saveAdditionalInformation(payload).subscribe({
-      next: (response) => {
-        if (response.code === 200 || response.code === 201) {
-          this.userToastNotificationService.showToast('Success', 'Draft saved successfully.', 'success');
-        } else {
-          this.userToastNotificationService.showToast('Warning', 'Could not save draft before exiting.', 'danger');
-        }
-        this.exitToDashboard();
-      },
-      error: (error) => {
-        console.error(error);
-        this.userToastNotificationService.showToast('Error', 'An error occurred while saving draft.', 'danger');
-        this.exitToDashboard();
-      }
-    });
   }
 
   exitToDashboard(): void {

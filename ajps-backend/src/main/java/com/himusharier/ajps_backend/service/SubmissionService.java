@@ -4,10 +4,8 @@ import com.himusharier.ajps_backend.constants.FileUploadOrigin;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
-import com.himusharier.ajps_backend.model.FileUpload;
-import com.himusharier.ajps_backend.model.Profile;
-import com.himusharier.ajps_backend.model.Reviewer;
-import com.himusharier.ajps_backend.model.Submission;
+import com.himusharier.ajps_backend.model.*;
+import com.himusharier.ajps_backend.repository.AuthorRepository;
 import com.himusharier.ajps_backend.repository.FileUploadRepository;
 import com.himusharier.ajps_backend.repository.ReviewerRepository;
 import com.himusharier.ajps_backend.repository.SubmissionRepository;
@@ -31,14 +29,18 @@ public class SubmissionService {
     private String uploadDirectory;
 
     private final SubmissionRepository submissionRepository;
+    private final AuthorRepository authorRepository;
     private final FileUploadRepository fileUploadRepository;
     private final ReviewerRepository reviewerRepository;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
+            AuthorRepository authorRepository,
             FileUploadRepository fileUploadRepository,
-            ReviewerRepository reviewerRepository) {
+            ReviewerRepository reviewerRepository
+    ) {
         this.submissionRepository = submissionRepository;
+        this.authorRepository = authorRepository;
         this.fileUploadRepository = fileUploadRepository;
         this.reviewerRepository = reviewerRepository;
     }
@@ -129,6 +131,32 @@ public class SubmissionService {
         // Set updated comma-separated steps back to entity
         existingSubmission.setCompletedSteps(String.join(",", steps));
         submissionRepository.save(existingSubmission);
+    }
+
+
+
+
+    @Transactional
+    public List<Author> saveAuthors(List<AuthorDTO> authors, Submission submission) {
+        List<Author> savedAuthors = new ArrayList<>();
+
+        for (AuthorDTO authorInfo : authors) {
+            Author author = new Author();
+            author.setName(authorInfo.name());
+            author.setEmail(authorInfo.email());
+            author.setInstitution(authorInfo.institution());
+            author.setCorresponding(authorInfo.corresponding());
+            author.setSubmission(submission);
+
+            savedAuthors.add(authorRepository.save(author));
+        }
+
+        return savedAuthors;
+    }
+
+    @Transactional
+    public void removeAuthor(Long submissionId, Long authorId) {
+        authorRepository.deleteBySubmissionIdAndId(submissionId, authorId);
     }
 
 
@@ -243,12 +271,16 @@ public class SubmissionService {
 
         try {
             submission.setSubmissionStatus(SubmissionStatus.valueOf(request.submissionStatus()));
+            if (request.completedSteps() != null && !request.completedSteps().isEmpty()) {
+                updateCompletedSteps(request.submissionId(), request.completedSteps());
+            }
+
         } catch (IllegalArgumentException e) {
             throw new SubmissionRequestException("Invalid submission status: " + request.submissionStatus());
         }
 
         submission.setSubmissionDateTime(); // Sets submittedAt using BdtZoneTimeUtil
-        submission.setEditable(false); // Lock submission after final submission
+//        submission.setEditable(true); // Lock submission after final submission
 
         return submissionRepository.save(submission);
     }

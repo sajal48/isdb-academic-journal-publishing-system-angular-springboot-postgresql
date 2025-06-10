@@ -25,7 +25,7 @@
                 <a>5</a>
                 <span [ngClass]="{'text-primary': currentRoute === '/user/submission/additional-informations', 'small': true}">Additional Information</span>
             </li>
-            <li [ngClass]="{'active': currentRoute === '/user/submission/submission-confirmation'}">
+            <li [ngClass]="{'active': currentRoute === '/user/submission/submission-confirmation', 'completed': isStepCompleted('submission-confirmation')}">
                 <a>6</a>
                 <span [ngClass]="{'text-primary': currentRoute === '/user/submission/submission-confirmation', 'small': true}">Confirmation</span>
             </li>

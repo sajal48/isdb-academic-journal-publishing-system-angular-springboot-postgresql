@@ -3,7 +3,7 @@ package com.himusharier.ajps_backend.dto.response;
 import lombok.Data;
 
 @Data
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)  --> added this in application.properties to apply system-wide.
 public class SuccessResponseModel<T> {
     String status = "success";
     int code;
