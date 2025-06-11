@@ -88,7 +88,8 @@ export class SubmissionStepFourComponent implements OnInit {
     this.userSubmissionDetailsService.saveReviewerInformations(payload).subscribe({
       next: (response) => {
         if (response.code === 200 || response.code === 201) {
-          this.reviewers.push({ ...this.reviewerDetails });
+          const newReviewerId = response.data.reviewer[0].id;
+          this.reviewers.push({ ...this.reviewerDetails, id: newReviewerId });
           this.reviewerDetails = { id: 0, name: '', email: '', institution: '' };
           this.validationError = '';
           this.userToastNotificationService.showToast('Success', 'Reviewer added successfully.', 'success');

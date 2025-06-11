@@ -220,7 +220,7 @@ public class SubmissionService {
 
 
 
-    public void saveReviewers(ReviewerSubmissionRequest request) {
+    /*public void saveReviewers(ReviewerSubmissionRequest request) {
         Submission submission = submissionRepository.findById(request.submissionId())
                 .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
 
@@ -233,7 +233,28 @@ public class SubmissionService {
             );
             reviewerRepository.save(reviewer);
         }
+    }*/
+
+    public List<Reviewer> saveReviewers(ReviewerSubmissionRequest request) {
+        Submission submission = submissionRepository.findById(request.submissionId())
+                .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
+
+        List<Reviewer> savedReviewers = new ArrayList<>();
+
+        for (ReviewerDTO dto : request.reviewers()) {
+            Reviewer reviewer = new Reviewer(
+                    dto.name(),
+                    dto.email(),
+                    dto.institution(),
+                    submission
+            );
+            Reviewer savedReviewer = reviewerRepository.save(reviewer);
+            savedReviewers.add(savedReviewer);
+        }
+        return savedReviewers;
     }
+
+
 
     public List<ReviewerDTO> getReviewersBySubmissionId(Long submissionId) {
         return reviewerRepository.findBySubmissionId(submissionId)

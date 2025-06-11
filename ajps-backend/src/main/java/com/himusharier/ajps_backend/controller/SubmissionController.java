@@ -5,10 +5,7 @@ import com.himusharier.ajps_backend.dto.response.SuccessResponseModel;
 import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
-import com.himusharier.ajps_backend.model.Author;
-import com.himusharier.ajps_backend.model.FileUpload;
-import com.himusharier.ajps_backend.model.Profile;
-import com.himusharier.ajps_backend.model.Submission;
+import com.himusharier.ajps_backend.model.*;
 import com.himusharier.ajps_backend.service.ProfileService;
 import com.himusharier.ajps_backend.service.SubmissionService;
 import com.himusharier.ajps_backend.util.UserSubmissionListMapperUtil;
@@ -179,8 +176,10 @@ public class SubmissionController {
 
     @PostMapping("/reviewer-informations/save")
     public ApiResponse<?> saveReviewerInformations(@RequestBody ReviewerSubmissionRequest request) {
-        submissionService.saveReviewers(request);
-        return new ApiResponse<>(200, "Reviewers saved successfully");
+        List<Reviewer> savedReviewer = submissionService.saveReviewers(request);
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("reviewer", savedReviewer);
+        return new ApiResponse<>(200, "Reviewers saved successfully", responseData);
     }
 
     @DeleteMapping("/reviewer/remove/{submissionId}/{reviewerId}")

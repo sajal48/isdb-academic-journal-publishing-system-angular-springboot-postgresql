@@ -110,7 +110,9 @@ export class SubmissionStepTwoComponent implements OnInit {
     this.userSubmissionDetailsService.saveAuthorInformations(payload).subscribe({
       next: (response) => {
         if (response.code === 200 || response.code === 201) {
-          this.authors.push({ ...this.authorDetails });
+          const newAuthorId = response.data.authors[0].id;
+          this.authors.push({ ...this.authorDetails, id: newAuthorId });
+          debugger
           this.authorDetails = {id: 0, name: '', email: '', institution: '', corresponding: false };
           this.validationError = '';
           this.userToastNotificationService.showToast('Success', 'Author added successfully.', 'success');
@@ -127,7 +129,6 @@ export class SubmissionStepTwoComponent implements OnInit {
 
   removeAuthor(index: number) {
     const authorId = this.authors[index].id;
-    debugger
     this.userSubmissionDetailsService.removeAuthor(this.submissionId, authorId).subscribe({
       next: (response) => {
         if (response.code === 200) {
