@@ -106,4 +106,13 @@ export class UserSubmissionDetailsService {
 
 
 
+
+
+
+  deleteSubmission(submissionId: number): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });    
+    return this.http.delete(`${apiConfig.apiBaseUrl}/user/submission/delete/${submissionId}`, { headers });
+}
+
+
 }

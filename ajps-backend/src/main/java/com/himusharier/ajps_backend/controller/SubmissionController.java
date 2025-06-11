@@ -203,4 +203,22 @@ public class SubmissionController {
 
 
 
+
+
+
+    @DeleteMapping("/delete/{submissionId}")
+    public ResponseEntity<SuccessResponseModel<Void>> deleteSubmission(
+            @PathVariable Long submissionId) {
+
+        submissionService.deleteSubmission(submissionId);
+        return new ResponseEntity<>(
+                new SuccessResponseModel<>(
+                        HttpStatus.OK.value(),
+                        null,
+                        "Submission deleted successfully."),
+                HttpStatus.OK);
+    }
+
+
+
 }

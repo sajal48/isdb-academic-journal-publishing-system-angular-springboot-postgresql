@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../site-settings/submission/user-submission-details.service';
 import { SubmissionList } from '../../site-settings/interfaces/submission-list-interface';
+import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -16,6 +17,7 @@ export class UserDashboardComponent implements OnInit {
 
   constructor(
     private userSubmissionDetailsService: UserSubmissionDetailsService,
+    private userToastNotificationService: UserToastNotificationService,
     private router: Router
 
   ) {}
@@ -88,5 +90,26 @@ export class UserDashboardComponent implements OnInit {
     }
     return { 'background-color': bgColor, color: textColor };
   }
+
+
+
+
+
+  deleteManuscript(id: number) {
+    if (confirm('Are you sure you want to delete this manuscript? This action cannot be undone.')) {
+        this.userSubmissionDetailsService.deleteSubmission(id).subscribe({
+            next: () => {
+                this.submissions = this.submissions.filter(sub => sub.id !== id);
+                // this.toastr.success('Manuscript deleted successfully');
+                this.userToastNotificationService.showToast('Success', `Manuscript deleted successfully`, 'success');
+            },
+            error: (error) => {
+                console.error('Error deleting submission', error);
+                // this.toastr.error('Failed to delete manuscript');
+                this.userToastNotificationService.showToast('Error', `Failed to delete manuscript`, 'danger');
+            }
+        });
+    }
+}
 
 }

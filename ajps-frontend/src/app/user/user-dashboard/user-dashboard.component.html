@@ -77,7 +77,7 @@
                             <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button>
                             <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button>
                             }                            
-                            <button *ngIf="submission.submissionStatus == 'SAVED'" class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
+                            <button *ngIf="submission.submissionStatus == 'SAVED'" (click)="deleteManuscript(submission.id)" class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
                         </td>
                     </tr>
                 </ng-container>

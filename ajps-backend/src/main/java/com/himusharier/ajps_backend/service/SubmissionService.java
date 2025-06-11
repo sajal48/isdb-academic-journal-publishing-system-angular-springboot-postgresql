@@ -297,4 +297,26 @@ public class SubmissionService {
 
 
 
+
+
+    @Transactional
+    public void deleteSubmission(Long submissionId) {
+        // First delete associated files physically from storage
+        List<FileUpload> files = fileUploadRepository.findBySubmissionId(submissionId);
+        for (FileUpload file : files) {
+            try {
+                Path uploadPath = Paths.get(uploadDirectory);
+                Path filePath = uploadPath.resolve(file.getStoredName());
+                Files.deleteIfExists(filePath);
+            } catch (IOException e) {
+                throw new SubmissionRequestException("Failed to delete file: " + file.getOriginalName());
+            }
+        }
+
+        // The cascade will handle authors, files, and reviewers deletion
+        submissionRepository.deleteById(submissionId);
+    }
+
+
+
 }
