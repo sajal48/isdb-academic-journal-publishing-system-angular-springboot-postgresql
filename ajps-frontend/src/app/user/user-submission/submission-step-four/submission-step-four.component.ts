@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
-import { UserToastNotificationService } from '../../../site-settings/user-profile/user-toast-notification.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 import { CommonModule } from '@angular/common';
 
 interface ReviewerDetails {

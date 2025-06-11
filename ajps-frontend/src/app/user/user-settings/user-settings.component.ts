@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 import { UserProfileSettingsService } from '../../site-settings/user-profile/user-profile-settings.service';
-import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
 import { FormsModule } from '@angular/forms';
 
 declare const bootstrap: any;

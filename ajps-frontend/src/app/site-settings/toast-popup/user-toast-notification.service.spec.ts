@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { UserToastNotificationService } from './user-toast-notification.service';
+import { UserToastNotificationService } from '../toast-popup/user-toast-notification.service';
 
 describe('UserToastNotificationService', () => {
   let service: UserToastNotificationService;

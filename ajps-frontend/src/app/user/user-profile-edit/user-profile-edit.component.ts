@@ -3,7 +3,7 @@ import { UserProfile } from '../../site-settings/interfaces/user-profile-interfa
 import { UserProfileDetailsService } from '../../site-settings/user-profile/user-profile-details.service';
 import { FormsModule } from '@angular/forms';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
-import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 

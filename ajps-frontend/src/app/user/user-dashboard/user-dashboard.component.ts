@@ -3,7 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../site-settings/submission/user-submission-details.service';
 import { SubmissionList } from '../../site-settings/interfaces/submission-list-interface';
-import { UserToastNotificationService } from '../../site-settings/user-profile/user-toast-notification.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
+import Swal from 'sweetalert2';
+import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -18,6 +20,7 @@ export class UserDashboardComponent implements OnInit {
   constructor(
     private userSubmissionDetailsService: UserSubmissionDetailsService,
     private userToastNotificationService: UserToastNotificationService,
+    private popupMessageService: PopupMessageService,
     private router: Router
 
   ) {}
@@ -96,7 +99,16 @@ export class UserDashboardComponent implements OnInit {
 
 
   deleteManuscript(id: number) {
-    if (confirm('Are you sure you want to delete this manuscript? This action cannot be undone.')) {
+    this.popupMessageService
+      .confirm(
+        'Delete Manuscript?',
+        'Are you sure you want to delete this manuscript permanently?',
+        'Yes, Delete',
+        'No, Cancel'
+      )
+      .then((confirmed) => {
+        if (confirmed) {
+    
         this.userSubmissionDetailsService.deleteSubmission(id).subscribe({
             next: () => {
                 this.submissions = this.submissions.filter(sub => sub.id !== id);
@@ -109,7 +121,10 @@ export class UserDashboardComponent implements OnInit {
                 this.userToastNotificationService.showToast('Error', `Failed to delete manuscript`, 'danger');
             }
         });
-    }
+    
+      }
+  });
+
 }
 
 }

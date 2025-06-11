@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { FormsModule, NgForm } from '@angular/forms';
-import { UserToastNotificationService } from '../../../site-settings/user-profile/user-toast-notification.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
 interface ManuscriptDetails {
   journalName: string;
