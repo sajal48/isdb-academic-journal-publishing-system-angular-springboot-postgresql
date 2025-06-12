@@ -104,7 +104,7 @@ export class UserDashboardComponent implements OnInit {
         'Delete Manuscript?',
         'Are you sure you want to delete this manuscript permanently?',
         'Yes, Delete',
-        'No, Cancel'
+        'Cancel'
       )
       .then((confirmed) => {
         if (confirmed) {

@@ -38,10 +38,16 @@
                       <i class="bi bi-person-fill"></i> {{ userName }}
                   </button>
                   <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a [routerLink]="['/user/dashboard']"><button class="dropdown-item" type="button">Dashboard</button></a></li>
+                    <li><a [routerLink]="['/user/dashboard']"><button class="dropdown-item" type="button">User Dashboard</button></a></li>
                     <li><a [routerLink]="['/user/submission']"><button class="dropdown-item" type="button">Online Submission</button></a></li>
                     <li><a [routerLink]="['/user/view-profile']"><button class="dropdown-item" type="button">View Profile</button></a></li>
-                    <li><a [routerLink]="['/user/settings']"><button class="dropdown-item" type="button">Profile Settings</button></a></li>
+                    <li><a [routerLink]="['/user/settings']"><button class="dropdown-item" type="button">Settings</button></a></li>
+                    @if (userRole == "admin") {
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Admin Dashboard</button></a></li>
+                    <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Journal Publication</button></a></li>
+                    <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Journal Management</button></a></li>
+                    }
                     <li><hr class="dropdown-divider"></li>
                     <li><button (click)="logout()" class="dropdown-item" type="button" style="color: #ff2926;"><i class="bi bi-power"></i> Logout</button></li>
                   </ul>

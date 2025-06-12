@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
   searchQuery = '';
   userName = '';
   isLoggedIn = false;
+  userRole: string = '';
 
   constructor(
     private authLoginRegisterService: AuthLoginRegisterService,
@@ -29,6 +30,7 @@ export class HeaderComponent implements OnInit {
           const email = this.authLoginRegisterService.getUserEmail();
           this.userName = email ? email.split('@')[0] : '';
           this.isLoggedIn = true;
+          this.userRole = this.authLoginRegisterService.getUserRole();
         }
       },
       error: () => {

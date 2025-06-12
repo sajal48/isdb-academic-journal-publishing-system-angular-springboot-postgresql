@@ -14,7 +14,6 @@ import { map } from 'rxjs/operators';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
-  redirectUrl: string | null = null; // To store the URL to redirect to after login
 
   user: AuthRegisterLoginRequest = {
     email: '',
@@ -59,16 +58,13 @@ export class LoginComponent implements OnInit {
           this.user = {email: '', password: ''};
 
           this.authLoginRegisterService.setToken(response.access_token);
-          window.location.href="/user";
+          // window.location.href="/user";
 
-          // Navigate to the stored URL or a default page
-          if (this.redirectUrl) {
-            // this.router.navigateByUrl(this.redirectUrl);
-            window.location.href = this.redirectUrl;
-            this.redirectUrl = null; // Clear the stored URL
-          } else {
-            // this.router.navigate(['/user']); // Default page after login
-            window.location.href = "/user";
+          if(this.authLoginRegisterService.getUserRole() == "user") {
+            window.location.href="/user";
+          }
+          if(this.authLoginRegisterService.getUserRole() == "admin") {
+            window.location.href="/user/admin-dashboard";
           }
 
         } else {

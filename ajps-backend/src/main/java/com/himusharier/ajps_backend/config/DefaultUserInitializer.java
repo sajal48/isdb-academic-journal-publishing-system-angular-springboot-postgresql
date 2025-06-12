@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AdminDataInitializer implements CommandLineRunner {
+public class DefaultUserInitializer implements CommandLineRunner {
 
     @Autowired
     private AuthRepository authRepository;
@@ -29,6 +29,9 @@ public class AdminDataInitializer implements CommandLineRunner {
         String adminEmail = "admin@mail.com";
         String adminPass = "admin123";
 
+        String userEmail = "user@mail.com";
+        String userPass = "user123";
+
         try {
             if (authRepository.findByEmail(adminEmail).isEmpty()) {
                 Auth admin = new Auth();
@@ -37,15 +40,28 @@ public class AdminDataInitializer implements CommandLineRunner {
                 admin.setUserRole(UserRole.ADMIN);
                 admin.setUserStatus(UserStatus.ACTIVE);
                 authRepository.save(admin);
-
                 Profile profile = Profile.builder()
                         .auth(admin)
                         .build();
                 profileRepository.save(profile);
             }
 
+
+            if (authRepository.findByEmail(userEmail).isEmpty()) {
+                Auth user = new Auth();
+                user.setEmail(userEmail);
+                user.setPassword(passwordEncoder.encode(userPass));
+                user.setUserRole(UserRole.USER);
+                user.setUserStatus(UserStatus.ACTIVE);
+                authRepository.save(user);
+                Profile profile = Profile.builder()
+                        .auth(user)
+                        .build();
+                profileRepository.save(profile);
+            }
+
         } catch (RuntimeException e) {
-            throw new RegisterRequestException("Admin account not created!");
+            throw new RegisterRequestException("Default accounts not created!");
         }
     }
 }
