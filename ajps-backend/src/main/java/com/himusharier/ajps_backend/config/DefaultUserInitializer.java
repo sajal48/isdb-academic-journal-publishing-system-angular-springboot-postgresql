@@ -32,6 +32,12 @@ public class DefaultUserInitializer implements CommandLineRunner {
         String userEmail = "user@mail.com";
         String userPass = "user123";
 
+        String editorEmail = "editor@mail.com";
+        String editorPass = "editor123";
+
+        String reviewerEmail = "reviewer@mail.com";
+        String reviewerPass = "reviewer123";
+
         try {
             if (authRepository.findByEmail(adminEmail).isEmpty()) {
                 Auth admin = new Auth();
@@ -46,7 +52,6 @@ public class DefaultUserInitializer implements CommandLineRunner {
                 profileRepository.save(profile);
             }
 
-
             if (authRepository.findByEmail(userEmail).isEmpty()) {
                 Auth user = new Auth();
                 user.setEmail(userEmail);
@@ -56,6 +61,32 @@ public class DefaultUserInitializer implements CommandLineRunner {
                 authRepository.save(user);
                 Profile profile = Profile.builder()
                         .auth(user)
+                        .build();
+                profileRepository.save(profile);
+            }
+
+            if (authRepository.findByEmail(editorEmail).isEmpty()) {
+                Auth editor = new Auth();
+                editor.setEmail(editorEmail);
+                editor.setPassword(passwordEncoder.encode(editorPass));
+                editor.setUserRole(UserRole.EDITOR);
+                editor.setUserStatus(UserStatus.ACTIVE);
+                authRepository.save(editor);
+                Profile profile = Profile.builder()
+                        .auth(editor)
+                        .build();
+                profileRepository.save(profile);
+            }
+
+            if (authRepository.findByEmail(reviewerEmail).isEmpty()) {
+                Auth reviewer = new Auth();
+                reviewer.setEmail(reviewerEmail);
+                reviewer.setPassword(passwordEncoder.encode(reviewerPass));
+                reviewer.setUserRole(UserRole.REVIEWER);
+                reviewer.setUserStatus(UserStatus.ACTIVE);
+                authRepository.save(reviewer);
+                Profile profile = Profile.builder()
+                        .auth(reviewer)
                         .build();
                 profileRepository.save(profile);
             }

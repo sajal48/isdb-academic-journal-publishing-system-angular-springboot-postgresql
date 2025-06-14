@@ -60,11 +60,21 @@ export class LoginComponent implements OnInit {
           this.authLoginRegisterService.setToken(response.access_token);
           // window.location.href="/user";
 
-          if(this.authLoginRegisterService.getUserRole() == "user") {
+          /*if(this.authLoginRegisterService.getUserRole() == "user") {
             window.location.href="/user";
-          }
+          }*/
+
           if(this.authLoginRegisterService.getUserRole() == "admin") {
             window.location.href="/user/admin-dashboard";
+
+          } else if (this.authLoginRegisterService.getUserRole() == "editor") {
+            window.location.href="/user/journal-overview";
+
+          } else if (this.authLoginRegisterService.getUserRole() == "reviewer") {
+            window.location.href="/user/reviewer-dashboard";
+
+          } else {
+            window.location.href="/user";
           }
 
         } else {

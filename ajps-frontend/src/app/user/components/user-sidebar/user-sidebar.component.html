@@ -1,6 +1,7 @@
 <nav class="sidebar">
     <div class="sidebar-header">
-        <h3><i class="bi bi-view-list"></i> {{ userRole | titlecase }} Menu</h3>
+        <!-- <h3><i class="bi bi-view-list"></i> {{ userRole | titlecase }} Menu</h3> -->
+        <h3><i class="bi bi-view-list"></i> Common Menu</h3>
     </div>
     <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" routerLink="dashboard" routerLinkActive="active">Dashboard</a></li>
@@ -11,10 +12,13 @@
         <li class="nav-item"><a class="nav-link" routerLink="settings" routerLinkActive="active">Settings</a></li>
     </ul>
 </nav>
-<!-- <nav class="sidebar">
+
+@if (userRole == "editor") {
+<nav class="sidebar">
     <div class="sidebar-header">
         <h3><i class="bi bi-view-list"></i> Editor Menu</h3>
     </div>
+    <!-- <hr style="border-top: 1px solid #aaa;"/> -->
     <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" routerLink="journal-overview" routerLinkActive="active">Journal Overview</a></li>
         <li class="nav-item">
@@ -29,23 +33,29 @@
         <li class="nav-item"><a class="nav-link" routerLink="journal-reports" routerLinkActive="active">Reports</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="journal-editorial-board" routerLinkActive="active">Editorial Board</a></li>
     </ul>
-</nav> -->
-<!-- <nav class="sidebar">
+</nav>
+}
+
+@if (userRole == "reviewer") {
+<nav class="sidebar">
     <div class="sidebar-header">
         <h3><i class="bi bi-view-list"></i> Reviewer Menu</h3>
     </div>
+    <!-- <hr style="border-top: 1px solid #aaa;"/> -->
     <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" routerLink="reviewer-dashboard" routerLinkActive="active">Reviewer Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="reviewer-manuscripts" routerLinkActive="active">Assigned Manuscripts</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="reviewer-reviews" routerLinkActive="active">Submitted Reviews</a></li>
     </ul>
-</nav> -->
+</nav>
+}
+
 @if (userRole == "admin") {
 <nav class="sidebar">
-    <!-- <div class="sidebar-header">
+    <div class="sidebar-header">
         <h3><i class="bi bi-view-list"></i> Admin Menu</h3>
-    </div> -->
-    <hr style="border-top: 1px solid #aaa;"/>
+    </div>
+    <!-- <hr style="border-top: 1px solid #aaa;"/> -->
     <ul class="nav flex-column">
         <li class="nav-item"><a class="nav-link" routerLink="admin-dashboard" routerLinkActive="active">Admin Dashboard</a></li>
         <li class="nav-item"><a class="nav-link" routerLink="admin-journal-publication" routerLinkActive="active">Journal Publication</a></li>
