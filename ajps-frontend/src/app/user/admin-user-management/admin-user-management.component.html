@@ -1,1 +1,133 @@
-<p>admin-user-management works!</p>
+<div class="px-2">
+    <h4 class="page-title mb-4" style="color: #2e7d32; margin-top: 10px">
+        User Management
+    </h4>
+</div>
+
+<div class="container">
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-4" id="userManagementTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="add-user-tab" data-bs-toggle="tab" data-bs-target="#add-user"
+                type="button" role="tab" aria-controls="add-user" aria-selected="true">
+                Add User
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manage-users-tab" data-bs-toggle="tab" data-bs-target="#manage-users"
+                type="button" role="tab" aria-controls="manage-users" aria-selected="false">
+                Manage Users
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="userManagementTabsContent">
+        <!-- Add User Tab -->
+        <div class="tab-pane fade show active" id="add-user" role="tabpanel" aria-labelledby="add-user-tab">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title h5 mb-4 text-primary">Add New User</h2>
+                    <form (ngSubmit)="addUser()" #userForm="ngForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name <i>*</i></label>
+                                <input id="firstName" [(ngModel)]="newUser.firstName" name="firstName" type="text"
+                                    class="form-control" placeholder="Enter first name" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name <i>*</i></label>
+                                <input id="lastName" [(ngModel)]="newUser.lastName" name="lastName" type="text"
+                                    class="form-control" placeholder="Enter last name" required />
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email <i>*</i></label>
+                                <input id="email" [(ngModel)]="newUser.email" name="email" type="email"
+                                    class="form-control" placeholder="Enter email" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label for="role" class="form-label">Role <i>*</i></label>
+                                <select id="role" [(ngModel)]="newUser.role" name="role" class="form-select" required>
+                                    <option value="" disabled selected>Select a role</option>
+                                    <option value="User">User</option>
+                                    <option value="Editor">Editor</option>
+                                    <option value="Viewer">Reviewer</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input id="sendEmail" [(ngModel)]="newUser.sendEmail" name="sendEmail"
+                                        type="checkbox" class="form-check-input" />
+                                    <label for="sendEmail" class="form-check-label">Send email with password to user</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary" [disabled]="!userForm.valid">
+                                    <i class="bi bi-person-plus"></i> Add User
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Users Tab -->
+        <div class="tab-pane fade" id="manage-users" role="tabpanel" aria-labelledby="manage-users-tab">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title h5 mb-4 text-primary">Search Users</h2>
+                    <div class="input-group mb-3">
+                        <input type="text" [(ngModel)]="searchQuery" (input)="searchUsers()" class="form-control"
+                            placeholder="Search by first name, last name, email, or role" aria-label="Search users">
+                        <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()"><i class="bi bi-x-lg"></i> Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title h5 mb-4 text-primary">Manage Users</h2>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Role</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of filteredUsers">
+                                    <td>{{ user.firstName }} {{ user.lastName }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.role }}</td>
+                                    <td>{{ user.status }}</td>
+                                    <td>
+                                        <!-- <button class="btn btn-sm btn-warning me-2" (click)="toggleSuspend(user)"
+                                            [disabled]="user.status === 'Deleted'">
+                                            {{ user.status === 'Active' ? 'Suspend' : 'Activate' }}
+                                        </button> -->
+                                        <!-- <button class="btn btn-sm btn-danger" (click)="deleteUser(user)"
+                                            [disabled]="user.status === 'Deleted'">Delete</button> -->
+
+                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-pencil"></i> Edit User</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

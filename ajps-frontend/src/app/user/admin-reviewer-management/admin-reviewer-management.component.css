@@ -1,0 +1,35 @@
+.page-title {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px; /* Fixed length for the underline */
+    height: 3px;
+    background: linear-gradient(to right, #2e7d32, #4caf50);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+.form-label {
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-label > i {
+    color: #dc3545;
+}
+.table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #1a202c;
+    /* padding: 1rem; */
+    font-size: 14px;
+}
+.table td {
+    vertical-align: middle;
+    /* padding: 1rem; */
+    font-size: 14px;
+}

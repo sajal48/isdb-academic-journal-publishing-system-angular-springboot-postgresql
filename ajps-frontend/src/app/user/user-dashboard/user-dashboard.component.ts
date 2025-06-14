@@ -4,7 +4,6 @@ import { Router, RouterLink } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../site-settings/submission/user-submission-details.service';
 import { SubmissionList } from '../../site-settings/interfaces/submission-list-interface';
 import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
-import Swal from 'sweetalert2';
 import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service';
 
 @Component({

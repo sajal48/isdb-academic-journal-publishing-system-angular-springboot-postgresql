@@ -311,7 +311,7 @@ public class SubmissionService {
         }
 
         submission.setSubmissionDateTime(); // Sets submittedAt using BdtZoneTimeUtil
-//        submission.setEditable(true); // Lock submission after final submission
+        submission.setEditable(false); // Lock submission after final submission
 
         return submissionRepository.save(submission);
     }
