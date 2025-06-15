@@ -23,6 +23,7 @@
           <select [(ngModel)]="journalFilter" (change)="searchReviewers()" class="form-select"
             aria-label="Filter by journal">
             <option value="">All Journals</option>
+            <option value="">Unassign</option>
             <option *ngFor="let journal of journals" [value]="journal">{{ journal }}</option>
           </select>
         </div>

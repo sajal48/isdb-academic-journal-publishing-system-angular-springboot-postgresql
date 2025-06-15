@@ -22,11 +22,11 @@ export class AdminReviewerManagementComponent {
 
   reviewerSearchQuery: string = '';
   journalFilter: string = '';
-  journals: string[] = ['Journal of Botany', 'Environmental Studies', 'Plant Diversity', 'Unassigned']; // example journals
+  journals: string[] = ['Journal of Botany', 'Environmental Studies', 'Plant Diversity']; // example journals
 
   reviewers: Reviewer[] = [
     { id: 1, firstName: 'Alice', lastName: 'Johnson', email: 'alice@example.com', assignedJournals: ['Journal of Botany', 'Plant Diversity'], status: 'Active' },
-    { id: 2, firstName: 'Bob', lastName: 'Smith', email: 'bob@example.com', assignedJournals: ['Unassigned'], status: 'Suspended' }
+    { id: 2, firstName: 'Bob', lastName: 'Smith', email: 'bob@example.com', assignedJournals: [], status: 'Suspended' }
   ];
 
   filteredReviewers: Reviewer[] = [...this.reviewers];
