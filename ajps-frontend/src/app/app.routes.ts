@@ -54,6 +54,7 @@ import { SubmissionStepSixComponent } from './user/user-submission/submission-st
 import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
 import { authGuardUserGuard } from './site-settings/auth/auth-guard-user.guard';
 import { UserPaymentsComponent } from './user/user-payments/user-payments.component';
+import { AdminSiteSettingsComponent } from './user/admin-site-settings/admin-site-settings.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -142,7 +143,7 @@ export const routes: Routes = [
             {path: 'admin-editorial-management', component: AdminEditorialManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Editorial Management - ScholarPress'},
             {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Reviewer Management - ScholarPress'},
             {path: 'admin-user-management', component: AdminUserManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'User Management - ScholarPress'},
-            {path: 'admin-site-settings', component: AdminUserManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Site Settings - ScholarPress'},
+            {path: 'admin-site-settings', component: AdminSiteSettingsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Site Settings - ScholarPress'},
             {path: 'admin-activity-logs', component: AdminActivityLogsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Activity Logs - ScholarPress'},
         ]
     },
