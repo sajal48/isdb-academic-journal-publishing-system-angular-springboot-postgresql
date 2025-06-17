@@ -1,0 +1,68 @@
+.page-title {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #2e7d32, #4caf50);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.table {
+  font-size: 0.875rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #1a202c;
+  background: #f8f9fa;
+  font-size: 14px;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+}
+
+.nav-tabs .nav-link {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  color: #2e7d32;
+  background-color: #f8f9fa;
+  border-bottom-color: #2e7d32;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 1em;
+}

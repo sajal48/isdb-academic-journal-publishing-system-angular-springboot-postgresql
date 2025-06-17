@@ -52,18 +52,20 @@
   color: #00ADB5;
   /* background: white; */
   border-radius: 8px;
+  background-color: #eee;
+  padding: 10px;
 }
 
 .accordion-button:not(.collapsed) {
   color: #00ADB5;
   /* background: white; */
   box-shadow: none;
-  border-radius: 8px;
+  /* border-radius: 8px; */
 }
 
 .accordion-button:focus {
   box-shadow: none;
-  border-radius: 8px;
+  /* border-radius: 8px; */
 }
 
 .table {
@@ -74,10 +76,12 @@
   font-weight: 600;
   color: #1a202c;
   background: #f8f9fa;
+  font-size: 14px;
 }
 
 .table td {
   vertical-align: middle;
+  font-size: 14px;
 }
 
 .btn-link {
@@ -109,9 +113,4 @@
 .badge {
   font-size: 0.75rem;
   padding: 0.5em 1em;
-}
-
-.main-content {
-  border-radius: 8px;
-  /* background-color: white; */
 }
