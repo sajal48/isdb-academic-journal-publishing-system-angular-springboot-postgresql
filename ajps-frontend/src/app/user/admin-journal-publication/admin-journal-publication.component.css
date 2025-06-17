@@ -1,0 +1,56 @@
+.page-title {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px; /* Fixed length for the underline */
+    height: 3px;
+    background: linear-gradient(to right, #2e7d32, #4caf50);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
+.card { 
+    margin-bottom: 20px; 
+    border: none; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+}
+.card-header { 
+    background-color: #007bff; 
+    color: white; 
+    font-weight: bold; 
+}
+/* .table { 
+    background-color: white; 
+} */
+.btn-sm { 
+    margin-right: 5px; 
+}
+.modal-content { 
+    border-radius: 10px; 
+}
+
+.table {
+  font-size: 0.875rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #1a202c;
+  background: #f8f9fa;
+  font-size: 14px;
+}
+
+.table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.nav-item {
+    cursor: pointer;
+}

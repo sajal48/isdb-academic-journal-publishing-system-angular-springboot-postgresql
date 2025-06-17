@@ -1,1 +1,99 @@
-<p>admin-journal-publication works!</p>
+<div class="px-2">
+    <h4 class="page-title mb-4" style="color: #2e7d32; margin-top: 10px">
+        Journal Publication Management
+    </h4>
+</div>
+<div class="container-fluid">
+    <!-- Main Content -->
+    <main>
+        <!-- Journal Selection -->
+        <div class="card">
+            <div class="card-header">Select Journal</div>
+            <div class="card-body">
+                <select class="form-select mb-3" [(ngModel)]="selectedJournal" (change)="loadIssues()">
+                    <option *ngFor="let journal of journals" [value]="journal.id">{{ journal.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabs for Published and Future Issues -->
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="currentTab === 'published'" (click)="currentTab = 'published'">Published Issues</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [class.active]="currentTab === 'future'" (click)="currentTab = 'future'">Future Issues</a>
+            </li>
+        </ul>
+
+        <!-- Issue List -->
+        <div class="card">
+            <div class="card-header">{{ currentTab === 'published' ? 'Published Issues' : 'Future Issues' }}</div>
+            <div class="card-body">
+                <button class="btn btn-primary mb-3" (click)="openAddIssueModal()">Add New Issue</button>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Volume</th>
+                            <th>Issue</th>
+                            <th>Publication Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let issue of getFilteredIssues()">
+                            <td>{{ issue.volume }}</td>
+                            <td>{{ issue.number }}</td>
+                            <td>{{ issue.publicationDate | date:'shortDate' }}</td>
+                            <td>{{ issue.status }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" (click)="viewPapers(issue)">View Papers</button>
+                                <button class="btn btn-sm btn-warning" (click)="editIssue(issue)">Edit</button>
+                                <button class="btn btn-sm btn-danger" (click)="deleteIssue(issue)">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Papers List Modal -->
+        <div class="modal fade" id="papersModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Papers in Volume {{ selectedIssue?.volume }} Issue {{
+                            selectedIssue?.number }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <button class="btn btn-primary mb-3" (click)="addPaper()">Add Paper</button>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Authors</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let paper of selectedIssue?.papers">
+                                    <td>{{ paper.title }}</td>
+                                    <td>{{ paper.authors }}</td>
+                                    <td>{{ paper.status }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" (click)="editPaper(paper)">Edit</button>
+                                        <button class="btn btn-sm btn-danger"
+                                            (click)="deletePaper(paper)">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
