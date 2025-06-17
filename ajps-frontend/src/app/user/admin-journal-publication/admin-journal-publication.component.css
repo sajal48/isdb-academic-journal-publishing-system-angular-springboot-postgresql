@@ -19,11 +19,15 @@
     margin-bottom: 20px; 
     border: none; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    border: 1px solid #ddd;
 }
 .card-header { 
-    background-color: #007bff; 
-    color: white; 
-    font-weight: bold; 
+    /* background-color: #007bff;  */
+    background-color: #F8F8F8; 
+    color: #212529; 
+    /* font-weight: bold;  */
+    font-size: 18px;
+    font-weight: 500;
 }
 /* .table { 
     background-color: white; 

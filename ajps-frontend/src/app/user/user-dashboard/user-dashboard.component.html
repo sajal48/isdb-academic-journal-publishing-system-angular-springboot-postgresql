@@ -74,10 +74,12 @@
                             <button *ngIf="submission.paymentDue" routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
                             <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
                             <button *ngIf="submission.submissionStatus == 'PUBLISHED'" class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
-                            <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button>
-                            <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button>
+                            <!-- <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button> -->
+                            <!-- <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button> -->
                             }                            
                             <button *ngIf="submission.submissionStatus == 'SAVED'" (click)="deleteManuscript(submission.id)" class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
+                            <!-- <a *ngIf="submission.submissionStatus == 'REVISION_REQUIRED'" class="text-warning"><i class="bi bi-exclamation-triangle"></i> This journal required revision.</a> -->
+                            <a *ngIf="submission.submissionStatus != 'SAVED'" class="text-warning-emphasis text-decoration-none"><i class="bi bi-exclamation-triangle"></i> This journal required revision!</a>
                         </td>
                     </tr>
                 </ng-container>
