@@ -1,137 +1,229 @@
-<div class="mb-4">
-    <h5 class="mb-3 text-primary">Manuscript Details</h5>
-    <form id="manuscriptDetailsForm" enctype="multipart/form-data">
-        <!-- Error Message Placeholder -->
-        <div id="submissionError-messageQ" class="alert alert-danger d-none mb-3" role="alert">
-            <!-- Dynamic error messages will appear here -->
+<div class="container-fluid">
+    <!-- Manuscript Header -->
+    <div class="mb-4">
+        <div>
+            <p class="mt-2">Manuscript ID: {{ manuscript.id }} | Submitted on: {{ manuscript.submissionDate |
+                date:'mediumDate' }}</p>
+            <h3>{{ manuscript.title }}</h3>
+            <h5 class="text-muted">{{ manuscript.journalName }}</h5>
         </div>
-        <div class="mb-3">
-            <label for="journal" class="form-label">Select Journal <span class="text-danger">*</span></label>
-            <select class="form-select" id="journal" name="journal" required>
-                <option value="" disabled selected>Select a journal</option>
-                <option value="plants-and-ecosystem">Plants and Ecosystem</option>
-                <option value="journal-of-botany">Journal of Botany</option>
-                <option value="ecological-studies">Ecological Studies</option>
-                <option value="environmental-research">Environmental Research</option>
-                <option value="biodiversity-and-conservation">Biodiversity and Conservation</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="articleTitle" class="form-label">Article Title <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="articleTitle" name="articleTitle" placeholder="Enter manuscript title" required>
-        </div>
-        <div class="mb-3">
-            <label for="articleCategory" class="form-label">Article Category <span class="text-danger">*</span></label>
-            <select class="form-select" id="articleCategory" name="articleCategory" required>
-                <option value="" disabled selected>Select a category</option>
-                <option value="research">Research Article</option>
-                <option value="review">Review Article</option>
-                <option value="case-study">Case Study</option>
-                <option value="editorial">Editorial</option>
-                <option value="other">Other</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="abstract" class="form-label">Abstract <span class="text-danger">*</span></label>
-            <textarea class="form-control" id="abstract" name="abstract" rows="5" placeholder="Enter abstract (max 300 words)" autocomplete="off" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="keywords" class="form-label">Keywords (Comma Separated) <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="keywords" name="keywords" placeholder="Enter keywords (e.g., ecology, biodiversity, photosynthesis)" required>
-        </div>
-        <hr class="my-4">
-    </form>
-</div>
-<div class="mb-4">
-    <h5 class="mb-3 text-primary">Author Information</h5>
-    <form id="authorInformationForm">
-        <div class="mb-3">
-            <label for="corresponding-author" class="form-label">Corresponding Author Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="corresponding-author" name="corresponding-author" placeholder="Enter full name" required>
-        </div>
-        <div class="mb-3">
-            <label for="author-email" class="form-label">Corresponding Author Email <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="author-email" name="author-email" placeholder="Enter institutional email" required>
-        </div>
-        <div class="mb-3">
-            <label for="institution" class="form-label">Institution/Organization <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="institution" name="institution" placeholder="Enter institution name" required>
-        </div>
-        <hr class="my-4">
-    </form>
-</div>
-<div class="mb-4">
-    <h5 class="mb-3 text-primary">Manuscript Upload</h5>
-    <form id="manuscriptUploadForm" enctype="multipart/form-data">
-        <!-- Uploaded Files List -->
-        <div class="mb-3 file-list-container" id="uploadedFilesList">
-            <h6 class="mb-2">Uploaded Files</h6>
-            <div id="fileList" class="list-group">
-                <!-- Dynamically populated file list will appear here -->
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                    <span class="file-name">example.pdf</span>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-outline-primary me-2 rename-btn"><i class="bi bi-pencil"></i> Rename</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger remove-btn"><i class="bi bi-trash3"></i> Remove</button>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="submission-tab" data-bs-toggle="tab" href="#submission"
+                role="tab">Submission</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="review-tab" data-bs-toggle="tab" href="#review" role="tab">Review</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="copyediting-tab" data-bs-toggle="tab" href="#copyediting"
+                role="tab">Copy-editing</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="production-tab" data-bs-toggle="tab" href="#production" role="tab">Production</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="publication-tab" data-bs-toggle="tab" href="#publication" role="tab">Publication</a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="mainTabsContent">
+        <!-- Submission Tab -->
+        <div class="tab-pane fade show active" id="submission" role="tabpanel">
+
+            <!-- Main Content with Two Columns -->
+            <div class="row">
+                <!-- Left Column (Existing Content) -->
+                <div class="col-md-9">
+                    <!-- Submission Files Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Submission Files</h5>
+                            <div>
+                                <button class="btn btn-sm btn-outline-secondary" (click)="uploadFile()">Upload
+                                    File</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li *ngFor="let file of manuscript.files"
+                                    class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold">{{ file.name }}</div>
+                                        <small class="text-muted">{{ file.size }} KB</small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                        (click)="downloadFile(file.url, file.name)">
+                                        <i class="bi bi-download"></i> Download
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <!-- Pre-Review Discussions Section -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Pre-Review Discussions</h5>
+                            <button class="btn btn-sm btn-outline-secondary" (click)="addDiscussion()">Add
+                                discussion</button>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>From</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let discussion of manuscript.discussions">
+                                        <td>{{ discussion.name }}</td>
+                                        <td>{{ discussion.from }}</td>
+                                        <td>{{ discussion.lastReply | date:'MMM/yy' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Action Buttons and Participants) -->
+                <div class="col-md-3">
+                    <!-- Action Buttons Section -->
+                    <div class="card mb-4">
+                        <div class="card-body d-flex flex-column gap-2">
+                            <button class="btn btn-primary" style="font-size: 14px;" (click)="sendToReview()">Send to
+                                Review</button>
+                            <button class="btn btn-secondary" style="font-size: 14px;"
+                                (click)="acceptAndSkipReview()">Accept and Skip
+                                Review</button>
+                            <button class="btn btn-danger" style="font-size: 14px;"
+                                (click)="declineSubmission()">Decline Submission</button>
+                        </div>
+                    </div>
+
+                    <!-- Participants Section -->
+                    <div class="card">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fs-6">Participants</h5>
+                            <button class="btn btn-sm btn-outline-primary" (click)="assignParticipant()">Assign</button>
+                        </div>
+                        <div class="card-body">
+                            <p class="fw-bold mb-1">Journal editor:</p>
+                            <ul class="list-unstyled m-0">
+                                <li>
+                                    <a href="https://example.com/patricia-profile"
+                                        class="text-decoration-none text-body">
+                                        Patricia Katowa Mukwato
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </div>
+
         </div>
-        <div class="mb-3">
-            <label for="articleFile" class="form-label">Manuscript File (DOC, DOCX, PDF Only) <span class="text-danger">*</span></label>
-            <input type="file" class="form-control" id="articleFile" name="articleFile" accept=".doc,.docx,.pdf" required>
-        </div>
-        <hr class="my-4">
-    </form>
-</div>
-<div class="mb-4">
-    <h5 class="mb-2 text-primary">Suggested Reviewers</h5>
-    <p class="text-muted mb-2 small">Provide at least two reviewers (not collaborators or co-authors, from different institutions with institutional emails).</p>
-    <form id="suggestedReviewersForm">
-        <div class="row g-3">
-            <!-- Reviewer 1 -->
-            <div class="col-md-6">
-                <h6 class="mb-2">Reviewer 1</h6>
-                <div class="mb-2">
-                    <label for="reviewer1-name" class="form-label small">Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer1-name" name="reviewer1-name" placeholder="Name" required>
+
+        <!-- Review Tab -->
+        <div class="tab-pane fade" id="review" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Review Process</h5>
                 </div>
-                <div class="mb-2">
-                    <label for="reviewer1-email" class="form-label small">Email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control form-control-sm" id="reviewer1-email" name="reviewer1-email" placeholder="Institutional email" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer1-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer1-institution" name="reviewer1-institution" placeholder="Institution name" required>
-                </div>
-            </div>
-            <!-- Reviewer 2 -->
-            <div class="col-md-6">
-                <h6 class="mb-2">Reviewer 2</h6>
-                <div class="mb-2">
-                    <label for="reviewer2-name" class="form-label small">Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer2-name" name="reviewer2-name" placeholder="Name" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer2-email" class="form-label small">Email <span class="text-danger">*</span></label>
-                    <input type="email" class="form-control form-control-sm" id="reviewer2-email" name="reviewer2-email" placeholder="Institutional email" required>
-                </div>
-                <div class="mb-2">
-                    <label for="reviewer2-institution" class="form-label small">Institution <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="reviewer2-institution" name="reviewer2-institution" placeholder="Institution name" required>
+                <div class="card-body">
+                    <p><strong>Review Start Date:</strong> {{ manuscript.review.startDate | date:'mediumDate' }}</p>
+                    <p><strong>Reviewers Assigned:</strong> {{ manuscript.review.reviewers.length }}</p>
+                    <div *ngIf="manuscript.review.reviewers.length > 0">
+                        <h6>Reviewer Feedback:</h6>
+                        <ul>
+                            <li *ngFor="let reviewer of manuscript.review.reviewers">
+                                <strong>{{ reviewer.name }}:</strong> {{ reviewer.status }}
+                                <span *ngIf="reviewer.comments"> - {{ reviewer.comments }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <p><strong>Decision:</strong> {{ manuscript.review.decision || 'Pending' }}</p>
+                    <p><strong>Status:</strong> <span class="badge bg-warning">{{ manuscript.status.review }}</span></p>
                 </div>
             </div>
         </div>
-        <hr class="my-4">
-    </form>
-</div>
-<div class="mb-4">
-    <h5 class="mb-3 text-primary">Additional Information</h5>
-    <form id="additionalInformationForm">
-        <div class="mb-3">
-            <label for="comments" class="form-label">Comments to the Editor (Optional)</label>
-            <textarea class="form-control" id="comments" name="comments" rows="5" placeholder="Enter any additional comments for the editor"></textarea>
+
+        <!-- Copy-editing Tab -->
+        <div class="tab-pane fade" id="copyediting" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Copy-editing</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Copy-editing Start Date:</strong> {{ manuscript.copyEditing.startDate | date:'mediumDate'
+                        }}</p>
+                    <p><strong>Editor:</strong> {{ manuscript.copyEditing.editor }}</p>
+                    <p><strong>Changes Requested:</strong></p>
+                    <ul *ngIf="manuscript.copyEditing.changes.length > 0">
+                        <li *ngFor="let change of manuscript.copyEditing.changes">
+                            {{ change.description }} (Status: {{ change.status }})
+                        </li>
+                    </ul>
+                    <p *ngIf="manuscript.copyEditing.changes.length === 0">No changes requested yet.</p>
+                    <p><strong>Status:</strong> <span class="badge bg-info">{{ manuscript.status.copyEditing }}</span>
+                    </p>
+                </div>
+            </div>
         </div>
-        <hr class="my-4">
-    </form>
+
+        <!-- Production Tab -->
+        <div class="tab-pane fade" id="production" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Production</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Production Start Date:</strong> {{ manuscript.production.startDate | date:'mediumDate' }}
+                    </p>
+                    <p><strong>Typesetting Status:</strong> {{ manuscript.production.typesetting }}</p>
+                    <p><strong>Proofs:</strong></p>
+                    <ul *ngIf="manuscript.production.proofs.length > 0">
+                        <li *ngFor="let proof of manuscript.production.proofs">
+                            <a href="{{ proof.url }}" target="_blank">{{ proof.name }}</a> (Sent: {{ proof.sentDate |
+                            date:'mediumDate' }})
+                        </li>
+                    </ul>
+                    <p *ngIf="manuscript.production.proofs.length === 0">No proofs available yet.</p>
+                    <p><strong>Status:</strong> <span class="badge bg-primary">{{ manuscript.status.production }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Publication Tab -->
+        <div class="tab-pane fade" id="publication" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">Publication Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Publication Status:</strong> {{ manuscript.publication.status }}</p>
+                    <p><strong>Publication Date:</strong> {{ manuscript.publication.date | date:'mediumDate' }}</p>
+                    <p><strong>DOI:</strong> {{ manuscript.publication.doi || 'Not assigned yet' }}</p>
+                    <p><strong>Volume/Issue:</strong> {{ manuscript.publication.volumeIssue || 'Pending' }}</p>
+                    <p><strong>Access Type:</strong> {{ manuscript.publication.accessType }}</p>
+                    <p *ngIf="manuscript.publication.url">
+                        <strong>Published URL:</strong> <a href="{{ manuscript.publication.url }}" target="_blank">View
+                            Publication</a>
+                    </p>
+                    <p><strong>Status:</strong> <span class="badge bg-success">{{ manuscript.status.publication
+                            }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

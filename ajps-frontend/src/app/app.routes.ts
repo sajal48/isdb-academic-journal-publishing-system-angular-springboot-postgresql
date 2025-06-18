@@ -51,16 +51,21 @@ import { SubmissionStepThreeComponent } from './user/user-submission/submission-
 import { SubmissionStepFiveComponent } from './user/user-submission/submission-step-five/submission-step-five.component';
 import { SubmissionStepFourComponent } from './user/user-submission/submission-step-four/submission-step-four.component';
 import { SubmissionStepSixComponent } from './user/user-submission/submission-step-six/submission-step-six.component';
-import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
+// import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
 import { authGuardUserGuard } from './site-settings/auth/auth-guard-user.guard';
 import { UserPaymentsComponent } from './user/user-payments/user-payments.component';
 import { AdminSiteSettingsComponent } from './user/admin-site-settings/admin-site-settings.component';
+import { UserManuscriptComponent } from './user/user-manuscript/user-manuscript.component';
+import { ManuscriptSubmissionComponent } from './user/user-manuscript/manuscript-submission/manuscript-submission.component';
+import { ManuscriptReviewComponent } from './user/user-manuscript/manuscript-review/manuscript-review.component';
+import { ManuscriptCopyeditingComponent } from './user/user-manuscript/manuscript-copyediting/manuscript-copyediting.component';
+import { ManuscriptProductionComponent } from './user/user-manuscript/manuscript-production/manuscript-production.component';
+import { ManuscriptPublicationComponent } from './user/user-manuscript/manuscript-publication/manuscript-publication.component';
 
 export const routes: Routes = [
     // publisher site:
     {path: '', component: PublisherViewComponent,
         children: [
-            {path: '', redirectTo: 'home', pathMatch: 'full'},
             {path: 'home', component: HomepageComponent, title: 'Welcome - ScholarPress'},
             {path: 'about-us', component: AboutUsComponent, title: 'About Us - ScholarPress'},
             {path: 'journal', component: JournalsComponent, title: 'Our Journals - ScholarPress'},
@@ -69,12 +74,12 @@ export const routes: Routes = [
             {path: 'login', component: LoginComponent, title: 'Login to Your Account - ScholarPress'},
             {path: 'register', component: RegisterComponent, title: 'Create an Account - ScholarPress'},
             {path: 'recovery', component: RecoveryComponent, title: 'Recover Your Account - ScholarPress'},
+            {path: '', redirectTo: 'home', pathMatch: 'full'},
         ]
     },
     // journal site:
     {path: 'journal/:journalName', component: JournalViewComponent,    
         children: [
-            {path: '', redirectTo: 'homepage', pathMatch: 'full'},
             {path: 'homepage', component: JournalHomepageComponent, title: 'Homepage - ScholarPress'},
             {path: 'editorial-board', component: JournalEditorialBoardComponent, title: 'Editorial Board - ScholarPress'},
             {path: 'current-issue', component: JournalCurrentIssueComponent, title: 'Current Issue - ScholarPress'},
@@ -85,6 +90,7 @@ export const routes: Routes = [
             {path: 'online-submission', component: JournalSubmissionComponent, title: 'Online Submission - ScholarPress'},
             {path: ':issueNumber', component: JournalIssueArticlesComponent, title: 'Article List - ScholarPress'},
             {path: ':issueNumber/article/:articleNumber', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'},
+            {path: '', redirectTo: 'homepage', pathMatch: 'full'},
         ]        
     },
     // user site:
@@ -99,16 +105,28 @@ export const routes: Routes = [
                 canActivate: [authGuardUserGuard], 
                 data: {roles: ['user','editor','reviewer','admin']},
                 children: [
-                    {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
                     {path: 'manuscript-details', component: SubmissionStepOneComponent, title: 'Manuscript Details Submission - ScholarPress'},
                     {path: 'author-informations', component: SubmissionStepTwoComponent, title: 'Author Informations Submission - ScholarPress'},
                     {path: 'manuscript-upload', component: SubmissionStepThreeComponent, title: 'Manuscript File Submission - ScholarPress'},
                     {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
                     {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
                     {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
-                    {path: 'submission-view', component: SubmissionViewComponent, title: 'View Article Submission - ScholarPress'},
+                    {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
                 ]
             },
+            {path: 'manuscript/:manuscriptId', component: UserManuscriptComponent,
+                canActivate: [authGuardUserGuard], 
+                data: {roles: ['user','editor','reviewer','admin']},
+                children: [
+                    {path: 'submission', component: ManuscriptSubmissionComponent, title: 'Manuscript Submission - ScholarPress'},
+                    {path: 'review', component: ManuscriptReviewComponent, title: 'Manuscript Review - ScholarPress'},
+                    {path: 'copyediting', component: ManuscriptCopyeditingComponent, title: 'Manuscript Copyediting - ScholarPress'},
+                    {path: 'production', component: ManuscriptProductionComponent, title: 'Manuscript Production - ScholarPress'},
+                    {path: 'publication', component: ManuscriptPublicationComponent, title: 'Manuscript Publication - ScholarPress'},
+                    {path: '', redirectTo: 'submission', pathMatch: 'full'},
+                ]
+            },
+            // {path: 'manuscript/:manuscriptId', component: SubmissionViewComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Article Submission - ScholarPress'},
             {path: 'view-profile', component: UserProfileComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'View Profile - ScholarPress'},
             {path: 'edit-profile', component: UserProfileEditComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Edit Profile - ScholarPress'},
             {path: 'settings', component: UserSettingsComponent, canActivate: [authGuardUserGuard], data: {roles: ['user','editor','reviewer','admin']}, title: 'Profile Settings - ScholarPress'},
@@ -120,10 +138,10 @@ export const routes: Routes = [
                 canActivate: [authGuardUserGuard], 
                 data: {roles: ['editor']},
                 children: [
-                    {path: '', redirectTo: 'new-submissions', pathMatch: 'full'},
                     {path: 'new-submissions', component: EditorSubmissionsComponent, title: 'New Submissions - ScholarPress'},
                     {path: 'under-review', component: InReviewComponent, title: 'Under Review - ScholarPress'},
                     {path: 'decision-queue', component: DecisionQueueComponent, title: 'Decision Queue - ScholarPress'},
+                    {path: '', redirectTo: 'new-submissions', pathMatch: 'full'},
                 ]
             },
             {path: 'journal-reviewers', component: EditorReviewersComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Reviewers - ScholarPress'},

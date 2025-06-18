@@ -72,7 +72,7 @@
                             <button *ngIf="submission.editable" (click)="editManuscript(submission.id)" routerLink="/user/submission/submission-edit" class="btn btn-sm btn-link"><i class="bi bi-pencil"></i> Edit Manuscript</button>
                             @if (submission.submissionStatus != 'SAVED') {
                             <button *ngIf="submission.paymentDue" routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
-                            <button routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
+                            <button routerLink="/user/manuscript/324509" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
                             <button *ngIf="submission.submissionStatus == 'PUBLISHED'" class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
                             <!-- <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button> -->
                             <!-- <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button> -->

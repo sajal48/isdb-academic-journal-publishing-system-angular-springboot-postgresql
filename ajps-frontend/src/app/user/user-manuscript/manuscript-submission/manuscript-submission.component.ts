@@ -1,19 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs/internal/Subscription';
-
-declare const bootstrap: any;
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-submission-view',
-  imports: [CommonModule, FormsModule],
-  templateUrl: './submission-view.component.html',
-  styleUrl: '../user-submission.component.css'
+  selector: 'app-manuscript-submission',
+  imports: [CommonModule],
+  templateUrl: './manuscript-submission.component.html',
+  styleUrl: './manuscript-submission.component.css'
 })
-export class SubmissionViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  
+export class ManuscriptSubmissionComponent {
+
   manuscript = {
     id: 'MS12345',
     title: 'Monitoring the Seasonal Distribution and Variation of Sea Surface Temperature and Chlorophyll Concentration in Bay of Bengal using MODIS Satellite Images',
@@ -75,46 +70,6 @@ export class SubmissionViewComponent implements OnInit, AfterViewInit, OnDestroy
     ]
   };
 
-  private fragmentSubscription: Subscription | undefined;
-
-  constructor(private route: ActivatedRoute, private router: Router) {}
-
-  ngOnInit(): void {
-    this.fragmentSubscription = this.route.fragment.subscribe(fragment => {
-      this.handleFragment(fragment);
-    });
-  }
-
-  ngAfterViewInit(): void {
-    const tabs = document.querySelectorAll('#mainTabs .nav-link');
-    tabs.forEach(tab => {
-      tab.addEventListener('shown.bs.tab', (event) => {
-        const target = (event.target as HTMLElement).getAttribute('href')?.substring(1);
-        this.router.navigate([], { fragment: target, relativeTo: this.route });
-      });
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.fragmentSubscription) {
-      this.fragmentSubscription.unsubscribe();
-    }
-  }
-
-  private handleFragment(fragment: string | null): void {
-    const validTabs = ['submission', 'review', 'copyediting', 'production', 'publication'];
-    const tabToActivate = fragment && validTabs.includes(fragment) ? fragment : 'submission';
-    this.activateTab(tabToActivate);
-  }
-
-  private activateTab(tab: string): void {
-    const tabElement = document.querySelector(`#${tab}-tab`) as HTMLElement;
-    if (tabElement) {
-      const tabInstance = new bootstrap.Tab(tabElement);
-      tabInstance.show();
-    }
-  }
-
   uploadFile(): void {
     // Placeholder for file upload logic
     alert('File upload functionality to be implemented');
@@ -147,13 +102,13 @@ export class SubmissionViewComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   downloadFile(fileUrl: string, fileName: string): void {
-  const link = document.createElement('a');
-  link.href = fileUrl;
-  link.download = fileName;
-  link.target = '_blank'; // Optional: opens in new tab
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = fileName;
+    link.target = '_blank'; // Optional: opens in new tab
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
 }

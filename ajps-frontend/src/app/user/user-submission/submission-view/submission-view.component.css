@@ -1,0 +1,16 @@
+.card {
+  font-size: 1rem;
+}
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+}
+
+.nav-pills .nav-link {
+  margin-right: 10px;
+}
+
+.badge {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+}

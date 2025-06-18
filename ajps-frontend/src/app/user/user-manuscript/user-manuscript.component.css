@@ -1,0 +1,22 @@
+.nav-tabs-custom {
+    border-bottom: 1px solid #dee2e6;
+}
+.nav-tabs-custom .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #007bff;
+    margin-right: 0.5rem;
+    padding: 0.3rem 1rem;
+    background: none;
+}
+.nav-tabs-custom .nav-link:hover {
+    border-bottom-color: #007bff;
+}
+.nav-tabs-custom .nav-link.active {
+    border-bottom-color: #007bff;
+    background: #deedfc;
+    color: #007bff;
+    /* font-weight: bold; */
+    /* border-top-left-radius: 8px; */
+    /* border-top-right-radius: 8px; */
+}
