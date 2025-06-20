@@ -14,7 +14,7 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="manage-users-tab" data-bs-toggle="tab" data-bs-target="#manage-users"
+            <button (click)="loadUsersFromBackend()" class="nav-link" id="manage-users-tab" data-bs-toggle="tab" data-bs-target="#manage-users"
                 type="button" role="tab" aria-controls="manage-users" aria-selected="false">
                 Manage Users
             </button>
@@ -30,15 +30,20 @@
                     <h2 class="card-title h5 mb-4 text-primary">Add New User</h2>
                     <form (ngSubmit)="addUser()" #userForm="ngForm">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="firstName" class="form-label">First Name <i>*</i></label>
+                            <div class="col-md-4">
+                                <label for="firstName" class="form-label">First Name</label>
                                 <input id="firstName" [(ngModel)]="newUser.firstName" name="firstName" type="text"
-                                    class="form-control" placeholder="Enter first name" required />
+                                    class="form-control" placeholder="Enter first name" />
                             </div>
-                            <div class="col-md-6">
-                                <label for="lastName" class="form-label">Last Name <i>*</i></label>
+                            <div class="col-md-4">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input id="middleName" [(ngModel)]="newUser.middleName" name="middleName" type="text"
+                                    class="form-control" placeholder="Enter middle name" />
+                            </div>
+                            <div class="col-md-4">
+                                <label for="lastName" class="form-label">Last Name</label>
                                 <input id="lastName" [(ngModel)]="newUser.lastName" name="lastName" type="text"
-                                    class="form-control" placeholder="Enter last name" required />
+                                    class="form-control" placeholder="Enter last name" />
                             </div>
                         </div>
                         <div class="row g-3 mt-1">
@@ -51,10 +56,10 @@
                                 <label for="role" class="form-label">Role <i>*</i></label>
                                 <select id="role" [(ngModel)]="newUser.role" name="role" class="form-select" required>
                                     <option value="" disabled selected>Select a role</option>
-                                    <option value="User">User</option>
-                                    <option value="Editor">Editor</option>
-                                    <option value="Viewer">Reviewer</option>
-                                    <option value="Admin">Admin</option>
+                                    <option value="USER">User</option>
+                                    <option value="EDITOR">Editor</option>
+                                    <option value="REVIEWER">Reviewer</option>
+                                    <option value="ADMIN">Admin</option>
                                 </select>
                             </div>
                         </div>
@@ -81,7 +86,7 @@
 
         <!-- Manage Users Tab -->
         <div class="tab-pane fade" id="manage-users" role="tabpanel" aria-labelledby="manage-users-tab">
-            <div class="card mb-4 shadow-sm">
+            <div class="card mb-4 -shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title h5 mb-4 text-primary">Search Users</h2>
                     <div class="input-group mb-3">
@@ -108,7 +113,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let user of filteredUsers">
-                                    <td>{{ user.firstName }} {{ user.lastName }}</td>
+                                    <td>{{ user.firstName }} {{ user.middleName }} {{ user.lastName }}</td>
                                     <td>{{ user.email }}</td>
                                     <td>{{ user.role }}</td>
                                     <td>{{ user.status }}</td>
@@ -120,7 +125,7 @@
                                         <!-- <button class="btn btn-sm btn-danger" (click)="deleteUser(user)"
                                             [disabled]="user.status === 'Deleted'">Delete</button> -->
 
-                                        <button class="btn btn-sm btn-primary me-2"><i class="bi bi-pencil"></i> Edit User</button>
+                                        <button (click)="openEditUserModal(user)" class="btn btn-sm btn-primary me-2"><i class="bi bi-pencil"></i> Edit User</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -130,4 +135,60 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form (ngSubmit)="updateUser()" #editForm="ngForm">
+        <div class="modal-header">
+          <h5 class="modal-title text-primary" id="editUserModalLabel">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="resetEditForm()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">First Name</label>
+              <input [(ngModel)]="editUser.firstName" name="editFirstName" class="form-control" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Middle Name</label>
+              <input [(ngModel)]="editUser.middleName" name="editMiddleName" class="form-control" />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Last Name</label>
+              <input [(ngModel)]="editUser.lastName" name="editLastName" class="form-control" />
+            </div>
+            <div class="col-md-6 mt-2">
+              <label class="form-label">Email</label>
+              <input [(ngModel)]="editUser.email" name="editEmail" class="form-control" type="email" required />
+            </div>
+            <div class="col-md-6 mt-2">
+              <label class="form-label">Role</label>
+              <select [(ngModel)]="editUser.role" name="editRole" class="form-select" required>
+                <option value="USER">User</option>
+                <option value="EDITOR">Editor</option>
+                <option value="REVIEWER">Reviewer</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+            <div class="col-md-6 mt-2">
+              <label class="form-label">Status</label>
+              <select [(ngModel)]="editUser.status" name="editStatus" class="form-select" required>
+                <option value="ACTIVE">Active</option>
+                <option value="SUSPEND">Suspend</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetEditForm()">Cancel</button>
+          <button type="submit" class="btn btn-success" [disabled]="!editForm.valid">
+            <i class="bi bi-check-circle"></i> {{ isUpdating ? 'Saving Changes...' : 'Save Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
