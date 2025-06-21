@@ -71,7 +71,7 @@ public class Submission implements Serializable {
 
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private List<Reviewer> reviewers;
+    private List<SubmissionReviewer> submissionReviewers;
 
     @ManyToOne
     @JoinColumn(name = "profile_id")

@@ -176,9 +176,9 @@ public class SubmissionController {
 
     @PostMapping("/reviewer-informations/save")
     public ApiResponse<?> saveReviewerInformations(@RequestBody ReviewerSubmissionRequest request) {
-        List<Reviewer> savedReviewer = submissionService.saveReviewers(request);
+        List<SubmissionReviewer> savedSubmissionReviewer = submissionService.saveReviewers(request);
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("reviewer", savedReviewer);
+        responseData.put("reviewer", savedSubmissionReviewer);
         return new ApiResponse<>(200, "Reviewers saved successfully", responseData);
     }
 

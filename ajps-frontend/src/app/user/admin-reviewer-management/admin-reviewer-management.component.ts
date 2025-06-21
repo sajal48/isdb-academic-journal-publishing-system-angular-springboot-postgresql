@@ -1,6 +1,7 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
 declare const bootstrap: any;
 
 interface Reviewer {
@@ -9,40 +10,56 @@ interface Reviewer {
   lastName: string;
   email: string;
   assignedJournals: string[];
-  status: 'Active' | 'Suspended' | 'Deleted';
 }
 
 @Component({
   selector: 'app-admin-reviewer-management',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-reviewer-management.component.html',
-  styleUrl: './admin-reviewer-management.component.css'
+  styleUrls: ['./admin-reviewer-management.component.css']
 })
 export class AdminReviewerManagementComponent {
-
   reviewerSearchQuery: string = '';
   journalFilter: string = '';
-  journals: string[] = ['Journal of Botany', 'Environmental Studies', 'Plant Diversity']; // example journals
+  journals: string[] = ['Journal of Botany', 'Environmental Studies', 'Plant Diversity'];
 
   reviewers: Reviewer[] = [
-    { id: 1, firstName: 'Alice', lastName: 'Johnson', email: 'alice@example.com', assignedJournals: ['Journal of Botany', 'Plant Diversity'], status: 'Active' },
-    { id: 2, firstName: 'Bob', lastName: 'Smith', email: 'bob@example.com', assignedJournals: [], status: 'Suspended' }
+    {
+      id: 1,
+      firstName: 'Alice',
+      lastName: 'Johnson',
+      email: 'alice@example.com',
+      assignedJournals: ['Journal of Botany', 'Plant Diversity']
+    },
+    {
+      id: 2,
+      firstName: 'Bob',
+      lastName: 'Smith',
+      email: 'bob@example.com',
+      assignedJournals: []
+    }
   ];
 
   filteredReviewers: Reviewer[] = [...this.reviewers];
 
   selectedReviewer: Reviewer | null = null;
-  selectedJournal: string = '';
+  journalSelections: { [journal: string]: boolean } = {};
 
   searchReviewers() {
     const query = this.reviewerSearchQuery.toLowerCase();
+
     this.filteredReviewers = this.reviewers.filter(reviewer => {
       const matchesQuery =
         reviewer.firstName.toLowerCase().includes(query) ||
         reviewer.lastName.toLowerCase().includes(query) ||
         reviewer.email.toLowerCase().includes(query);
 
-      const matchesJournal = !this.journalFilter || reviewer.assignedJournals.includes(this.journalFilter);
+      const matchesJournal =
+        !this.journalFilter ||
+        (this.journalFilter === '__UNASSIGNED__'
+          ? reviewer.assignedJournals.length === 0
+          : reviewer.assignedJournals.includes(this.journalFilter));
 
       return matchesQuery && matchesJournal;
     });
@@ -54,51 +71,33 @@ export class AdminReviewerManagementComponent {
     this.filteredReviewers = [...this.reviewers];
   }
 
-  toggleSuspend(reviewer: Reviewer) {
-    this.reviewers = this.reviewers.map(r =>
-      r.id === reviewer.id
-        ? { ...r, status: r.status === 'Active' ? 'Suspended' : 'Active' }
-        : r
-    );
-    this.filteredReviewers = [...this.reviewers];
-  }
-
-  deleteUser(reviewer: Reviewer) {
-    this.reviewers = this.reviewers.map(r =>
-      r.id === reviewer.id ? { ...r, status: 'Deleted' } : r
-    );
-    this.filteredReviewers = [...this.reviewers];
-  }
-
-  openAssignModal(reviewer: Reviewer) {
+  openEditAssignedJournals(reviewer: Reviewer) {
     this.selectedReviewer = reviewer;
-    this.selectedJournal = '';
-    // Show modal using Bootstrap JS or Angular wrapper
-    const modal = new bootstrap.Modal(document.getElementById('assignJournalModal')!);
+
+    // Initialize checkbox selections
+    this.journalSelections = {};
+    this.journals.forEach(journal => {
+      this.journalSelections[journal] = reviewer.assignedJournals.includes(journal);
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('editAssignedJournalsModal')!);
     modal.show();
   }
 
-  assignJournal() {
-    if (this.selectedReviewer && this.selectedJournal) {
-      const updatedReviewers = this.reviewers.map(r => {
-        if (r.id === this.selectedReviewer!.id) {
-          const alreadyAssigned = r.assignedJournals.includes(this.selectedJournal);
-          return {
-            ...r,
-            assignedJournals: alreadyAssigned
-              ? r.assignedJournals
-              : [...r.assignedJournals, this.selectedJournal]
-          };
-        }
-        return r;
-      });
+  saveAssignedJournals() {
+    if (!this.selectedReviewer) return;
 
-      this.reviewers = updatedReviewers;
-      this.filteredReviewers = [...updatedReviewers];
-    }
+    const updatedAssignments = Object.keys(this.journalSelections)
+      .filter(journal => this.journalSelections[journal]);
 
+    this.reviewers = this.reviewers.map(r =>
+      r.id === this.selectedReviewer!.id
+        ? { ...r, assignedJournals: updatedAssignments }
+        : r
+    );
+
+    this.filteredReviewers = [...this.reviewers];
     this.selectedReviewer = null;
-    this.selectedJournal = '';
+    this.journalSelections = {};
   }
-
 }

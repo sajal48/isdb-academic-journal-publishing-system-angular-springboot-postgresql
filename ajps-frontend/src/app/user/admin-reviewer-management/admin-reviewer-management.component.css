@@ -33,3 +33,11 @@
     /* padding: 1rem; */
     font-size: 14px;
 }
+
+.form-check-input {
+  cursor: pointer;
+}
+.form-check-label {
+  cursor: pointer;
+  font-size: 14px;
+}

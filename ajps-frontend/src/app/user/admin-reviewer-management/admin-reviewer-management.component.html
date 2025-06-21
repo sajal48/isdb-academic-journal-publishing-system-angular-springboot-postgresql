@@ -1,34 +1,42 @@
 <div class="px-2">
-    <h4 class="page-title mb-4" style="color: #2e7d32; margin-top: 10px">
-        Reviewer Management
-    </h4>
+  <h4 class="page-title mb-4" style="color: #2e7d32; margin-top: 10px">
+    Reviewer Management
+  </h4>
 </div>
+
 <div class="container">
+  <!-- Search Card -->
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
       <h2 class="card-title h5 mb-3 text-primary">Search Reviewers</h2>
       <div class="input-group mb-3">
         <input type="text" [(ngModel)]="reviewerSearchQuery" (input)="searchReviewers()" class="form-control"
           placeholder="Search by first name, last name, or email" aria-label="Search reviewers">
-        <button class="btn btn-outline-secondary" type="button" (click)="clearReviewerSearch()"><i class="bi bi-x-lg"></i> Clear</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="clearReviewerSearch()">
+          <i class="bi bi-x-lg"></i> Clear
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Reviewer Table Card -->
   <div class="card shadow-sm">
     <div class="card-body">
       <h2 class="card-title h5 mb-3 text-primary">Manage Reviewers</h2>
+
+      <!-- Filter Dropdown -->
       <div class="row g-3 mb-3">
         <div class="col-md-4">
           <select [(ngModel)]="journalFilter" (change)="searchReviewers()" class="form-select"
             aria-label="Filter by journal">
             <option value="">All Journals</option>
-            <option value="">Unassign</option>
+            <option value="__UNASSIGNED__">Unassigned</option>
             <option *ngFor="let journal of journals" [value]="journal">{{ journal }}</option>
           </select>
         </div>
       </div>
 
+      <!-- Reviewer Table -->
       <div class="table-responsive">
         <table class="table">
           <thead>
@@ -44,19 +52,12 @@
             <tr *ngFor="let reviewer of filteredReviewers">
               <td>{{ reviewer.firstName }} {{ reviewer.lastName }}</td>
               <td>{{ reviewer.email }}</td>
-              <!-- <td>{{ reviewer.assignedJournals.join(', ') || 'None' }}</td> -->
-              <td>{{ reviewer.assignedJournals.join(', ') || '--' }}</td>
+              <td>{{ reviewer.assignedJournals.length ? reviewer.assignedJournals.join(', ') : '--' }}</td>
               <td>2 / 6</td>
               <td>
-                <button class="btn btn-sm btn-primary me-2" (click)="openAssignModal(reviewer)"
-                  [disabled]="reviewer.status === 'Deleted'">Assign Journal</button>
-                <!-- <button class="btn btn-sm btn-warning me-2" (click)="toggleSuspend(reviewer)"
-                  [disabled]="reviewer.status === 'Deleted'">
-                  {{ reviewer.status === 'Active' ? 'Unassign' : 'Activate' }}
-                </button> -->
-                <button class="btn btn-sm btn-warning me-2" (click)="toggleSuspend(reviewer)"><i class="bi bi-pencil"></i> Edit</button>
-                <!-- <button class="btn btn-sm btn-danger" (click)="deleteUser(reviewer)"
-                  [disabled]="reviewer.status === 'Deleted'">Delete</button> -->
+                <button class="btn btn-sm btn-primary me-2" (click)="openEditAssignedJournals(reviewer)">
+                  <i class="bi bi-journal-text"></i> Edit Journals
+                </button>
               </td>
             </tr>
           </tbody>
@@ -65,32 +66,35 @@
     </div>
   </div>
 
-  <!-- Modal for Assigning Journal -->
-  <div class="modal fade" id="assignJournalModal" tabindex="-1" aria-labelledby="assignJournalModalLabel"
-    aria-hidden="true">
+  <!-- Edit Assigned Journals Modal -->
+  <div class="modal fade" id="editAssignedJournalsModal" tabindex="-1" aria-labelledby="editAssignedJournalsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="assignJournalModalLabel">Assign Journal to
-            {{ selectedReviewer?.firstName }} {{ selectedReviewer?.lastName }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form #assignForm="ngForm">
-            <div class="mb-3">
-              <label for="journalSelect" class="form-label">Select Journal</label>
-              <select id="journalSelect" [(ngModel)]="selectedJournal" name="journalSelect" class="form-select" required>
-                <option value="" disabled selected>Select a journal</option>
-                <option *ngFor="let journal of journals" [value]="journal">{{ journal }}</option>
-              </select>
+        <form #checkboxForm="ngForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editAssignedJournalsModalLabel">
+              Edit Assigned Journals for {{ selectedReviewer?.firstName }} {{ selectedReviewer?.lastName }}
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div *ngFor="let journal of journals" class="form-check mb-2">
+              <input class="form-check-input"
+                     type="checkbox"
+                     [id]="'journal-' + journal"
+                     [value]="journal"
+                     [(ngModel)]="journalSelections[journal]"
+                     name="journalSelections_{{journal}}">
+              <label class="form-check-label" [for]="'journal-' + journal">{{ journal }}</label>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" (click)="assignJournal()" [disabled]="!assignForm.valid"
-            data-bs-dismiss="modal">Assign</button>
-        </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="saveAssignedJournals()" data-bs-dismiss="modal">Save</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

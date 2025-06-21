@@ -9,8 +9,8 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "AJPS_REVIEWER")
-public class Reviewer {
+@Table(name = "AJPS_SUBMISSION_REVIEWER")
+public class SubmissionReviewer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class Reviewer {
 
 //    public Reviewer() {}
 
-    public Reviewer(String name, String email, String institution, Submission submission) {
+    public SubmissionReviewer(String name, String email, String institution, Submission submission) {
         this.name = name;
         this.email = email;
         this.institution = institution;

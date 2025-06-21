@@ -4,9 +4,10 @@ import { FormsModule, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-journal-management',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-journal-management.component.html',
-  styleUrl: './admin-journal-management.component.css'
+  styleUrls: ['./admin-journal-management.component.css']
 })
 export class AdminJournalManagementComponent {
 
@@ -19,11 +20,11 @@ export class AdminJournalManagementComponent {
     issn: '',
     frequency: '',
     journalType: '',
-    publisher: '',
-    editor: '',
+    journalCode: '',
     contactEmail: '',
     journalUrl: '',
-    aimsScopes: ''
+    aimsScopes: '',
+    aboutJournal: ''
   };
 
   journals: any[] = [
@@ -32,11 +33,11 @@ export class AdminJournalManagementComponent {
       issn: '1234-5678',
       frequency: 'Quarterly',
       journalType: 'Open Access',
-      publisher: 'Sample Publisher',
-      editor: 'Dr. John Doe',
+      journalCode: 'SJQ',
       contactEmail: 'editor@samplejournal.com',
       journalUrl: 'https://samplejournal.com',
-      aimsScopes: 'To advance research in sample fields.'
+      aimsScopes: 'To advance research in sample fields.',
+      aboutJournal: 'This journal publishes cutting-edge research in various fields of science.'
     }
   ];
 
@@ -87,12 +88,11 @@ export class AdminJournalManagementComponent {
       issn: '',
       frequency: '',
       journalType: '',
-      publisher: '',
-      editor: '',
+      journalCode: '',
       contactEmail: '',
       journalUrl: '',
-      aimsScopes: ''
+      aimsScopes: '',
+      aboutJournal: ''
     };
   }
-
 }

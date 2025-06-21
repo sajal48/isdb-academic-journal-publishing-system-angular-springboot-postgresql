@@ -7,7 +7,7 @@ import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.*;
 import com.himusharier.ajps_backend.repository.AuthorRepository;
 import com.himusharier.ajps_backend.repository.FileUploadRepository;
-import com.himusharier.ajps_backend.repository.ReviewerRepository;
+import com.himusharier.ajps_backend.repository.SubmissionReviewerRepository;
 import com.himusharier.ajps_backend.repository.SubmissionRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,18 +34,18 @@ public class SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final AuthorRepository authorRepository;
     private final FileUploadRepository fileUploadRepository;
-    private final ReviewerRepository reviewerRepository;
+    private final SubmissionReviewerRepository submissionReviewerRepository;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
             AuthorRepository authorRepository,
             FileUploadRepository fileUploadRepository,
-            ReviewerRepository reviewerRepository
+            SubmissionReviewerRepository submissionReviewerRepository
     ) {
         this.submissionRepository = submissionRepository;
         this.authorRepository = authorRepository;
         this.fileUploadRepository = fileUploadRepository;
-        this.reviewerRepository = reviewerRepository;
+        this.submissionReviewerRepository = submissionReviewerRepository;
     }
 
     public Submission returnSubmissionDetails(Profile profile, Long submissionId) {
@@ -235,29 +235,29 @@ public class SubmissionService {
         }
     }*/
 
-    public List<Reviewer> saveReviewers(ReviewerSubmissionRequest request) {
+    public List<SubmissionReviewer> saveReviewers(ReviewerSubmissionRequest request) {
         Submission submission = submissionRepository.findById(request.submissionId())
                 .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
 
-        List<Reviewer> savedReviewers = new ArrayList<>();
+        List<SubmissionReviewer> savedSubmissionReviewers = new ArrayList<>();
 
         for (ReviewerDTO dto : request.reviewers()) {
-            Reviewer reviewer = new Reviewer(
+            SubmissionReviewer submissionReviewer = new SubmissionReviewer(
                     dto.name(),
                     dto.email(),
                     dto.institution(),
                     submission
             );
-            Reviewer savedReviewer = reviewerRepository.save(reviewer);
-            savedReviewers.add(savedReviewer);
+            SubmissionReviewer savedSubmissionReviewer = submissionReviewerRepository.save(submissionReviewer);
+            savedSubmissionReviewers.add(savedSubmissionReviewer);
         }
-        return savedReviewers;
+        return savedSubmissionReviewers;
     }
 
 
 
     public List<ReviewerDTO> getReviewersBySubmissionId(Long submissionId) {
-        return reviewerRepository.findBySubmissionId(submissionId)
+        return submissionReviewerRepository.findBySubmissionId(submissionId)
                 .stream()
                 .map(r -> new ReviewerDTO(
                         r.getId(),
@@ -270,7 +270,7 @@ public class SubmissionService {
 
     @Transactional
     public void removeReviewer(Long submissionId, Long reviewerId) {
-        reviewerRepository.deleteByIdAndSubmissionId(reviewerId, submissionId);
+        submissionReviewerRepository.deleteByIdAndSubmissionId(reviewerId, submissionId);
     }
 
 
