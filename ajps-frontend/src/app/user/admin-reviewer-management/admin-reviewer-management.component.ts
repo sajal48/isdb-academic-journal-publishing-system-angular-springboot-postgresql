@@ -1,15 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { JournalOperationsService } from '../../site-settings/admin/journal-operations.service';
+import { ReviewerOperationsService } from '../../site-settings/admin/reviewer-operations.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
 
 declare const bootstrap: any;
 
-interface Reviewer {
+interface JournalShort {
   id: number;
+  title: string;
+}
+
+interface Reviewer {
+  authId: number;
+  profileId: number;
   firstName: string;
   lastName: string;
   email: string;
-  assignedJournals: string[];
+  assignedJournals: JournalShort[];
 }
 
 @Component({
@@ -19,47 +28,62 @@ interface Reviewer {
   templateUrl: './admin-reviewer-management.component.html',
   styleUrls: ['./admin-reviewer-management.component.css']
 })
-export class AdminReviewerManagementComponent {
+export class AdminReviewerManagementComponent implements OnInit {
   reviewerSearchQuery: string = '';
   journalFilter: string = '';
-  journals: string[] = ['Journal of Botany', 'Environmental Studies', 'Plant Diversity'];
+  journals: JournalShort[] = [];
 
-  reviewers: Reviewer[] = [
-    {
-      id: 1,
-      firstName: 'Alice',
-      lastName: 'Johnson',
-      email: 'alice@example.com',
-      assignedJournals: ['Journal of Botany', 'Plant Diversity']
-    },
-    {
-      id: 2,
-      firstName: 'Bob',
-      lastName: 'Smith',
-      email: 'bob@example.com',
-      assignedJournals: []
-    }
-  ];
-
-  filteredReviewers: Reviewer[] = [...this.reviewers];
+  reviewers: Reviewer[] = [];
+  filteredReviewers: Reviewer[] = [];
 
   selectedReviewer: Reviewer | null = null;
-  journalSelections: { [journal: string]: boolean } = {};
+  journalSelections: { [journalId: number]: boolean } = {};
+
+  constructor(
+    private journalService: JournalOperationsService,
+    private reviewerService: ReviewerOperationsService,
+    private userToastNotificationService: UserToastNotificationService
+
+  ) {}
+
+  ngOnInit() {
+    this.loadJournals();
+    this.loadReviewers();
+  }
+
+  loadJournals() {
+    this.journalService.getAll().subscribe((data: any[]) => {
+      this.journals = data.map(j => ({ id: j.id, title: j.journalName }));
+    });
+  }
+
+  loadReviewers() {
+    this.reviewerService.getAllReviewers().subscribe((data: any[]) => {
+      this.reviewers = data.map((item: any) => ({
+        authId: item.authId,
+        profileId: item.profileId,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        assignedJournals: item.assignedJournals || []
+      }));
+      this.filteredReviewers = [...this.reviewers];
+    });
+  }
 
   searchReviewers() {
     const query = this.reviewerSearchQuery.toLowerCase();
-
     this.filteredReviewers = this.reviewers.filter(reviewer => {
       const matchesQuery =
-        reviewer.firstName.toLowerCase().includes(query) ||
-        reviewer.lastName.toLowerCase().includes(query) ||
-        reviewer.email.toLowerCase().includes(query);
+        reviewer.firstName?.toLowerCase().includes(query) ||
+        reviewer.lastName?.toLowerCase().includes(query) ||
+        reviewer.email?.toLowerCase().includes(query);
 
       const matchesJournal =
         !this.journalFilter ||
         (this.journalFilter === '__UNASSIGNED__'
           ? reviewer.assignedJournals.length === 0
-          : reviewer.assignedJournals.includes(this.journalFilter));
+          : reviewer.assignedJournals.some(j => j.title === this.journalFilter));
 
       return matchesQuery && matchesJournal;
     });
@@ -73,11 +97,9 @@ export class AdminReviewerManagementComponent {
 
   openEditAssignedJournals(reviewer: Reviewer) {
     this.selectedReviewer = reviewer;
-
-    // Initialize checkbox selections
     this.journalSelections = {};
     this.journals.forEach(journal => {
-      this.journalSelections[journal] = reviewer.assignedJournals.includes(journal);
+      this.journalSelections[journal.id] = reviewer.assignedJournals.some(j => j.id === journal.id);
     });
 
     const modal = new bootstrap.Modal(document.getElementById('editAssignedJournalsModal')!);
@@ -85,19 +107,30 @@ export class AdminReviewerManagementComponent {
   }
 
   saveAssignedJournals() {
-    if (!this.selectedReviewer) return;
+  if (!this.selectedReviewer) return;
 
-    const updatedAssignments = Object.keys(this.journalSelections)
-      .filter(journal => this.journalSelections[journal]);
+  const selectedIds = Object.keys(this.journalSelections)
+    .filter(id => this.journalSelections[+id])
+    .map(id => +id);
 
-    this.reviewers = this.reviewers.map(r =>
-      r.id === this.selectedReviewer!.id
-        ? { ...r, assignedJournals: updatedAssignments }
-        : r
-    );
+  this.reviewerService.assignJournalsToReviewer(this.selectedReviewer.profileId, selectedIds).subscribe({
+    next: () => {
+      this.userToastNotificationService.showToast('Success', 'Journals assigned successfully', 'success');
+      this.loadReviewers(); // reload data
+    },
+    error: () => {
+      this.userToastNotificationService.showToast('Error', 'Failed to assign journals', 'danger');
+    }
+  });
 
-    this.filteredReviewers = [...this.reviewers];
-    this.selectedReviewer = null;
-    this.journalSelections = {};
+  this.selectedReviewer = null;
+  this.journalSelections = {};
+}
+
+
+  getJournalTitles(reviewer: Reviewer): string {
+    return reviewer.assignedJournals && reviewer.assignedJournals.length
+      ? reviewer.assignedJournals.map(j => j.title).join(', ')
+      : '--';
   }
 }

@@ -10,8 +10,14 @@
     <div class="card-body">
       <h2 class="card-title h5 mb-3 text-primary">Search Reviewers</h2>
       <div class="input-group mb-3">
-        <input type="text" [(ngModel)]="reviewerSearchQuery" (input)="searchReviewers()" class="form-control"
-          placeholder="Search by first name, last name, or email" aria-label="Search reviewers">
+        <input
+          type="text"
+          [(ngModel)]="reviewerSearchQuery"
+          (input)="searchReviewers()"
+          class="form-control"
+          placeholder="Search by first name, last name, or email"
+          aria-label="Search reviewers"
+        />
         <button class="btn btn-outline-secondary" type="button" (click)="clearReviewerSearch()">
           <i class="bi bi-x-lg"></i> Clear
         </button>
@@ -27,11 +33,17 @@
       <!-- Filter Dropdown -->
       <div class="row g-3 mb-3">
         <div class="col-md-4">
-          <select [(ngModel)]="journalFilter" (change)="searchReviewers()" class="form-select"
-            aria-label="Filter by journal">
-            <option value="">All Journals</option>
+          <select
+            [(ngModel)]="journalFilter"
+            (change)="searchReviewers()"
+            class="form-select"
+            aria-label="Filter by journal"
+          >
+            <option value="">Show All</option>
             <option value="__UNASSIGNED__">Unassigned</option>
-            <option *ngFor="let journal of journals" [value]="journal">{{ journal }}</option>
+            <option *ngFor="let journal of journals" [value]="journal.title">
+              {{ journal.title }}
+            </option>
           </select>
         </div>
       </div>
@@ -44,7 +56,6 @@
               <th scope="col">Name</th>
               <th scope="col">Email</th>
               <th scope="col">Assigned Journals</th>
-              <th scope="col">Contribution</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -52,11 +63,10 @@
             <tr *ngFor="let reviewer of filteredReviewers">
               <td>{{ reviewer.firstName }} {{ reviewer.lastName }}</td>
               <td>{{ reviewer.email }}</td>
-              <td>{{ reviewer.assignedJournals.length ? reviewer.assignedJournals.join(', ') : '--' }}</td>
-              <td>2 / 6</td>
+              <td>{{ getJournalTitles(reviewer) }}</td>
               <td>
                 <button class="btn btn-sm btn-primary me-2" (click)="openEditAssignedJournals(reviewer)">
-                  <i class="bi bi-journal-text"></i> Edit Journals
+                  <i class="bi bi-journal-text"></i> Assign Journals
                 </button>
               </td>
             </tr>
@@ -67,7 +77,13 @@
   </div>
 
   <!-- Edit Assigned Journals Modal -->
-  <div class="modal fade" id="editAssignedJournalsModal" tabindex="-1" aria-labelledby="editAssignedJournalsModalLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="editAssignedJournalsModal"
+    tabindex="-1"
+    aria-labelledby="editAssignedJournalsModalLabel"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <form #checkboxForm="ngForm">
@@ -80,19 +96,24 @@
 
           <div class="modal-body">
             <div *ngFor="let journal of journals" class="form-check mb-2">
-              <input class="form-check-input"
-                     type="checkbox"
-                     [id]="'journal-' + journal"
-                     [value]="journal"
-                     [(ngModel)]="journalSelections[journal]"
-                     name="journalSelections_{{journal}}">
-              <label class="form-check-label" [for]="'journal-' + journal">{{ journal }}</label>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [id]="'journal-' + journal.id"
+                [checked]="journalSelections[journal.id]"
+                (change)="journalSelections[journal.id] = !journalSelections[journal.id]"
+              />
+              <label class="form-check-label" [for]="'journal-' + journal.id">
+                {{ journal.title }}
+              </label>
             </div>
           </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" (click)="saveAssignedJournals()" data-bs-dismiss="modal">Save</button>
+            <button type="button" class="btn btn-primary" (click)="saveAssignedJournals()" data-bs-dismiss="modal">
+              Save
+            </button>
           </div>
         </form>
       </div>
