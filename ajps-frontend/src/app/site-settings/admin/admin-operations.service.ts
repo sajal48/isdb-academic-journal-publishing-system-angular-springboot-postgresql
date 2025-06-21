@@ -24,7 +24,8 @@ export class AdminOperationsService {
   }
 
   updateUser(id: number, userData: any) {
-  return this.http.put<any>(`${apiConfig.apiBaseUrl}/user/admin/update-user-details/${id}`, userData);
-}
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    return this.http.put<any>(`${apiConfig.apiBaseUrl}/user/admin/update-user-details/${id}`, userData, {headers});
+  }
 
 }

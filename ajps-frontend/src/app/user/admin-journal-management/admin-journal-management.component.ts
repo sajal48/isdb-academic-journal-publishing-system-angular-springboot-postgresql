@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
+import { Journal, JournalOperationsService } from '../../site-settings/admin/journal-operations.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
+import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service'; // Import PopupMessageService
 
 @Component({
   selector: 'app-admin-journal-management',
@@ -9,81 +12,119 @@ import { FormsModule, NgForm } from '@angular/forms';
   templateUrl: './admin-journal-management.component.html',
   styleUrls: ['./admin-journal-management.component.css']
 })
-export class AdminJournalManagementComponent {
+export class AdminJournalManagementComponent implements OnInit {
 
   showForm = false;
   isEditMode = false;
   editIndex: number | null = null;
 
-  journal = {
-    journalName: '',
-    issn: '',
-    frequency: '',
-    journalType: '',
-    journalCode: '',
-    contactEmail: '',
-    journalUrl: '',
-    aimsScopes: '',
-    aboutJournal: ''
-  };
+  journals: Journal[] = [];
 
-  journals: any[] = [
-    {
-      journalName: 'Sample Journal',
-      issn: '1234-5678',
-      frequency: 'Quarterly',
-      journalType: 'Open Access',
-      journalCode: 'SJQ',
-      contactEmail: 'editor@samplejournal.com',
-      journalUrl: 'https://samplejournal.com',
-      aimsScopes: 'To advance research in sample fields.',
-      aboutJournal: 'This journal publishes cutting-edge research in various fields of science.'
-    }
-  ];
+  journal: Journal = this.getEmptyJournal();
 
-  showAddForm() {
+  constructor(
+    private journalService: JournalOperationsService,
+    private userToastNotificationService: UserToastNotificationService,
+    private popupMessageService: PopupMessageService // Inject PopupMessageService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadJournals();
+  }
+
+  loadJournals(): void {
+    this.journalService.getAll().subscribe({
+      next: (data) => this.journals = data,
+      error: (err) => {
+        console.error('Failed to load journals:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load journals.', 'danger');
+      }
+    });
+  }
+
+  showAddForm(): void {
     this.showForm = true;
     this.isEditMode = false;
     this.editIndex = null;
-    this.resetForm();
+    this.journal = this.getEmptyJournal();
   }
 
-  editJournal(index: number) {
+  editJournal(index: number): void {
     this.showForm = true;
     this.isEditMode = true;
     this.editIndex = index;
     this.journal = { ...this.journals[index] };
   }
 
-  deleteJournal(index: number) {
-    if (confirm('Are you sure you want to delete this journal?')) {
-      this.journals.splice(index, 1);
-      alert('Journal deleted successfully!');
+  deleteJournal(index: number): void {
+    const journal = this.journals[index];
+    if (journal.id) {
+      this.popupMessageService.confirm(
+        'Delete Journal?',
+        `Are you sure you want to delete the journal "${journal.journalName}" permanently?`,
+        'Yes, Delete',
+        'Cancel'
+      ).then((confirmed) => {
+        if (confirmed) {
+          this.journalService.delete(journal.id!).subscribe({ // Use non-null assertion as we've checked for journal.id
+            next: () => {
+              this.journals.splice(index, 1);
+              this.userToastNotificationService.showToast('Success', 'Journal deleted successfully!', 'success');
+            },
+            error: (err) => {
+              console.error('Failed to delete journal:', err);
+              this.userToastNotificationService.showToast('Error', 'Failed to delete journal.', 'danger');
+            }
+          });
+        }
+      });
     }
   }
 
-  cancelForm() {
+  cancelForm(): void {
     this.showForm = false;
-    this.resetForm();
+    this.journal = this.getEmptyJournal();
   }
 
-  onSubmit(form: NgForm) {
-    if (form.valid) {
-      if (this.isEditMode && this.editIndex !== null) {
-        this.journals[this.editIndex] = { ...this.journal };
-        alert('Journal updated successfully!');
-      } else {
-        this.journals.push({ ...this.journal });
-        alert('Journal created successfully!');
-      }
-      this.showForm = false;
-      this.resetForm();
-      form.resetForm();
+  onSubmit(form: NgForm): void {
+    if (form.invalid) {
+      this.userToastNotificationService.showToast('Warning', 'Please fill in all required fields.', 'warning');
+      return;
+    }
+
+    if (this.isEditMode && this.journal.id) {
+      this.journalService.update(this.journal.id, this.journal).subscribe({
+        next: (updated) => {
+          if (this.editIndex !== null) {
+            this.journals[this.editIndex] = updated;
+          }
+          this.userToastNotificationService.showToast('Success', 'Journal updated successfully!', 'success');
+          this.showForm = false;
+          form.resetForm();
+        },
+        error: (err) => {
+          console.error('Failed to update journal:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to update journal.', 'danger');
+        }
+      });
+    } else {
+      this.journalService.create(this.journal).subscribe({
+        next: (created) => {
+          this.journals.push(created);
+          this.userToastNotificationService.showToast('Success', 'Journal created successfully!', 'success');
+          this.showForm = false;
+          form.resetForm();
+        },
+        error: (err) => {
+          console.error('Failed to create journal:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to create journal.', 'danger');
+        }
+      });
     }
   }
 
-  private resetForm() {
-    this.journal = {
+  private getEmptyJournal(): Journal {
+    return {
       journalName: '',
       issn: '',
       frequency: '',
