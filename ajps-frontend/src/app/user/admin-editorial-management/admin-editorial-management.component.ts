@@ -1,21 +1,8 @@
-import { Component } from '@angular/core';
-import { BootstrapModalService } from '../../site-settings/services/bootstrap-modal.service';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-interface Editor {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  assignedJournals: { journalId: number; designation: string }[];
-  status: string;
-}
-
-interface Journal {
-  id: number;
-  name: string;
-}
+import { BootstrapModalService } from '../../site-settings/services/bootstrap-modal.service';
+import { Editor, EditorialManagementService, Journal } from '../../site-settings/admin/editorial-management.service';
 
 @Component({
   selector: 'app-admin-editorial-management',
@@ -24,63 +11,50 @@ interface Journal {
   templateUrl: './admin-editorial-management.component.html',
   styleUrl: './admin-editorial-management.component.css'
 })
-export class AdminEditorialManagementComponent {
+export class AdminEditorialManagementComponent implements OnInit {
+
+  journals: Journal[] = [];
+  editors: Editor[] = [];
 
   selectedJournalId: string = '';
   selectedJournal: Journal | null = null;
   selectedEditor: Editor | null = null;
   selectedDesignation: string = '';
-  journals: Journal[] = [
-    { id: 1, name: 'Journal of Science' },
-    { id: 2, name: 'Journal of Technology' },
-  ];
-  editors: Editor[] = [
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'john.smith@example.com',
-      assignedJournals: [{ journalId: 1, designation: 'Editor-in-Chief' }],
-      status: 'Active',
-    },
-    {
-      id: 2,
-      firstName: 'Jane',
-      lastName: 'Doe',
-      email: 'jane.doe@example.com',
-      assignedJournals: [{ journalId: 1, designation: 'Associate Editor' }],
-      status: 'Active',
-    },
-    {
-      id: 3,
-      firstName: 'Alice',
-      lastName: 'Brown',
-      email: '',
-      assignedJournals: [],
-      status: 'Active',
-    },
-    {
-      id: 4,
-      firstName: 'Bob',
-      lastName: 'Johnson',
-      email: 'bob.johnson@example.com',
-      assignedJournals: [],
-      status: 'Active',
-    },
+
+  editorDesignations: string[] = [
+    'Editor-in-Chief',
+    'Executive Editor',
+    'Advisory Editor',
+    'Editor',
+    'Editorial Assistant'
   ];
 
-  constructor(private modalService: BootstrapModalService) {}
+  constructor(
+    private modalService: BootstrapModalService,
+    private editorialService: EditorialManagementService
+  ) {}
 
-  loadJournalPanel() {
-    this.selectedJournal = this.journals.find((journal) => journal.id === +this.selectedJournalId) || null;
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  loadData(): void {
+    this.editorialService.getJournals().subscribe(journals => this.journals = journals);
+    this.editorialService.getEditors().subscribe(editors => this.editors = editors);
+  }
+
+  loadJournalPanel(): void {
+    this.selectedJournal = this.journals.find(j => j.id === +this.selectedJournalId) || null;
+  }
+
+  sanitizeDesignation(designation: string): string {
+    return designation.replace(/\s+/g, '');
   }
 
   getEditorsByDesignation(designation: string): Editor[] {
     if (!this.selectedJournal) return [];
-    return this.editors.filter((editor) =>
-      editor.assignedJournals.some(
-        (assignment) => assignment.journalId === this.selectedJournal!.id && assignment.designation === designation
-      )
+    return this.editors.filter(editor =>
+      editor.assignedJournals.some(a => a.journalId === this.selectedJournal!.id && a.designation === designation)
     );
   }
 
@@ -92,54 +66,39 @@ export class AdminEditorialManagementComponent {
 
   get availableEditors(): Editor[] {
     if (!this.selectedJournal) return [];
-    return this.editors.filter(
-      (editor) => !editor.assignedJournals.some((assignment) => assignment.journalId === this.selectedJournal!.id)
+    return this.editors.filter(editor =>
+      !editor.assignedJournals.some(a => a.journalId === this.selectedJournal!.id)
     );
   }
 
   isEditorAssigned(editor: Editor): boolean {
     return this.selectedJournal
-      ? editor.assignedJournals.some((assignment) => assignment.journalId === this.selectedJournal!.id)
+      ? editor.assignedJournals.some(a => a.journalId === this.selectedJournal!.id)
       : false;
   }
 
-  openAssignModal(designation: string) {
+  openAssignModal(designation: string): void {
     this.selectedEditor = null;
     this.selectedDesignation = designation;
     this.modalService.show('assignEditorModal');
   }
 
-  assignEditorToJournal() {
+  assignEditorToJournal(): void {
     if (this.selectedEditor && this.selectedJournal && this.selectedDesignation) {
-      this.editors = this.editors.map((editor) =>
-        editor.id === this.selectedEditor!.id
-          ? {
-              ...editor,
-              assignedJournals: [
-                ...editor.assignedJournals,
-                { journalId: this.selectedJournal!.id, designation: this.selectedDesignation },
-              ],
-            }
-          : editor
-      );
+      this.editorialService
+        .assignEditor(this.selectedEditor.id, this.selectedJournal.id, this.selectedDesignation)
+        .subscribe(() => this.loadData());
+
       this.selectedEditor = null;
       this.selectedDesignation = '';
     }
   }
 
-  removeEditorFromJournal(editor: Editor) {
+  removeEditorFromJournal(editor: Editor): void {
     if (this.selectedJournal) {
-      this.editors = this.editors.map((e) =>
-        e.id === editor.id
-          ? {
-              ...e,
-              assignedJournals: e.assignedJournals.filter(
-                (assignment) => assignment.journalId !== this.selectedJournal!.id
-              ),
-            }
-          : e
-      );
+      this.editorialService
+        .removeEditor(editor.id, this.selectedJournal.id)
+        .subscribe(() => this.loadData());
     }
   }
-
 }

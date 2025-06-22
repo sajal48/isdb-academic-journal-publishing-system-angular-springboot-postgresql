@@ -65,6 +65,9 @@ public class Profile {
     )
     private List<Journal> assignedJournals = new ArrayList<>();
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EditorAssignment> editorAssignments;
+
     @PrePersist
     protected void onCreate() {
         createdAt = BdtZoneTimeUtil.timeInBDT();

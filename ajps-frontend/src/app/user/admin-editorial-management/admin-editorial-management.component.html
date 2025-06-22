@@ -3,193 +3,93 @@
     Editorial Management
   </h4>
 </div>
+
 <div class="container-fluid">
-  <!-- Journal Selection (Updated to Card Style) -->
+  <!-- Journal Selection -->
   <div class="card mb-4">
-    <div class="card-header">
-      Select Journal
-    </div>
+    <div class="card-header">Select Journal</div>
     <div class="card-body">
       <label class="form-label fw-medium mb-2">Journal</label>
       <select class="form-select" [(ngModel)]="selectedJournalId" (ngModelChange)="loadJournalPanel()">
         <option value="" disabled>Select a journal</option>
-        <option *ngFor="let journal of journals" [value]="journal.id">{{ journal.name }}</option>
+        <option *ngFor="let journal of journals" [value]="journal.id">{{ journal.journalName }}</option>
       </select>
     </div>
   </div>
 
+  <div *ngIf="selectedJournal">
+    <h2 class="h5 mb-4" style="border-bottom: 1px solid #2e7d32; padding: 10px 0; color: #2e7d32;">
+      Editorial Panel for <span class="fw-semibold fs-5">"{{ selectedJournal.journalName }}"</span>
+    </h2>
 
-  <!-- Main Content: Editorial Panel -->
-  <div class="container-fluid" *ngIf="selectedJournal">
-    <h2 class="h5 mb-4" style="border-bottom: 1px solid #2e7d32; padding: 10px 0; color: #2e7d32;">Editorial Panel for
-      <span class="fw-semibold fs-5">"{{ selectedJournal.name }}"</span></h2>
-
-    <!-- Accordion -->
     <div class="accordion" id="editorialAccordion">
-      <!-- Editor-in-Chief Section -->
-      <div class="accordion-item mb-3 shadow-sm">
-        <h2 class="accordion-header" id="headingEditorInChief">
-          <button class="accordion-button" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseEditorInChief" aria-expanded="true" aria-controls="collapseEditorInChief">
-            Editor-in-Chief
-          </button>
-        </h2>
-        <div id="collapseEditorInChief" class="accordion-collapse collapse show" aria-labelledby="headingEditorInChief"
-          data-bs-parent="#editorialAccordion">
-          <div class="accordion-body">
-            <div class="table-responsive">
-              <table class="table">
-                <thead class="bg-light">
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Designation</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let editor of getEditorsByDesignation('Editor-in-Chief')">
-                    <td>{{ editor.firstName }} {{ editor.lastName }}</td>
-                    <td>{{ editor.email || '--' }}</td>
-                    <td><span class="badge bg-teal text-white">{{ getEditorDesignation(editor) }}</span></td>
-                    <td>
-                      <button class="btn btn-sm btn-danger" (click)="removeEditorFromJournal(editor)"
-                        [disabled]="!isEditorAssigned(editor)" title="Remove">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="getEditorsByDesignation('Editor-in-Chief').length === 0">
-                    <td colspan="4" class="text-center text-muted py-3">No Editor-in-Chief assigned</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="text-end mt-3">
-              <button class="btn btn-link text-teal fw-medium" (click)="openAssignModal('Editor-in-Chief')">
-                <i class="bi bi-plus-circle me-1"></i>Add Editor-in-Chief
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Associate Editor Section -->
-      <div class="accordion-item mb-3 shadow-sm">
-        <h2 class="accordion-header" id="headingAssociateEditor">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseAssociateEditor" aria-expanded="false" aria-controls="collapseAssociateEditor">
-            Associate Editor
-          </button>
-        </h2>
-        <div id="collapseAssociateEditor" class="accordion-collapse collapse" aria-labelledby="headingAssociateEditor"
-          data-bs-parent="#editorialAccordion">
-          <div class="accordion-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead class="bg-light">
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Designation</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let editor of getEditorsByDesignation('Associate Editor')">
-                    <td>{{ editor.firstName }} {{ editor.lastName }}</td>
-                    <td>{{ editor.email || '--' }}</td>
-                    <td><span class="badge bg-info text-white">{{ getEditorDesignation(editor) }}</span></td>
-                    <td>
-                      <button class="btn btn-sm btn-danger" (click)="removeEditorFromJournal(editor)"
-                        [disabled]="!isEditorAssigned(editor)" title="Remove">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="getEditorsByDesignation('Associate Editor').length === 0">
-                    <td colspan="4" class="text-center text-muted py-3">No Associate Editors assigned</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="text-end mt-3">
-              <button class="btn btn-link text-teal fw-medium" (click)="openAssignModal('Associate Editor')">
-                <i class="bi bi-plus-circle me-1"></i>Add Associate Editor
-              </button>
+      <ng-container *ngFor="let designation of editorDesignations">
+        <div class="accordion-item mb-3 shadow-sm">
+          <h2 class="accordion-header" [attr.id]="'heading' + sanitizeDesignation(designation)">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#collapse' + sanitizeDesignation(designation)" aria-expanded="false"
+              [attr.aria-controls]="'collapse' + sanitizeDesignation(designation)">
+              {{ designation }}
+            </button>
+          </h2>
+          <div class="accordion-collapse collapse" [attr.id]="'collapse' + sanitizeDesignation(designation)"
+            [attr.aria-labelledby]="'heading' + sanitizeDesignation(designation)" data-bs-parent="#editorialAccordion">
+            <div class="accordion-body">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead class="bg-light">
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Designation</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let editor of getEditorsByDesignation(designation)">
+                      <td>{{ editor.firstName }} {{ editor.lastName }}</td>
+                      <td>{{ editor.email || '--' }}</td>
+                      <td><span class="badge bg-dark text-white">{{ getEditorDesignation(editor) }}</span></td>
+                      <td>
+                        <button class="btn btn-sm btn-danger" (click)="removeEditorFromJournal(editor)"
+                          [disabled]="!isEditorAssigned(editor)" title="Remove">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="getEditorsByDesignation(designation).length === 0">
+                      <td colspan="4" class="text-center text-muted py-3">No {{ designation }} assigned</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end mt-3">
+                <button class="btn btn-link text-teal fw-medium" (click)="openAssignModal(designation)">
+                  <i class="bi bi-plus-circle me-1"></i>Add {{ designation }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Reviewer Section -->
-      <div class="accordion-item mb-3 shadow-sm">
-        <h2 class="accordion-header" id="headingReviewer">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseReviewer" aria-expanded="false" aria-controls="collapseReviewer">
-            Reviewer
-          </button>
-        </h2>
-        <div id="collapseReviewer" class="accordion-collapse collapse" aria-labelledby="headingReviewer"
-          data-bs-parent="#editorialAccordion">
-          <div class="accordion-body">
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead class="bg-light">
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Designation</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let editor of getEditorsByDesignation('Reviewer')">
-                    <td>{{ editor.firstName }} {{ editor.lastName }}</td>
-                    <td>{{ editor.email || '--' }}</td>
-                    <td><span class="badge bg-secondary text-white">{{ getEditorDesignation(editor) }}</span></td>
-                    <td>
-                      <button class="btn btn-sm btn-danger" (click)="removeEditorFromJournal(editor)"
-                        [disabled]="!isEditorAssigned(editor)" title="Remove">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="getEditorsByDesignation('Reviewer').length === 0">
-                    <td colspan="4" class="text-center text-muted py-3">No Reviewers assigned</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="text-end mt-3">
-              <button class="btn btn-link text-teal fw-medium" (click)="openAssignModal('Reviewer')">
-                <i class="bi bi-plus-circle me-1"></i>Add Reviewer
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      </ng-container>
     </div>
   </div>
 </div>
 
-<!-- Assign Editor Modal -->
+<!-- Assign Modal -->
 <div class="modal fade" id="assignEditorModal" tabindex="-1" aria-labelledby="assignEditorModalLabel"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content rounded-4 shadow">
       <div class="modal-header border-0 bg-teal text-white">
-        <h5 class="modal-title" id="assignEditorModalLabel">
-          <!-- Assign {{ selectedDesignation || 'Editor' }} to {{ selectedJournal?.name }} -->
-          Assign {{ selectedDesignation || 'Editor' }}
-        </h5>
+        <h5 class="modal-title" id="assignEditorModalLabel">Assign {{ selectedDesignation || 'Editor' }}</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form #assignForm="ngForm">
           <div class="mb-3">
-            <label for="editorSelect" class="form-label fw-medium">Select Editor</label>
-            <select id="editorSelect" [(ngModel)]="selectedEditor" name="editorSelect" class="form-select" required>
+            <label class="form-label fw-medium">Select Editor</label>
+            <select [(ngModel)]="selectedEditor" name="editorSelect" class="form-select" required>
               <option value="" disabled>Select an editor</option>
               <option *ngFor="let editor of availableEditors" [ngValue]="editor">
                 {{ editor.firstName }} {{ editor.lastName }} ({{ editor.email }})
@@ -197,13 +97,10 @@
             </select>
           </div>
           <div class="mb-3" *ngIf="!selectedDesignation">
-            <label for="designationSelect" class="form-label fw-medium">Designation</label>
-            <select id="designationSelect" [(ngModel)]="selectedDesignation" name="designationSelect"
-              class="form-select" required>
+            <label class="form-label fw-medium">Designation</label>
+            <select [(ngModel)]="selectedDesignation" name="designationSelect" class="form-select" required>
               <option value="" disabled>Select a designation</option>
-              <option value="Editor-in-Chief">Editor-in-Chief</option>
-              <option value="Associate Editor">Associate Editor</option>
-              <option value="Reviewer">Reviewer</option>
+              <option *ngFor="let role of editorDesignations" [value]="role">{{ role }}</option>
             </select>
           </div>
         </form>
@@ -211,9 +108,7 @@
       <div class="modal-footer border-0">
         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary text-white" (click)="assignEditorToJournal()"
-          [disabled]="!assignForm.valid" data-bs-dismiss="modal">
-          Assign
-        </button>
+          [disabled]="!assignForm.valid" data-bs-dismiss="modal">Assign</button>
       </div>
     </div>
   </div>

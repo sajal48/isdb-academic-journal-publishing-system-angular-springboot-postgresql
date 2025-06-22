@@ -3,6 +3,9 @@ package com.himusharier.ajps_backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "ajps_journals")
 @Getter
@@ -42,4 +45,7 @@ public class Journal {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String aboutJournal;
+
+    @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EditorAssignment> editorAssignments = new ArrayList<>();
 }
