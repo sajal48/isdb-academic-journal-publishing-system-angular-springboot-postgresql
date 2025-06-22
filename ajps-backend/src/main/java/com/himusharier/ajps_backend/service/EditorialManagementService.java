@@ -8,6 +8,7 @@ import com.himusharier.ajps_backend.model.EditorAssignment;
 import com.himusharier.ajps_backend.model.Journal;
 import com.himusharier.ajps_backend.model.Profile;
 import com.himusharier.ajps_backend.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,7 @@ public class EditorialManagementService {
         assignmentRepo.save(ea);
     }
 
+    @Transactional
     public void removeEditor(Long profileId, Long journalId) {
         assignmentRepo.deleteByProfileIdAndJournalId(profileId, journalId);
     }

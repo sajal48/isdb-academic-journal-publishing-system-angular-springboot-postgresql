@@ -57,16 +57,18 @@ public class Profile {
     @JsonManagedReference
     private List<Submission> submissionList;
 
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<EditorAssignment> editorAssignments;
+
     @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinTable(
             name = "profile_journals",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "journal_id")
     )
     private List<Journal> assignedJournals = new ArrayList<>();
-
-    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<EditorAssignment> editorAssignments;
 
     @PrePersist
     protected void onCreate() {

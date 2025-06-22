@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,5 +48,6 @@ public class Journal {
     private String aboutJournal;
 
     @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<EditorAssignment> editorAssignments = new ArrayList<>();
 }

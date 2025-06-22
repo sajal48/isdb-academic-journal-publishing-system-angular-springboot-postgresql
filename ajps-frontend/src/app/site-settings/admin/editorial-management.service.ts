@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { apiConfig } from '../configs/api-config';
 
 export interface Editor {
-  id: number;
+  profileId: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -29,7 +29,7 @@ export class EditorialManagementService {
 
   getJournals(): Observable<Journal[]> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
-    return this.http.get<Journal[]>(`${apiConfig.apiBaseUrl}/editorial/journals`);
+    return this.http.get<Journal[]>(`${apiConfig.apiBaseUrl}/editorial/journals`, {headers});
   }
 
   getEditors(): Observable<Editor[]> {
@@ -37,22 +37,22 @@ export class EditorialManagementService {
     return this.http.get<Editor[]>(`${apiConfig.apiBaseUrl}/editorial/editors`);
   }
 
-  assignEditor(editorId: number, journalId: number, designation: string): Observable<any> {
+  assignEditor(profileId: number, journalId: number, designation: string): Observable<any> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     return this.http.post(`${apiConfig.apiBaseUrl}/editorial/editors/assign`, {
-      editorId,
+      profileId,
       journalId,
       designation,
-    });
+    }, {headers});
   }
 
-  removeEditor(editorId: number, journalId: number): Observable<any> {
+  removeEditor(profileId: number, journalId: number): Observable<any> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     const params = new HttpParams()
-      .set('editorId', editorId)
+      .set('profileId', profileId)
       .set('journalId', journalId);
 
-    return this.http.delete(`${apiConfig.apiBaseUrl}/editorial/editors/unassign`, { params });
+    return this.http.delete(`${apiConfig.apiBaseUrl}/editorial/editors/unassign`, { params },);
   }
   
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BootstrapModalService } from '../../site-settings/services/bootstrap-modal.service';
 import { Editor, EditorialManagementService, Journal } from '../../site-settings/admin/editorial-management.service';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
 
 @Component({
   selector: 'app-admin-editorial-management',
@@ -31,7 +32,9 @@ export class AdminEditorialManagementComponent implements OnInit {
 
   constructor(
     private modalService: BootstrapModalService,
-    private editorialService: EditorialManagementService
+    private editorialService: EditorialManagementService,
+    private toastService: UserToastNotificationService
+
   ) {}
 
   ngOnInit(): void {
@@ -86,19 +89,39 @@ export class AdminEditorialManagementComponent implements OnInit {
   assignEditorToJournal(): void {
     if (this.selectedEditor && this.selectedJournal && this.selectedDesignation) {
       this.editorialService
-        .assignEditor(this.selectedEditor.id, this.selectedJournal.id, this.selectedDesignation)
-        .subscribe(() => this.loadData());
+        .assignEditor(this.selectedEditor.profileId, this.selectedJournal.id, this.selectedDesignation)
+        .subscribe({
+          next: () => {
+            this.toastService.showToast('Success', 'Editor assigned successfully!', 'success');
+            this.loadData();
+          },
+          error: (err) => {
+            this.toastService.showToast('Error', 'Failed to assign editor.', 'danger');
+            console.error(err);
+          },
+        });
 
       this.selectedEditor = null;
       this.selectedDesignation = '';
     }
   }
 
+
   removeEditorFromJournal(editor: Editor): void {
     if (this.selectedJournal) {
       this.editorialService
-        .removeEditor(editor.id, this.selectedJournal.id)
-        .subscribe(() => this.loadData());
+        .removeEditor(editor.profileId, this.selectedJournal.id)
+        .subscribe({
+          next: () => {
+            this.toastService.showToast('Success', 'Editor removed successfully!', 'success');
+            this.loadData();
+          },
+          error: (err) => {
+            this.toastService.showToast('Error', 'Failed to remove editor.', 'danger');
+            console.error(err);
+          },
+        });
     }
   }
+
 }
