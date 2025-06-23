@@ -47,6 +47,9 @@ public class Journal {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String aboutJournal;
 
+    @Column(name = "cover_image_url")
+    private String coverImageUrl;
+
     @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<EditorAssignment> editorAssignments = new ArrayList<>();

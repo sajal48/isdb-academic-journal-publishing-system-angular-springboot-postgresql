@@ -1,31 +1,31 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Journal, JournalOperationsService } from '../../site-settings/admin/journal-operations.service';
 import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
-import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service'; // Import PopupMessageService
+import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service';
+import { CommonModule } from '@angular/common';
+import { FilePreviewPipe } from '../../site-settings/pipe/file-preview.pipe';
 
 @Component({
   selector: 'app-admin-journal-management',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './admin-journal-management.component.html',
-  styleUrls: ['./admin-journal-management.component.css']
+  styleUrls: ['./admin-journal-management.component.css'],
+  imports: [CommonModule, FormsModule, FilePreviewPipe]
 })
 export class AdminJournalManagementComponent implements OnInit {
-
+  journals: Journal[] = [];
   showForm = false;
   isEditMode = false;
   editIndex: number | null = null;
-
-  journals: Journal[] = [];
-
   journal: Journal = this.getEmptyJournal();
+  coverImageFile: File | null = null;
+  public readonly BASE_URL = 'localhost:4500/journal/';
 
   constructor(
     private journalService: JournalOperationsService,
-    private userToastNotificationService: UserToastNotificationService,
-    private popupMessageService: PopupMessageService // Inject PopupMessageService
+    private toast: UserToastNotificationService,
+    private popup: PopupMessageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -34,91 +34,93 @@ export class AdminJournalManagementComponent implements OnInit {
 
   loadJournals(): void {
     this.journalService.getAll().subscribe({
-      next: (data) => this.journals = data,
-      error: (err) => {
-        console.error('Failed to load journals:', err);
-        this.userToastNotificationService.showToast('Error', 'Failed to load journals.', 'danger');
-      }
+      next: (res) => {
+        this.journals = res;
+        this.cdr.detectChanges();
+      },
+      error: () => this.toast.showToast('Error', 'Failed to load journals', 'danger')
     });
   }
 
   showAddForm(): void {
-    this.showForm = true;
-    this.isEditMode = false;
-    this.editIndex = null;
     this.journal = this.getEmptyJournal();
+    this.coverImageFile = null;
+    this.isEditMode = false;
+    this.showForm = true;
   }
 
   editJournal(index: number): void {
-    this.showForm = true;
+    const selected = this.journals[index];
+    this.journal = { ...selected };
+    this.coverImageFile = null;
     this.isEditMode = true;
     this.editIndex = index;
-    this.journal = { ...this.journals[index] };
+    this.showForm = true;
   }
 
   deleteJournal(index: number): void {
     const journal = this.journals[index];
-    if (journal.id) {
-      this.popupMessageService.confirm(
-        'Delete Journal?',
-        `Are you sure you want to delete the journal "${journal.journalName}" permanently?`,
-        'Yes, Delete',
-        'Cancel'
-      ).then((confirmed) => {
-        if (confirmed) {
-          this.journalService.delete(journal.id!).subscribe({ // Use non-null assertion as we've checked for journal.id
+    this.popup.confirm('Delete Journal?', `Delete "${journal.journalName}" permanently?`, 'Yes', 'Cancel')
+      .then(confirm => {
+        if (confirm && journal.id) {
+          this.journalService.delete(journal.id).subscribe({
             next: () => {
               this.journals.splice(index, 1);
-              this.userToastNotificationService.showToast('Success', 'Journal deleted successfully!', 'success');
+              this.toast.showToast('Deleted', 'Journal deleted', 'success');
+              this.cdr.detectChanges();
             },
-            error: (err) => {
-              console.error('Failed to delete journal:', err);
-              this.userToastNotificationService.showToast('Error', 'Failed to delete journal.', 'danger');
-            }
+            error: () => this.toast.showToast('Error', 'Delete failed', 'danger')
           });
         }
       });
-    }
   }
 
   cancelForm(): void {
     this.showForm = false;
     this.journal = this.getEmptyJournal();
+    this.coverImageFile = null;
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      this.coverImageFile = file;
+    } else {
+      this.coverImageFile = null;
+      this.toast.showToast('Warning', 'Only image files allowed', 'warning');
+    }
   }
 
   onSubmit(form: NgForm): void {
-    if (form.invalid) {
-      this.userToastNotificationService.showToast('Warning', 'Please fill in all required fields.', 'warning');
+    if (form.invalid || (!this.coverImageFile && !this.journal.coverImageUrl)) {
+      this.toast.showToast('Warning', 'Fill all required fields including image', 'warning');
       return;
     }
 
+    const formData = new FormData();
+    const journalPayload = { ...this.journal };
+    formData.append('journal', new Blob([JSON.stringify(journalPayload)], { type: 'application/json' }));
+    if (this.coverImageFile) formData.append('coverImage', this.coverImageFile);
+
     if (this.isEditMode && this.journal.id) {
-      this.journalService.update(this.journal.id, this.journal).subscribe({
-        next: (updated) => {
-          if (this.editIndex !== null) {
-            this.journals[this.editIndex] = updated;
-          }
-          this.userToastNotificationService.showToast('Success', 'Journal updated successfully!', 'success');
-          this.showForm = false;
+      this.journalService.update(this.journal.id, formData).subscribe({
+        next: (res) => {
+          if (this.editIndex !== null) this.journals[this.editIndex] = res;
+          this.toast.showToast('Updated', 'Journal updated successfully.', 'success');
+          this.cancelForm();
           form.resetForm();
         },
-        error: (err) => {
-          console.error('Failed to update journal:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to update journal.', 'danger');
-        }
+        error: () => this.toast.showToast('Error', 'Journal update failed.', 'danger')
       });
     } else {
-      this.journalService.create(this.journal).subscribe({
-        next: (created) => {
-          this.journals.push(created);
-          this.userToastNotificationService.showToast('Success', 'Journal created successfully!', 'success');
-          this.showForm = false;
+      this.journalService.create(formData).subscribe({
+        next: (res) => {
+          this.journals.push(res);
+          this.toast.showToast('Created', 'Journal created successfully.', 'success');
+          this.cancelForm();
           form.resetForm();
         },
-        error: (err) => {
-          console.error('Failed to create journal:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to create journal.', 'danger');
-        }
+        error: () => this.toast.showToast('Error', 'Journal creation failed.', 'danger')
       });
     }
   }
@@ -133,7 +135,8 @@ export class AdminJournalManagementComponent implements OnInit {
       contactEmail: '',
       journalUrl: '',
       aimsScopes: '',
-      aboutJournal: ''
+      aboutJournal: '',
+      coverImageUrl: ''
     };
   }
 }

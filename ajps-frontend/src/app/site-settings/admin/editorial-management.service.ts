@@ -6,6 +6,7 @@ import { apiConfig } from '../configs/api-config';
 export interface Editor {
   profileId: number;
   firstName: string;
+  middleName: string;
   lastName: string;
   email: string;
   assignedJournals: { journalId: number; designation: string }[];

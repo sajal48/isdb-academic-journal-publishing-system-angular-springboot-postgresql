@@ -3,159 +3,162 @@
     Journal Management
   </h4>
 </div>
+
 <div class="container-fluid">
   <!-- Journal List -->
   <div *ngIf="!showForm">
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card shadow-sm border-0 rounded">
+      <div class="card-header d-flex justify-content-between align-items-center bg-light">
         <h5 class="card-title mb-0">Existing Journals</h5>
-        <button class="btn btn-primary" (click)="showAddForm()"><i class="bi bi-plus-lg"></i> Add New Journal</button>
+        <button class="btn btn-primary" (click)="showAddForm()">
+          <i class="bi bi-plus-lg"></i> Add New Journal
+        </button>
       </div>
       <div class="card-body">
         <div *ngIf="journals.length === 0" class="alert alert-info">
           No journals added yet.
         </div>
-        <table *ngIf="journals.length > 0" class="table">
-          <thead>
-            <tr>
-              <th>Journal Name</th>
-              <th>ISSN</th>
-              <th>Frequency</th>
-              <th>Type</th>
-              <th>Short Code</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let journal of journals; let i = index">
-              <td>{{ journal.journalName }}</td>
-              <td>{{ journal.issn }}</td>
-              <td>{{ journal.frequency }}</td>
-              <td>{{ journal.journalType }}</td>
-              <td>{{ journal.journalCode }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary me-2" (click)="editJournal(i)">
-                  <i class="bi bi-pencil"></i> Edit Journal
-                </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteJournal(i)" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="row g-4">
+          <div *ngFor="let journal of journals; let i = index" class="col-md-6">
+            <div class="journal-card card p-3 h-100 shadow-sm rounded">
+              <div class="row g-0 h-100">
+                <div class="col-sm-5 d-flex align-items-center">
+                  <img *ngIf="journal.coverImageUrl" [src]="journal.coverImageUrl" [alt]="journal.journalName" class="journal-img" style="max-width: 100%; max-height: 150px;" />
+                  <span *ngIf="!journal.coverImageUrl" class="text-muted">No Image</span>
+                </div>
+                <div class="col-sm-7 d-flex flex-column">
+                  <div class="card-body d-flex flex-column justify-content-between h-100">
+                    <div>
+                      <h3 class="card-title h5">{{ journal.journalName }}</h3>
+                      <p class="card-text"><b>ISSN:</b> {{ journal.issn }}</p>
+                      <p class="card-text">Frequency: {{ journal.frequency }}</p>
+                      <p class="card-text">{{ journal.journalType }}</p>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                      <button class="btn btn-sm btn-outline-primary" (click)="editJournal(i)">
+                        <i class="bi bi-pencil"></i> Edit Journal
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteJournal(i)">
+                        <i class="bi bi-trash"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Journal Form -->
   <div *ngIf="showForm">
-    <h2 class="h5 mb-3 text-primary fs-5">{{ isEditMode ? 'Edit Journal' : 'Add New Journal' }}</h2>
-    <form #journalForm="ngForm" (ngSubmit)="onSubmit(journalForm)">
-      <div class="row">
-        <!-- Journal Name -->
-        <div class="col-md-6 mb-3">
-          <label for="journalName" class="form-label">Journal Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="journalName" name="journalName"
-                 [(ngModel)]="journal.journalName" required #journalName="ngModel"
-                 [ngClass]="{'is-invalid': journalName.invalid && journalName.touched}">
-          <div class="invalid-feedback">Journal name is required.</div>
-        </div>
-
-        <!-- ISSN -->
-        <div class="col-md-6 mb-3">
-          <label for="issn" class="form-label">ISSN <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="issn" name="issn"
-                 [(ngModel)]="journal.issn" required pattern="\d{4}-\d{4}" #issn="ngModel"
-                 [ngClass]="{'is-invalid': issn.invalid && issn.touched}">
-          <div class="invalid-feedback">Please enter a valid ISSN (e.g., 1234-5678).</div>
-        </div>
-
-        <!-- Frequency -->
-        <div class="col-md-6 mb-3">
-          <label for="frequency" class="form-label">Publication Frequency <span class="text-danger">*</span></label>
-          <select class="form-select" id="frequency" name="frequency"
-                  [(ngModel)]="journal.frequency" required #frequency="ngModel"
-                  [ngClass]="{'is-invalid': frequency.invalid && frequency.touched}">
-            <option value="" disabled>Select frequency</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Bimonthly">Bimonthly</option>
-            <option value="Quarterly">Quarterly</option>
-            <option value="Semiannually">Semiannually</option>
-            <option value="Annually">Annually</option>
-          </select>
-          <div class="invalid-feedback">Please select a publication frequency.</div>
-        </div>
-
-        <!-- Journal Type -->
-        <div class="col-md-6 mb-3">
-          <label for="journalType" class="form-label">Journal Type <span class="text-danger">*</span></label>
-          <select class="form-select" id="journalType" name="journalType"
-                  [(ngModel)]="journal.journalType" required #journalType="ngModel"
-                  [ngClass]="{'is-invalid': journalType.invalid && journalType.touched}">
-            <option value="" disabled>Select journal type</option>
-            <option value="Open Access">Open Access</option>
-            <option value="Subscription">Subscription</option>
-            <option value="Hybrid">Hybrid</option>
-          </select>
-          <div class="invalid-feedback">Please select a journal type.</div>
-        </div>
-
-        <!-- Journal Short Code -->
-        <div class="col-md-6 mb-3">
-          <label for="journalCode" class="form-label">Journal Short Code <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" id="journalCode" name="journalCode"
-                 [(ngModel)]="journal.journalCode" required #journalCode="ngModel"
-                 [ngClass]="{'is-invalid': journalCode.invalid && journalCode.touched}">
-          <div class="invalid-feedback">Journal short code is required.</div>
-        </div>
-
-        <!-- Contact Email -->
-        <div class="col-md-6 mb-3">
-          <label for="contactEmail" class="form-label">Contact Email <span class="text-danger">*</span></label>
-          <input type="email" class="form-control" id="contactEmail" name="contactEmail"
-                 [(ngModel)]="journal.contactEmail" required email #contactEmail="ngModel"
-                 [ngClass]="{'is-invalid': contactEmail.invalid && contactEmail.touched}">
-          <div class="invalid-feedback">Please enter a valid email address.</div>
-        </div>
-
-        <!-- Journal URL -->
-        <div class="col-md-6 mb-3">
-          <label for="journalUrl" class="form-label">Journal URL <span class="text-danger">*</span></label>
-          <input type="url" class="form-control" id="journalUrl" name="journalUrl"
-                 [(ngModel)]="journal.journalUrl" required
-                 pattern="https?://[^\s/$.?#].[^\s]*$"
-                 #journalUrl="ngModel"
-                 [ngClass]="{'is-invalid': journalUrl.invalid && journalUrl.touched}">
-          <div class="invalid-feedback">Please enter a valid URL (e.g., https://example.com).</div>
-        </div>
-
-        <!-- About Journal -->
-        <div class="col-12 mb-3">
-          <label for="aboutJournal" class="form-label">About Journal <span class="text-danger">*</span></label>
-          <textarea class="form-control" id="aboutJournal" name="aboutJournal" rows="4"
-                    [(ngModel)]="journal.aboutJournal" required #aboutJournal="ngModel"
-                    [ngClass]="{'is-invalid': aboutJournal.invalid && aboutJournal.touched}"></textarea>
-          <div class="invalid-feedback">About journal is required.</div>
-        </div>
-
-        <!-- Aims and Scopes -->
-        <div class="col-12 mb-3">
-          <label for="aimsScopes" class="form-label">Aims and Scopes <span class="text-danger">*</span></label>
-          <textarea class="form-control" id="aimsScopes" name="aimsScopes" rows="4"
-                    [(ngModel)]="journal.aimsScopes" required #aimsScopes="ngModel"
-                    [ngClass]="{'is-invalid': aimsScopes.invalid && aimsScopes.touched}"></textarea>
-          <div class="invalid-feedback">Aims and scopes are required.</div>
-        </div>
+    <div class="card shadow-sm rounded">
+      <div class="card-header bg-light">
+        <h2 class="h5 mb-0 text-primary fs-5">{{ isEditMode ? 'Edit Journal' : 'Add New Journal' }}</h2>
       </div>
+      <div class="card-body">
+        <form #journalForm="ngForm" (ngSubmit)="onSubmit(journalForm)">
+          <div class="row">
+            <!-- Journal Name -->
+            <div class="col-md-6 mb-3">
+              <label for="journalName" class="form-label">Journal Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="journalName" name="journalName" [(ngModel)]="journal.journalName" required #journalName="ngModel" [ngClass]="{'is-invalid': journalName.invalid && journalName.touched}" />
+              <div class="invalid-feedback">Journal name is required.</div>
+            </div>
 
-      <!-- Form Buttons -->
-      <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="journalForm.invalid">
-          {{ isEditMode ? 'Update Journal' : 'Create Journal' }}
-        </button>
+            <!-- ISSN -->
+            <div class="col-md-6 mb-3">
+              <label for="issn" class="form-label">ISSN <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="issn" name="issn" [(ngModel)]="journal.issn" required pattern="\d{4}-\d{4}" #issn="ngModel" [ngClass]="{'is-invalid': issn.invalid && issn.touched}" />
+              <div class="invalid-feedback">Enter a valid ISSN (e.g., 1234-5678).</div>
+            </div>
+
+            <!-- Frequency -->
+            <div class="col-md-6 mb-3">
+              <label for="frequency" class="form-label">Frequency <span class="text-danger">*</span></label>
+              <select class="form-select" id="frequency" name="frequency" [(ngModel)]="journal.frequency" required #frequency="ngModel" [ngClass]="{'is-invalid': frequency.invalid && frequency.touched}">
+                <option value="" disabled>Select frequency</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Annually">Annually</option>
+              </select>
+              <div class="invalid-feedback">Please select frequency.</div>
+            </div>
+
+            <!-- Journal Type -->
+            <div class="col-md-6 mb-3">
+              <label for="journalType" class="form-label">Journal Type <span class="text-danger">*</span></label>
+              <select class="form-select" id="journalType" name="journalType" [(ngModel)]="journal.journalType" required #journalType="ngModel" [ngClass]="{'is-invalid': journalType.invalid && journalType.touched}">
+                <option value="" disabled>Select journal type</option>
+                <option value="Open Access">Open Access</option>
+                <option value="Subscription">Subscription</option>
+              </select>
+              <div class="invalid-feedback">Please select type.</div>
+            </div>
+
+            <!-- Journal Code -->
+            <div class="col-md-6 mb-3">
+              <label for="journalCode" class="form-label">Journal Short Code <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="journalCode" name="journalCode" [(ngModel)]="journal.journalCode" required #journalCode="ngModel" [ngClass]="{'is-invalid': journalCode.invalid && journalCode.touched}" />
+              <div class="invalid-feedback">Short code required.</div>
+            </div>
+
+            <!-- Contact Email -->
+            <div class="col-md-6 mb-3">
+              <label for="contactEmail" class="form-label">Contact Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="contactEmail" name="contactEmail" [(ngModel)]="journal.contactEmail" required #contactEmail="ngModel" [ngClass]="{'is-invalid': contactEmail.invalid && contactEmail.touched}" />
+              <div class="invalid-feedback">Enter a valid email.</div>
+            </div>
+
+            <!-- Journal URL -->
+            <div class="col-md-6 mb-3">
+              <label for="journalUrl" class="form-label">Journal URL <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text">localhost:4500/journal/</span>
+                <input type="text" class="form-control" id="journalUrl" name="journalUrl" [(ngModel)]="journal.journalUrl" required #journalUrl="ngModel" [ngClass]="{'is-invalid': journalUrl.invalid && journalUrl.touched}" />
+              </div>
+              <div class="invalid-feedback">URL is required.</div>
+            </div>
+
+            <!-- Cover Image Upload -->
+            <div class="col-md-6 mb-3">
+              <label for="coverImage" class="form-label">Cover Image <span class="text-danger">*</span></label>
+              <input type="file" class="form-control" id="coverImage" name="coverImage" accept="image/*" (change)="onFileSelected($event)" />
+              <div *ngIf="coverImageFile || journal.coverImageUrl" class="mt-2">
+                <img
+                  [src]="coverImageFile ? (coverImageFile | filePreview) : journal.coverImageUrl"
+                  alt="Cover"
+                  style="max-width: 100px; max-height: 100px"
+                />
+              </div>
+            </div>
+
+            <!-- About Journal -->
+            <div class="col-12 mb-3">
+              <label for="aboutJournal" class="form-label">About Journal <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="aboutJournal" name="aboutJournal" rows="3" [(ngModel)]="journal.aboutJournal" required #aboutJournal="ngModel" [ngClass]="{'is-invalid': aboutJournal.invalid && aboutJournal.touched}"></textarea>
+              <div class="invalid-feedback">This field is required.</div>
+            </div>
+
+            <!-- Aims and Scopes -->
+            <div class="col-12 mb-3">
+              <label for="aimsScopes" class="form-label">Aims and Scopes <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="aimsScopes" name="aimsScopes" rows="3" [(ngModel)]="journal.aimsScopes" required #aimsScopes="ngModel" [ngClass]="{'is-invalid': aimsScopes.invalid && aimsScopes.touched}"></textarea>
+              <div class="invalid-feedback">This field is required.</div>
+            </div>
+          </div>
+
+          <!-- Form Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="journalForm.invalid">
+              {{ isEditMode ? 'Update Journal' : 'Create Journal' }}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </div>

@@ -3,8 +3,10 @@ package com.himusharier.ajps_backend.controller;
 import com.himusharier.ajps_backend.dto.request.AdminJournalDto;
 import com.himusharier.ajps_backend.service.JournalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,14 +23,19 @@ public class JournalController {
         return ResponseEntity.ok(journalService.getAllJournals());
     }
 
-    @PostMapping("/create-journal")
-    public ResponseEntity<AdminJournalDto> createJournal(@RequestBody AdminJournalDto dto) {
-        return ResponseEntity.ok(journalService.createJournal(dto));
+    @PostMapping(value = "/create-journal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminJournalDto> createJournal(
+            @RequestPart("journal") AdminJournalDto dto,
+            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage) {
+        return ResponseEntity.ok(journalService.createJournal(dto, coverImage));
     }
 
-    @PutMapping("/update-journal/{id}")
-    public ResponseEntity<AdminJournalDto> updateJournal(@PathVariable Long id, @RequestBody AdminJournalDto dto) {
-        return ResponseEntity.ok(journalService.updateJournal(id, dto));
+    @PutMapping(value = "/update-journal/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AdminJournalDto> updateJournal(
+            @PathVariable Long id,
+            @RequestPart("journal") AdminJournalDto dto,
+            @RequestPart(value = "coverImage", required = false) MultipartFile coverImage) {
+        return ResponseEntity.ok(journalService.updateJournal(id, dto, coverImage));
     }
 
     @DeleteMapping("/delete-journal/{id}")

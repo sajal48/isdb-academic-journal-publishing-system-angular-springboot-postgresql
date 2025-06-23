@@ -14,6 +14,7 @@ import java.util.List;
 public class EditorDto {
     private Long profileId;
     private String firstName;
+    private String  middleName;
     private String lastName;
     private String email;
     private List<AssignmentDto> assignedJournals;

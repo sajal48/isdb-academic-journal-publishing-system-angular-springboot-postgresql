@@ -37,6 +37,7 @@ public class EditorialManagementService {
         EditorDto dto = new EditorDto();
         dto.setProfileId(profile.getId());
         dto.setFirstName(profile.getFirstName());
+        dto.setMiddleName(profile.getMiddleName());
         dto.setLastName(profile.getLastName());
         dto.setEmail(profile.getAuth().getEmail());
 

@@ -19,4 +19,5 @@ public class AdminJournalDto {
     private String journalUrl;
     private String aimsScopes;
     private String aboutJournal;
+    private String coverImageUrl;
 }
