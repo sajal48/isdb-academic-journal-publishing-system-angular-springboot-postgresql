@@ -55,7 +55,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let reviewer of filteredReviewers">
-              <td>{{ reviewer.firstName }} {{ reviewer.lastName }}</td>
+              <td>{{ reviewer.firstName }} {{ reviewer.middleName }} {{ reviewer.lastName }}</td>
               <td>{{ reviewer.email }}</td>
               <td>{{ getJournalTitles(reviewer) }}</td>
               <td>
@@ -85,6 +85,11 @@
           </div>
 
           <div class="modal-body">
+            <div style="line-height: 10px;margin-bottom: 20px;">
+              <p><b>Editor Name:</b> {{ selectedReviewer?.firstName }} {{ selectedReviewer?.middleName }} {{
+                selectedReviewer?.lastName }}</p>
+              <p><b>Editor Email:</b> {{ selectedReviewer?.email }}</p>
+            </div>
             <label class="form-label mb-2 text-primary-emphasis fs-6">Select Journals:</label>
             <div *ngFor="let journal of journals" class="form-check mb-2" style="margin-left: 10px;">
               <input class="form-check-input" type="checkbox" [id]="'journal-' + journal.id"

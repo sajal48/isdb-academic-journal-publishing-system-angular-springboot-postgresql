@@ -16,6 +16,7 @@ interface Editor {
   authId: number;
   profileId: number;
   firstName: string;
+  middleName: string;
   lastName: string;
   email: string;
   assignedJournals: JournalShort[];
@@ -62,6 +63,7 @@ export class AdminEditorManagementComponent implements OnInit {
         authId: item.authId,
         profileId: item.profileId,
         firstName: item.firstName,
+        middleName: item.middleName,
         lastName: item.lastName,
         email: item.email,
         assignedJournals: item.assignedJournals || []
@@ -111,7 +113,7 @@ export class AdminEditorManagementComponent implements OnInit {
     const selectedIds = Object.keys(this.journalSelections)
       .filter(id => this.journalSelections[+id])
       .map(id => +id);
-
+    debugger
     this.editorService.assignJournalsToEditor(this.selectedEditor.profileId, selectedIds).subscribe({
       next: () => {
         this.userToastNotificationService.showToast('Success', 'Journals assigned successfully', 'success');

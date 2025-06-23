@@ -16,6 +16,7 @@ interface Reviewer {
   authId: number;
   profileId: number;
   firstName: string;
+  middleName: string;
   lastName: string;
   email: string;
   assignedJournals: JournalShort[];
@@ -63,6 +64,7 @@ export class AdminReviewerManagementComponent implements OnInit {
         authId: item.authId,
         profileId: item.profileId,
         firstName: item.firstName,
+        middleName: item.middleName,
         lastName: item.lastName,
         email: item.email,
         assignedJournals: item.assignedJournals || []

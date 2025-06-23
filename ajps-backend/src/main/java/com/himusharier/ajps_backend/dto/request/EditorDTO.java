@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewerDTO {
+public class EditorDTO {
     private Long profileId;
     private Long authId;
     private String firstName;
@@ -17,4 +17,7 @@ public class ReviewerDTO {
     private String lastName;
     private String email;
     private List<JournalShortDTO> assignedJournals;
+
+    // For assigning journals
+    private List<Long> assignedJournalsIds;
 }
