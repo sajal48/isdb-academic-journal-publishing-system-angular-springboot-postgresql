@@ -7,7 +7,8 @@ public record ManuscriptDetailsRequest(
         Long userId,
 
         @NotBlank(message = "Journal name should not left blank.")
-        String journalName,
+//        String journalName,
+        Long journalId,
 
         @NotBlank(message = "Manuscript title should not left blank.")
         String manuscriptTitle,

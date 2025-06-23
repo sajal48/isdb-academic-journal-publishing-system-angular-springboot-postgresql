@@ -8,7 +8,7 @@ public class UserSubmissionListMapperUtil {
     public static SubmissionListResponse submissionListResponseFromSubmission(Submission submission) {
         return new SubmissionListResponse(
                 submission.getId(),
-                submission.getJournalName(),
+                submission.getJournal().getJournalName(),
                 submission.getManuscriptTitle(),
                 submission.getManuscriptCategory(),
                 submission.getSubmissionStatus(),

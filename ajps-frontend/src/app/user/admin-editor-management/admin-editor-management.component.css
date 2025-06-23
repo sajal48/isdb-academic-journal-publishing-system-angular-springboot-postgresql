@@ -1,0 +1,46 @@
+.page-title {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+.page-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, #2e7d32, #4caf50);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+.form-label {
+    font-weight: 500;
+    font-size: 14px;
+}
+.form-label > i {
+    color: #dc3545;
+}
+.table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #1a202c;
+    font-size: 14px;
+}
+.table td {
+    vertical-align: middle;
+    font-size: 14px;
+}
+.form-check-input {
+    cursor: pointer;
+}
+.form-check-label {
+    cursor: pointer;
+    font-size: 16px;
+}
+.card-header {
+    font-weight: 500;
+}
+.card-body {
+    padding: 1.5rem;
+}

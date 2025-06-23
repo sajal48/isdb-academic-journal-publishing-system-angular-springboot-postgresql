@@ -78,8 +78,8 @@
                             <!-- <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button> -->
                             }                            
                             <button *ngIf="submission.submissionStatus == 'SAVED'" (click)="deleteManuscript(submission.id)" class="btn btn-sm btn-link" style="color: #ff2926;"><i class="bi bi-trash"></i> Delete</button>
-                            <!-- <a *ngIf="submission.submissionStatus == 'REVISION_REQUIRED'" class="text-warning"><i class="bi bi-exclamation-triangle"></i> This journal required revision.</a> -->
-                            <a *ngIf="submission.submissionStatus != 'SAVED'" class="text-warning-emphasis text-decoration-none"><i class="bi bi-exclamation-triangle"></i> This journal required revision!</a>
+                            <a *ngIf="submission.submissionStatus == 'REVISION_REQUIRED'" class="text-warning-emphasis text-decoration-none"><i class="bi bi-exclamation-triangle"></i> This journal required revision!</a>
+                            <!-- <a *ngIf="submission.submissionStatus != 'SAVED'" class="text-warning-emphasis text-decoration-none"><i class="bi bi-exclamation-triangle"></i> This journal required revision!</a> -->
                         </td>
                     </tr>
                 </ng-container>

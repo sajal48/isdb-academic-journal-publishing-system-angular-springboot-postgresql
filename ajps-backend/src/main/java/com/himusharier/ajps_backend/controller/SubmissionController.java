@@ -39,8 +39,7 @@ public class SubmissionController {
         Profile profile = profileService.userProfileDetailsByUserId(userId);
 
         List<SubmissionListResponse> submissionList = profile.getSubmissionList().stream()
-                .map(UserSubmissionListMapperUtil::submissionListResponseFromSubmission
-                )
+                .map(UserSubmissionListMapperUtil::submissionListResponseFromSubmission)
                 .toList();
 
         Map<String, Object> response = new HashMap<>();
@@ -57,10 +56,44 @@ public class SubmissionController {
         try {
             Submission submissionDetails = submissionService.returnSubmissionDetails(profile, submissionId);
 
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("id", submissionDetails.getId());
+            responseData.put("submissionNumber", submissionDetails.getSubmissionNumber());
+
+//            responseData.put("journalName", submissionDetails.getJournal().getJournalName()); // Get journal name from Journal entity
+            // --- IMPORTANT CHANGE HERE ---
+            // Instead of just journalName, return the journal object with its ID
+            Map<String, Object> journalData = new HashMap<>();
+            if (submissionDetails.getJournal() != null) {
+                journalData.put("id", submissionDetails.getJournal().getId());
+                journalData.put("journalName", submissionDetails.getJournal().getJournalName());
+                // Add any other journal properties you might need on the frontend
+            }
+            responseData.put("journal", journalData); // Return the journal object
+            // --- END IMPORTANT CHANGE ---
+
+            responseData.put("manuscriptTitle", submissionDetails.getManuscriptTitle());
+            responseData.put("manuscriptCategory", submissionDetails.getManuscriptCategory());
+            responseData.put("abstractContent", submissionDetails.getAbstractContent());
+            responseData.put("manuscriptKeywords", submissionDetails.getManuscriptKeywords());
+            responseData.put("comments", submissionDetails.getComments());
+            responseData.put("submissionConfirmation", submissionDetails.isSubmissionConfirmation());
+            responseData.put("submissionStatus", submissionDetails.getSubmissionStatus());
+            responseData.put("createdAt", submissionDetails.getCreatedAt());
+            responseData.put("submittedAt", submissionDetails.getSubmittedAt());
+            responseData.put("updatedAt", submissionDetails.getUpdatedAt());
+            responseData.put("isPaymentDue", submissionDetails.isPaymentDue());
+            responseData.put("completedSteps", submissionDetails.getCompletedSteps());
+            responseData.put("isEditable", submissionDetails.isEditable());
+            responseData.put("authors", submissionDetails.getAuthors());
+            responseData.put("files", submissionDetails.getFiles());
+            responseData.put("submissionReviewers", submissionDetails.getSubmissionReviewers());
+
+
             Map<String, Object> response = new HashMap<>();
             response.put("status", "success");
             response.put("code", HttpStatus.OK.value());
-            response.put("data", submissionDetails);
+            response.put("data", responseData); // Return the mapped data
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (RuntimeException e) {
@@ -200,11 +233,6 @@ public class SubmissionController {
         return new ApiResponse<>(200, "Manuscript submitted successfully", Map.of("submissionId", saved.getId()));
     }
 
-
-
-
-
-
     @DeleteMapping("/delete/{submissionId}")
     public ResponseEntity<SuccessResponseModel<Void>> deleteSubmission(
             @PathVariable Long submissionId) {
@@ -217,7 +245,4 @@ public class SubmissionController {
                         "Submission deleted successfully."),
                 HttpStatus.OK);
     }
-
-
-
 }

@@ -43,7 +43,8 @@
                     <li><a [routerLink]="['/user/settings']"><button class="dropdown-item" type="button">Settings</button></a></li>
                     @if (userRole == "admin") {
                     <li><hr class="dropdown-divider"></li>
-                    <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Admin Dashboard</button></a></li>
+                    <!-- <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Admin Dashboard</button></a></li> -->
+                    <li><a [routerLink]="['/user/admin-user-submissions']"><button class="dropdown-item" type="button">User Submissions</button></a></li>
                     <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Journal Publication</button></a></li>
                     <li><a [routerLink]="['/user/admin-dashboard']"><button class="dropdown-item" type="button">Journal Management</button></a></li>
                     }

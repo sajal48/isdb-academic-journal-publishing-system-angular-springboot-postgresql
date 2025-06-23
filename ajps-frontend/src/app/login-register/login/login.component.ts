@@ -65,7 +65,8 @@ export class LoginComponent implements OnInit {
           }*/
 
           if(this.authLoginRegisterService.getUserRole() == "admin") {
-            window.location.href="/user/admin-dashboard";
+            // window.location.href="/user/admin-dashboard";
+            window.location.href="/user/admin-user-submissions";
 
           } else if (this.authLoginRegisterService.getUserRole() == "editor") {
             window.location.href="/user/journal-overview";

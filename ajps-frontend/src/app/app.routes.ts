@@ -61,6 +61,7 @@ import { ManuscriptReviewComponent } from './user/user-manuscript/manuscript-rev
 import { ManuscriptCopyeditingComponent } from './user/user-manuscript/manuscript-copyediting/manuscript-copyediting.component';
 import { ManuscriptProductionComponent } from './user/user-manuscript/manuscript-production/manuscript-production.component';
 import { ManuscriptPublicationComponent } from './user/user-manuscript/manuscript-publication/manuscript-publication.component';
+import { AdminEditorManagementComponent } from './user/admin-editor-management/admin-editor-management.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -160,6 +161,7 @@ export const routes: Routes = [
             {path: 'admin-journal-management', component: AdminJournalManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Journal Management - ScholarPress'},
             {path: 'admin-editorial-management', component: AdminEditorialManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Editorial Management - ScholarPress'},
             {path: 'admin-reviewer-management', component: AdminReviewerManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Reviewer Management - ScholarPress'},
+            {path: 'admin-editor-management', component: AdminEditorManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Editor Management - ScholarPress'},
             {path: 'admin-user-management', component: AdminUserManagementComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'User Management - ScholarPress'},
             {path: 'admin-site-settings', component: AdminSiteSettingsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Site Settings - ScholarPress'},
             {path: 'admin-activity-logs', component: AdminActivityLogsComponent, canActivate: [authGuardUserGuard], data: {roles: ['admin']}, title: 'Activity Logs - ScholarPress'},

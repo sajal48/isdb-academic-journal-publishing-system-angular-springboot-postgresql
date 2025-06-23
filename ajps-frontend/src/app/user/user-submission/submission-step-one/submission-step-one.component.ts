@@ -8,7 +8,7 @@ import { Journal, JournalOperationsService } from '../../../site-settings/admin/
 import { CommonModule } from '@angular/common';
 
 interface ManuscriptDetails {
-  journalName: string;
+  journalId: number | null;
   manuscriptTitle: string;
   manuscriptCategory: string;
   abstractContent: string;
@@ -24,13 +24,12 @@ interface ManuscriptDetails {
 })
 export class SubmissionStepOneComponent implements OnInit {
   userId: number = 0;
-  // submissionId: number = 0;  
   validationError: string = '';
 
   journals: Journal[] = [];
 
   manuscript: ManuscriptDetails = {
-    journalName: '',
+    journalId: null,
     manuscriptTitle: '',
     manuscriptCategory: '',
     abstractContent: '',
@@ -39,11 +38,11 @@ export class SubmissionStepOneComponent implements OnInit {
   };
 
   private fieldDisplayNames: { [key: string]: string } = {
-    journalName: 'Journal Selection',
-    manuscriptTitle: 'Manuscript Title',
-    manuscriptCategory: 'Manuscript Category',
-    abstractContent: 'Abstract',
-    manuscriptKeywords: 'Keywords'
+    journalId: 'journal name',
+    manuscriptTitle: 'manuscript title',
+    manuscriptCategory: 'manuscript category',
+    abstractContent: 'abstract',
+    manuscriptKeywords: 'keywords'
   };
 
   constructor(
@@ -52,22 +51,27 @@ export class SubmissionStepOneComponent implements OnInit {
     private userToastNotificationService: UserToastNotificationService,
     private router: Router,
     private journalOperations: JournalOperationsService
-
   ) {
     this.userId = authService.getUserID();
   }
 
   ngOnInit(): void {
-    // Load available journals
+    // Load available journals first
     this.journalOperations.getAll().subscribe({
       next: (data) => {
         this.journals = data;
+        // After journals are loaded, attempt to load submission details
+        this.loadSubmissionDetails();
       },
       error: (err) => {
         console.error('Failed to load journals', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load journals.', 'danger');
       }
     });
+  }
 
+  // New method to encapsulate submission details loading
+  private loadSubmissionDetails(): void {
     const existingSubmissionId = this.userSubmissionDetailsService.getSubmissionId();
     if (existingSubmissionId) {
       this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(existingSubmissionId)
@@ -76,7 +80,9 @@ export class SubmissionStepOneComponent implements OnInit {
             if (response.code === 200 && response.data) {
               const data = response.data;
               this.manuscript = {
-                journalName: data.journalName || '',
+                // Correctly set journalId from the nested 'journal' object
+                // Ensure data.journal exists and has an id property
+                journalId: data.journal ? data.journal.id : null,
                 manuscriptTitle: data.manuscriptTitle || '',
                 manuscriptCategory: data.manuscriptCategory || '',
                 abstractContent: data.abstractContent || '',
@@ -87,17 +93,17 @@ export class SubmissionStepOneComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error loading manuscript details:', err);
+            this.userToastNotificationService.showToast('Error', 'Failed to load manuscript details.', 'danger');
           }
         });
     }
   }
 
   private validateForm(): boolean {
-    this.validationError = ''; // Clear previous errors
+    this.validationError = '';
 
-    // Define the list of required fields to check
     const requiredFields: (keyof ManuscriptDetails)[] = [
-      'journalName',
+      'journalId',
       'manuscriptTitle',
       'manuscriptCategory',
       'abstractContent',
@@ -107,13 +113,16 @@ export class SubmissionStepOneComponent implements OnInit {
     for (const field of requiredFields) {
       const displayName = this.fieldDisplayNames[field] || field;
 
-      if (typeof this.manuscript[field] === 'string' && (this.manuscript[field] as string).trim() === '') {
+      if (field === 'journalId') {
+        if (this.manuscript.journalId === null || this.manuscript.journalId === 0) {
+          this.validationError = `Please enter ${displayName}.`;
+          return false;
+        }
+      } else if (typeof this.manuscript[field] === 'string' && (this.manuscript[field] as string).trim() === '') {
         this.validationError = `Please fill out the '${displayName}' field.`;
         return false;
       }
-
     }
-
     return true;
   }
 
@@ -128,7 +137,12 @@ export class SubmissionStepOneComponent implements OnInit {
     const payload = {
       userId: this.userId,
       submissionId: existingSubmissionId,
-      ...this.manuscript
+      journalId: this.manuscript.journalId,
+      manuscriptTitle: this.manuscript.manuscriptTitle,
+      manuscriptCategory: this.manuscript.manuscriptCategory,
+      abstractContent: this.manuscript.abstractContent,
+      manuscriptKeywords: this.manuscript.manuscriptKeywords,
+      completedSteps: this.manuscript.completedSteps
     };
 
     const request = existingSubmissionId
@@ -140,13 +154,11 @@ export class SubmissionStepOneComponent implements OnInit {
         if (response.code === 200 || response.code === 201) {
           this.userToastNotificationService.showToast('Success', `${response.message}`, 'success');
 
-          if (!existingSubmissionId) {
-            this.userSubmissionDetailsService.setSubmissionId(response.data.submissionId); // only set if insert
+          if (!existingSubmissionId && response.data && response.data.submissionId) {
+            this.userSubmissionDetailsService.setSubmissionId(response.data.submissionId);
           }
 
-          // this.router.navigate(['/user/submission/author-informations']);
-          // window.location.href="/user/submission/author-informations";
-          setInterval(() => {
+          setTimeout(() => {
             window.location.href = "/user/submission/author-informations";
           }, 500);
         } else {
@@ -154,15 +166,14 @@ export class SubmissionStepOneComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error(error);
+        console.error('Submission error:', error);
+        this.userToastNotificationService.showToast('Error', 'An error occurred during submission. Please try again.', 'danger');
       }
     });
-
   }
 
   exitToDashboard(): void {
     this.userSubmissionDetailsService.clearSubmissionId();
     this.router.navigate(['/user/dashboard']);
   }
-
 }

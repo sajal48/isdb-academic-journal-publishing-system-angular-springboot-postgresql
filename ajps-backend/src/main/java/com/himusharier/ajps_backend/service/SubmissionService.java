@@ -5,10 +5,7 @@ import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.*;
-import com.himusharier.ajps_backend.repository.AuthorRepository;
-import com.himusharier.ajps_backend.repository.FileUploadRepository;
-import com.himusharier.ajps_backend.repository.SubmissionReviewerRepository;
-import com.himusharier.ajps_backend.repository.SubmissionRepository;
+import com.himusharier.ajps_backend.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,17 +32,20 @@ public class SubmissionService {
     private final AuthorRepository authorRepository;
     private final FileUploadRepository fileUploadRepository;
     private final SubmissionReviewerRepository submissionReviewerRepository;
+    private final JournalRepository journalRepository;
 
     public SubmissionService(
             SubmissionRepository submissionRepository,
             AuthorRepository authorRepository,
             FileUploadRepository fileUploadRepository,
-            SubmissionReviewerRepository submissionReviewerRepository
+            SubmissionReviewerRepository submissionReviewerRepository,
+            JournalRepository journalRepository
     ) {
         this.submissionRepository = submissionRepository;
         this.authorRepository = authorRepository;
         this.fileUploadRepository = fileUploadRepository;
         this.submissionReviewerRepository = submissionReviewerRepository;
+        this.journalRepository = journalRepository;
     }
 
     public Submission returnSubmissionDetails(Profile profile, Long submissionId) {
@@ -71,6 +71,43 @@ public class SubmissionService {
     }
 
     @Transactional
+    public Long saveManuscriptDetails(ManuscriptDetailsRequest request, Profile profile) {
+        Journal journal = journalRepository.findById(request.journalId())
+                .orElseThrow(() -> new SubmissionRequestException("Journal not found with ID: " + request.journalId()));
+
+        Submission submission = Submission.builder()
+                .profile(profile)
+                .journal(journal) // Set the Journal entity
+                .manuscriptTitle(request.manuscriptTitle())
+                .manuscriptCategory(request.manuscriptCategory())
+                .abstractContent(request.abstractContent())
+                .manuscriptKeywords(request.manuscriptKeywords())
+                .completedSteps(request.completedSteps())
+                .submissionConfirmation(false) // Default value
+                .submissionStatus(SubmissionStatus.SAVED) // Default status
+                .isPaymentDue(false) // Default value
+                .isEditable(true) // Default value
+                .build();
+        submissionRepository.save(submission);
+        return submission.getId();
+    }
+
+    @Transactional
+    public Submission updateManuscriptDetails(ManuscriptDetailsRequest request) {
+        Submission submission = returnSubmission(request.submissionId());
+        Journal journal = journalRepository.findById(request.journalId())
+                .orElseThrow(() -> new SubmissionRequestException("Journal not found with ID: " + request.journalId()));
+
+        submission.setJournal(journal); // Update the Journal entity
+        submission.setManuscriptTitle(request.manuscriptTitle());
+        submission.setManuscriptCategory(request.manuscriptCategory());
+        submission.setAbstractContent(request.abstractContent());
+        submission.setManuscriptKeywords(request.manuscriptKeywords());
+        submission.setCompletedSteps(request.completedSteps());
+        return submissionRepository.save(submission);
+    }
+
+    /*@Transactional
     public Long saveManuscriptDetails(ManuscriptDetailsRequest request, Profile profile) {
         Submission manuscriptDetails = Submission.builder()
                 .journalName(request.journalName())
@@ -107,7 +144,7 @@ public class SubmissionService {
 
 //        Submission updateSubmission = submissionRepository.save(existingSubmission);
         return submissionRepository.save(existingSubmission);
-    }
+    }*/
 
     @Transactional
     public void updateCompletedSteps(Long submissionId, List<String> completedSteps) {

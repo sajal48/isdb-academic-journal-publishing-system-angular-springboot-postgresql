@@ -3,17 +3,11 @@
     <form id="manuscriptDetailsForm" #manuscriptForm="ngForm" (ngSubmit)="onSubmit(manuscriptForm)">
         <div class="mb-3">
             <label class="form-label">Select Journal <span class="text-danger">*</span></label>
-            <select class="form-select" name="journalName" [(ngModel)]="manuscript.journalName">
-                <option value="" disabled>Select a journal</option>
-                <!-- <option value="Plants and Ecosystem">Plants and Ecosystem</option>
-                <option value="Journal of Botany">Journal of Botany</option>
-                <option value="Ecological Studies">Ecological Studies</option>
-                <option value="Environmental Research">Environmental Research</option>
-                <option value="Biodiversity and Conservation">Biodiversity and Conservation</option> -->
-                <option *ngFor="let journal of journals" [value]="journal.journalName">
+            <select class="form-select" name="journalId" [(ngModel)]="manuscript.journalId">
+                <option [ngValue]="null" disabled>Select a journal</option>
+                <option *ngFor="let journal of journals" [value]="journal.id">
                     {{ journal.journalName }}
                 </option>
-
             </select>
         </div>
 

@@ -28,8 +28,12 @@ public class Submission implements Serializable {
     @Column(updatable = false, nullable = false, unique = true)
     private Long submissionNumber;
 
-    @Column(nullable = false)
-    private String journalName;
+//    @Column(nullable = false)
+//    private String journalName;
+
+    @ManyToOne
+    @JoinColumn(name = "journal_id", nullable = false) // Foreign key column
+    private Journal journal; // Link to the Journal entity
 
     @Column(nullable = false)
     private String manuscriptTitle;
