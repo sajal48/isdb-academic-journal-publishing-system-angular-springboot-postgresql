@@ -1,6 +1,7 @@
 package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
@@ -9,6 +10,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -81,6 +83,10 @@ public class Submission implements Serializable {
     @JoinColumn(name = "profile_id")
     @JsonBackReference
     private Profile profile;
+
+    // Add Issues relation
+//    @OneToMany(mappedBy = "submission")
+//    private List<Issue> issues;
 
     @PrePersist
     protected void onCreate() {

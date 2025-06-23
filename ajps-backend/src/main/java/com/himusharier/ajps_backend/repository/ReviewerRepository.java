@@ -4,9 +4,11 @@ import com.himusharier.ajps_backend.model.Journal;
 import com.himusharier.ajps_backend.model.Reviewer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface ReviewerRepository extends JpaRepository<Reviewer, Long> {
 
     @Query("SELECT r FROM Reviewer r " +

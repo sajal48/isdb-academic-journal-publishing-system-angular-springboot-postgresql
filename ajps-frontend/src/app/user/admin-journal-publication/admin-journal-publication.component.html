@@ -3,97 +3,148 @@
         Journal Publication Management
     </h4>
 </div>
+
 <div class="container-fluid">
-    <!-- Main Content -->
-    <main>
-        <!-- Journal Selection -->
-        <div class="card">
-            <div class="card-header">Select Journal</div>
-            <div class="card-body">
-                <select class="form-select mb-3" [(ngModel)]="selectedJournal" (change)="loadIssues()">
-                    <option *ngFor="let journal of journals" [value]="journal.id">{{ journal.name }}</option>
-                </select>
-            </div>
+    <!-- Journal Selection Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">Select Journal</div>
+        <div class="card-body">
+            <select class="form-select mb-3" [(ngModel)]="selectedJournal" (change)="loadIssues()">
+                <option [ngValue]="null" disabled selected>Select a journal</option>
+                <option *ngFor="let journal of journals" [ngValue]="journal.id">{{ journal.journalName }}</option>
+            </select>
         </div>
+    </div>
 
-        <!-- Tabs for Published and Future Issues -->
-        <ul class="nav nav-tabs mb-3">
-            <li class="nav-item">
-                <a class="nav-link" [class.active]="currentTab === 'published'" (click)="currentTab = 'published'">Published Issues</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" [class.active]="currentTab === 'future'" (click)="currentTab = 'future'">Future Issues</a>
-            </li>
-        </ul>
-
-        <!-- Issue List -->
-        <div class="card">
-            <div class="card-header">{{ currentTab === 'published' ? 'Published Issues' : 'Future Issues' }}</div>
+    <!-- Show Issue Management Only If Journal Is Selected -->
+    <div *ngIf="selectedJournal">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">Issue Management</div>
             <div class="card-body">
-                <button class="btn btn-primary mb-3" (click)="openAddIssueModal()">Add New Issue</button>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Volume</th>
-                            <th>Issue</th>
-                            <th>Publication Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let issue of getFilteredIssues()">
-                            <td>{{ issue.volume }}</td>
-                            <td>{{ issue.number }}</td>
-                            <td>{{ issue.publicationDate | date:'shortDate' }}</td>
-                            <td>{{ issue.status }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info" (click)="viewPapers(issue)">View Papers</button>
-                                <button class="btn btn-sm btn-warning" (click)="editIssue(issue)">Edit</button>
-                                <button class="btn btn-sm btn-danger" (click)="deleteIssue(issue)">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                <ul class="nav nav-tabs mb-3">
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="currentTab === 'published'"
+                            (click)="currentTab = 'published'">Published Issues</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="currentTab === 'future'"
+                            (click)="currentTab = 'future'">Future Issues</a>
+                    </li>
+                </ul>
 
-        <!-- Papers List Modal -->
-        <div class="modal fade" id="papersModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Papers in Volume {{ selectedIssue?.volume }} Issue {{
-                            selectedIssue?.number }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <button class="btn btn-primary mb-3" (click)="addPaper()">Add Paper</button>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Authors</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let paper of selectedIssue?.papers">
-                                    <td>{{ paper.title }}</td>
-                                    <td>{{ paper.authors }}</td>
-                                    <td>{{ paper.status }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning" (click)="editPaper(paper)">Edit</button>
-                                        <button class="btn btn-sm btn-danger"
-                                            (click)="deletePaper(paper)">Delete</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <button class="btn btn-primary mb-3" (click)="openAddIssueModal()"><i class="bi bi-plus-lg"></i> Add New Issue</button>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Volume</th>
+                                <th>Issue</th>
+                                <th>Publication Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let issue of getFilteredIssues()">
+                                <td>{{ issue.volume }}</td>
+                                <td>{{ issue.number }}</td>
+                                <td>{{ issue.publicationDate | date:'shortDate' }}</td>
+                                <td>{{ issue.status }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" (click)="viewPapers(issue)"><i class="bi bi-eye"></i> View Papers</button>
+                                    <button class="btn btn-sm btn-warning" (click)="editIssue(issue)"><i class="bi bi-pencil"></i> Edit</button>
+                                    <button class="btn btn-sm btn-danger" (click)="deleteIssue(issue)"><i class="bi bi-trash3"> </i>Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
+
+    <!-- Papers Modal -->
+    <div class="modal fade" id="papersModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Papers in Volume {{ selectedIssue?.volume }} Issue {{ selectedIssue?.number }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Authors</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let paper of selectedIssue?.papers">
+                                <td>{{ paper.title }}</td>
+                                <td>{{ paper.authors }}</td>
+                                <td>{{ paper.status }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning" (click)="editPaper(paper)"><i class="bi bi-pencil"></i> Edit</button>
+                                    <button class="btn btn-sm btn-danger" (click)="deletePaper(paper)"><i class="bi bi-trash3"> </i>Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Issue Modal -->
+    <div class="modal fade" id="addIssueModal" tabindex="-1" aria-labelledby="addIssueModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ modalTitle }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="volumeInput">Volume</label>
+                                <input id="volumeInput" type="number" class="form-control" [(ngModel)]="newIssue.volume" name="volume" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="numberInput">Issue Number</label>
+                                <input id="numberInput" type="number" class="form-control" [(ngModel)]="newIssue.number" name="number" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="pubDateInput">Publication Date</label>
+                                <input id="pubDateInput" type="date" class="form-control" [(ngModel)]="newIssue.publicationDate" name="publicationDate" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="statusSelect">Status</label>
+                                <select id="statusSelect" class="form-select" [(ngModel)]="newIssue.status" name="status" required>
+                                    <option value="" disabled>Select issue status</option>
+                                    <option value="Published">Published</option>
+                                    <option value="Future">Future</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" [disabled]="!isIssueFormValid()" (click)="submitNewIssue()">
+                        <i class="bi bi-floppy"></i> Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

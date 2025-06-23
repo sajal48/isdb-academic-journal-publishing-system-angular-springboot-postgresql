@@ -1,19 +1,21 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-declare const bootstrap: any;
+import { CommonModule } from '@angular/common';
+import { JournalPublicationOperationsService } from '../../site-settings/admin/journal-publication-operations.service';
+import { Router } from '@angular/router';
+import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
+import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service';
 
 interface Journal {
   id: number;
-  name: string;
+  journalName: string;
 }
 
 interface Issue {
   id: number;
   volume: number;
   number: number;
-  publicationDate: Date;
+  publicationDate: string;
   status: 'Published' | 'Future';
   papers: Paper[];
 }
@@ -27,77 +29,180 @@ interface Paper {
 
 @Component({
   selector: 'app-admin-journal-publication',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-journal-publication.component.html',
-  styleUrl: './admin-journal-publication.component.css'
+  styleUrls: ['./admin-journal-publication.component.css']
 })
-export class AdminJournalPublicationComponent implements OnInit {
-  journals: Journal[] = [
-    { id: 1, name: 'Journal of Science' },
-    { id: 2, name: 'Journal of Technology' }
-  ];
-  selectedJournal: number = 1;
-  issues: Issue[] = [
-    { id: 1, volume: 1, number: 1, publicationDate: new Date('2025-01-15'), status: 'Published', papers: [
-      { id: 1, title: 'Quantum Computing Advances', authors: 'John Doe, Jane Smith', status: 'Published' },
-      { id: 2, title: 'AI in Healthcare', authors: 'Alice Brown', status: 'Published' }
-    ]},
-    { id: 2, volume: 1, number: 2, publicationDate: new Date('2025-06-30'), status: 'Future', papers: []}
-  ];
+export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
+  journals: Journal[] = [];
+  selectedJournal: number | null = null;
   currentTab: 'published' | 'future' = 'published';
   selectedIssue: Issue | null = null;
+  issues: Issue[] = [];
 
-  ngOnInit() {
-    this.loadIssues();
+  newIssue: Partial<Issue> = this.getEmptyIssue();
+  isEditingIssue = false;
+  modalTitle = 'Add New Issue';
+
+  private addIssueModalInstance: any;
+
+  constructor(
+    private journalService: JournalPublicationOperationsService,
+    private router: Router,
+    private toast: UserToastNotificationService,
+    private popup: PopupMessageService
+  ) { }
+
+  ngOnInit(): void {
+    this.journalService.getJournals().subscribe(data => this.journals = data);
+  }
+
+  ngAfterViewInit(): void {
+    const modalElement = document.getElementById('addIssueModal');
+    if (modalElement) {
+      this.addIssueModalInstance = new (window as any).bootstrap.Modal(modalElement);
+    }
   }
 
   loadIssues() {
-    // Fetch issues for selected journal (mock implementation)
-    // In real app, this would be an API call
+    if (this.selectedJournal) {
+      this.journalService.getIssues(this.selectedJournal).subscribe(data => {
+        this.issues = data;
+        this.selectedIssue = null;
+      });
+    }
   }
 
   getFilteredIssues(): Issue[] {
-    return this.issues.filter(issue => issue.status === this.currentTab.charAt(0).toUpperCase() + this.currentTab.slice(1));
+    return this.issues.filter(issue => issue.status === this.capitalize(this.currentTab));
+  }
+
+  capitalize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   openAddIssueModal() {
-    // Implement modal logic to add new issue
-    console.log('Open add issue modal');
+    this.newIssue = this.getEmptyIssue();
+    this.isEditingIssue = false;
+    this.modalTitle = 'Add New Issue';
+
+    if (this.addIssueModalInstance) {
+      this.addIssueModalInstance.show();
+    }
+  }
+
+  isIssueFormValid(): boolean {
+    return !!(
+      this.newIssue.volume &&
+      this.newIssue.number &&
+      this.newIssue.publicationDate &&
+      this.newIssue.status
+    );
+  }
+
+  submitNewIssue() {
+    if (this.selectedJournal && this.isIssueFormValid()) {
+      const operation = this.isEditingIssue && this.newIssue.id
+        ? this.journalService.updateIssue(this.newIssue as Issue)
+        : this.journalService.addIssue(this.selectedJournal, this.newIssue);
+
+      operation.subscribe({
+        next: () => {
+          this.loadIssues();
+
+          // Hide modal
+          if (this.addIssueModalInstance) {
+            this.addIssueModalInstance.hide();
+          }
+
+          // Toast
+          this.toast.showToast(
+            this.isEditingIssue ? 'Updated' : 'Created',
+            this.isEditingIssue ? 'Issue updated successfully.' : 'Issue added successfully.',
+            'success'
+          );
+
+          // Reset modal state
+          this.resetIssueForm();
+        },
+        error: () => {
+          this.toast.showToast('Error', this.isEditingIssue ? 'Failed to update issue.' : 'Failed to add issue.', 'danger');
+        }
+      });
+    }
+  }
+
+  private resetIssueForm(): void {
+    this.newIssue = this.getEmptyIssue();
+    this.isEditingIssue = false;
+    this.modalTitle = 'Add New Issue';
+
+    // Also reset any dropdown/select default visually
+    const statusSelect = document.querySelector<HTMLSelectElement>('select[name="status"]');
+    if (statusSelect) {
+      statusSelect.selectedIndex = 0; // reset to placeholder/default
+    }
   }
 
   viewPapers(issue: Issue) {
     this.selectedIssue = issue;
-    const modal = new bootstrap.Modal(document.getElementById('papersModal')!);
+    const modal = new (window as any).bootstrap.Modal(document.getElementById('papersModal'));
     modal.show();
   }
 
   editIssue(issue: Issue) {
-    // Implement edit issue logic
-    console.log('Edit issue:', issue);
-  }
+    this.newIssue = { ...issue };
+    this.isEditingIssue = true;
+    this.modalTitle = 'Edit Issue';
 
-  deleteIssue(issue: Issue) {
-    this.issues = this.issues.filter(i => i.id !== issue.id);
-  }
-
-  addPaper() {
-    // Implement add paper logic
-    console.log('Add paper to issue:', this.selectedIssue);
-  }
-
-  editPaper(paper: Paper) {
-    // Implement edit paper logic
-    console.log('Edit paper:', paper);
-  }
-
-  deletePaper(paper: Paper) {
-    if (this.selectedIssue) {
-      this.selectedIssue.papers = this.selectedIssue.papers.filter(p => p.id !== paper.id);
+    if (this.addIssueModalInstance) {
+      this.addIssueModalInstance.show();
     }
   }
 
-  selectSection(section: string) {
-    // Implement section navigation logic
-    console.log('Navigate to:', section);
+  deleteIssue(issue: Issue) {
+    this.popup.confirm('Delete Issue?', `Delete Volume ${issue.volume}, Issue ${issue.number} permanently?`, 'Yes, Delete', 'Cancel')
+      .then(confirm => {
+        if (confirm) {
+          this.journalService.deleteIssue(issue.id).subscribe({
+            next: () => {
+              this.loadIssues();
+              this.toast.showToast('Deleted', 'Issue deleted successfully.', 'success');
+            },
+            error: () => this.toast.showToast('Error', 'Delete failed', 'danger')
+          });
+        }
+      });
+  }
+
+  editPaper(paper: Paper) {
+    this.router.navigate(['/admin/papers/edit', paper.id]);
+  }
+
+  deletePaper(paper: Paper) {
+    if (!this.selectedIssue) return;
+    this.popup.confirm('Delete Paper?', `Are you sure you want to delete "${paper.title}"?`, 'Yes, Delete', 'Cancel')
+      .then(confirm => {
+        if (confirm) {
+          this.journalService.deletePaper(this.selectedIssue!.id, paper.id).subscribe({
+            next: () => {
+              this.selectedIssue!.papers = this.selectedIssue!.papers.filter(p => p.id !== paper.id);
+              this.toast.showToast('Deleted', 'Paper deleted successfully.', 'success');
+            },
+            error: () => this.toast.showToast('Error', 'Paper delete failed', 'danger')
+          });
+        }
+      });
+  }
+
+  private getEmptyIssue(): Partial<Issue> {
+    return {
+      volume: undefined,
+      number: undefined,
+      publicationDate: '',
+      status: undefined,
+      papers: []
+    };
   }
 }

@@ -23,10 +23,10 @@
 }
 .card-header { 
     /* background-color: #007bff;  */
-    background-color: #F8F8F8; 
-    color: #212529; 
+    /* background-color: #F8F8F8;  */
+    /* color: #212529;  */
     /* font-weight: bold;  */
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
 }
 /* .table { 
@@ -57,4 +57,14 @@
 
 .nav-item {
     cursor: pointer;
+}
+
+.nav-tabs .nav-link {
+  color: #2e7d32;
+  font-weight: 500;
+}
+.nav-tabs .nav-link.active {
+  color: #2e7d32;
+  background-color: #f8f9fa;
+  border-bottom-color: #2e7d32;
 }
