@@ -19,7 +19,8 @@ export class AdminUserSubmissionsComponent {
     {
       id: 'S001',
       journalId: '1',
-      title: 'Advances in Machine Learning',
+      // title: 'Advances in Machine Learning',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'New',
       submittedDate: new Date('2025-06-17')
     },
