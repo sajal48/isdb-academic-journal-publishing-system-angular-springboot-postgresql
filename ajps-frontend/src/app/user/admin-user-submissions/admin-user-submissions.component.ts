@@ -27,35 +27,40 @@ export class AdminUserSubmissionsComponent {
     {
       id: 'S002',
       journalId: '2',
-      title: 'Quantum Computing Applications',
+      // title: 'Quantum Computing Applications',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'Assigned',
       submittedDate: new Date('2025-06-15')
     },
     {
       id: 'S003',
       journalId: '1',
-      title: 'Data Science Trends',
+      // title: 'Data Science Trends',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'In Review',
       submittedDate: new Date('2025-05-20')
     },
     {
       id: 'S004',
       journalId: '2',
-      title: 'AI Ethics',
+      // title: 'AI Ethics',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'Production',
       submittedDate: new Date('2025-04-10')
     },
     {
       id: 'S005',
       journalId: '1',
-      title: 'Neural Network Innovations',
+      // title: 'Neural Network Innovations',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'Publication',
       submittedDate: new Date('2025-03-01')
     },
     {
       id: 'S006',
       journalId: '2',
-      title: 'Blockchain in Healthcare',
+      // title: 'Blockchain in Healthcare',
+      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
       status: 'New',
       submittedDate: new Date('2025-06-16')
     }

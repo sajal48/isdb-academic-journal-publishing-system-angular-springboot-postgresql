@@ -33,3 +33,22 @@
     /* padding: 1rem; */
     font-size: 14px;
 }
+
+.card-header {
+  /* padding: 1rem 1.5rem; */
+  font-weight: 500;
+}
+.card-body {
+  padding: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+  color: #2e7d32;
+  background-color: #f8f9fa;
+  border-bottom-color: #2e7d32;
+}

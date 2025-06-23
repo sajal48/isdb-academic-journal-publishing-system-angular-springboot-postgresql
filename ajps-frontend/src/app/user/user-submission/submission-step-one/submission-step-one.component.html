@@ -1,15 +1,19 @@
 <div class="mb-4">
     <h5 class="mb-3 text-primary">Manuscript Details</h5>
-    <form id="manuscriptDetailsForm"  #manuscriptForm="ngForm" (ngSubmit)="onSubmit(manuscriptForm)">
+    <form id="manuscriptDetailsForm" #manuscriptForm="ngForm" (ngSubmit)="onSubmit(manuscriptForm)">
         <div class="mb-3">
             <label class="form-label">Select Journal <span class="text-danger">*</span></label>
             <select class="form-select" name="journalName" [(ngModel)]="manuscript.journalName">
-            <option value="" disabled>Select a journal</option>
-            <option value="Plants and Ecosystem">Plants and Ecosystem</option>
-            <option value="Journal of Botany">Journal of Botany</option>
-            <option value="Ecological Studies">Ecological Studies</option>
-            <option value="Environmental Research">Environmental Research</option>
-            <option value="Biodiversity and Conservation">Biodiversity and Conservation</option>
+                <option value="" disabled>Select a journal</option>
+                <!-- <option value="Plants and Ecosystem">Plants and Ecosystem</option>
+                <option value="Journal of Botany">Journal of Botany</option>
+                <option value="Ecological Studies">Ecological Studies</option>
+                <option value="Environmental Research">Environmental Research</option>
+                <option value="Biodiversity and Conservation">Biodiversity and Conservation</option> -->
+                <option *ngFor="let journal of journals" [value]="journal.journalName">
+                    {{ journal.journalName }}
+                </option>
+
             </select>
         </div>
 
@@ -21,28 +25,33 @@
         <div class="mb-3">
             <label class="form-label">Category <span class="text-danger">*</span></label>
             <select class="form-select" name="manuscriptCategory" [(ngModel)]="manuscript.manuscriptCategory">
-            <option value="" disabled>Select a category</option>
-            <option value="research">Research Article</option>
-            <option value="review">Review Article</option>
-            <option value="case-study">Case Study</option>
-            <option value="editorial">Editorial</option>
-            <option value="other">Other</option>
+                <option value="" disabled>Select a category</option>
+                <option value="research">Original Research Article</option>
+                <option value="short-communication">Short Communication</option>
+                <option value="review">Review Article</option>
+                <option value="case-study">Case Study</option>
+                <option value="editorial">Editorial</option>
+                <option value="technical">Technical</option>
             </select>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Abstract <span class="text-danger">*</span></label>
-            <textarea class="form-control" name="abstractContent" rows="5" [(ngModel)]="manuscript.abstractContent"></textarea>
+            <textarea class="form-control" name="abstractContent" rows="5"
+                [(ngModel)]="manuscript.abstractContent"></textarea>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Keywords <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" name="manuscriptKeywords" [(ngModel)]="manuscript.manuscriptKeywords">
+            <input type="text" class="form-control" name="manuscriptKeywords"
+                [(ngModel)]="manuscript.manuscriptKeywords">
         </div>
         <hr class="my-4">
         <div class="d-flex gap-3">
-            <button type="submit" class="btn btn-primary">Save & Continue <i class="bi bi-arrow-right-circle"></i></button>
-            <button type="button" class="btn btn-outline-secondary" (click)="exitToDashboard()"><i class="bi bi-signpost"></i> Exit to Dashboard</button>
+            <button type="submit" class="btn btn-primary">Save & Continue <i
+                    class="bi bi-arrow-right-circle"></i></button>
+            <button type="button" class="btn btn-outline-secondary" (click)="exitToDashboard()"><i
+                    class="bi bi-signpost"></i> Exit to Dashboard</button>
         </div>
     </form>
 </div>

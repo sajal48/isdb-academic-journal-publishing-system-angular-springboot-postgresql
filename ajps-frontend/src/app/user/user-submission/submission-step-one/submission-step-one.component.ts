@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { FormsModule, NgForm } from '@angular/forms';
 import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
+import { Journal, JournalOperationsService } from '../../../site-settings/admin/journal-operations.service';
+import { CommonModule } from '@angular/common';
 
 interface ManuscriptDetails {
   journalName: string;
@@ -16,7 +18,7 @@ interface ManuscriptDetails {
 
 @Component({
   selector: 'app-submission-step-one',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './submission-step-one.component.html',
   styleUrl: '../user-submission.component.css'
 })
@@ -24,6 +26,8 @@ export class SubmissionStepOneComponent implements OnInit {
   userId: number = 0;
   // submissionId: number = 0;  
   validationError: string = '';
+
+  journals: Journal[] = [];
 
   manuscript: ManuscriptDetails = {
     journalName: '',
@@ -33,7 +37,7 @@ export class SubmissionStepOneComponent implements OnInit {
     manuscriptKeywords: '',
     completedSteps: 'manuscript-details'
   };
-  
+
   private fieldDisplayNames: { [key: string]: string } = {
     journalName: 'Journal Selection',
     manuscriptTitle: 'Manuscript Title',
@@ -46,13 +50,24 @@ export class SubmissionStepOneComponent implements OnInit {
     private userSubmissionDetailsService: UserSubmissionDetailsService,
     private authService: AuthLoginRegisterService,
     private userToastNotificationService: UserToastNotificationService,
-    private router: Router
+    private router: Router,
+    private journalOperations: JournalOperationsService
 
   ) {
     this.userId = authService.getUserID();
   }
 
   ngOnInit(): void {
+    // Load available journals
+    this.journalOperations.getAll().subscribe({
+      next: (data) => {
+        this.journals = data;
+      },
+      error: (err) => {
+        console.error('Failed to load journals', err);
+      }
+    });
+
     const existingSubmissionId = this.userSubmissionDetailsService.getSubmissionId();
     if (existingSubmissionId) {
       this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(existingSubmissionId)
@@ -90,13 +105,13 @@ export class SubmissionStepOneComponent implements OnInit {
     ];
 
     for (const field of requiredFields) {
-      const displayName = this.fieldDisplayNames[field] || field; 
+      const displayName = this.fieldDisplayNames[field] || field;
 
       if (typeof this.manuscript[field] === 'string' && (this.manuscript[field] as string).trim() === '') {
         this.validationError = `Please fill out the '${displayName}' field.`;
         return false;
       }
-      
+
     }
 
     return true;
@@ -117,8 +132,8 @@ export class SubmissionStepOneComponent implements OnInit {
     };
 
     const request = existingSubmissionId
-      ? this.userSubmissionDetailsService.updateManuscriptDetails(payload) 
-      : this.userSubmissionDetailsService.saveManuscriptDetails(payload); 
+      ? this.userSubmissionDetailsService.updateManuscriptDetails(payload)
+      : this.userSubmissionDetailsService.saveManuscriptDetails(payload);
 
     request.subscribe({
       next: (response) => {
@@ -132,7 +147,7 @@ export class SubmissionStepOneComponent implements OnInit {
           // this.router.navigate(['/user/submission/author-informations']);
           // window.location.href="/user/submission/author-informations";
           setInterval(() => {
-            window.location.href="/user/submission/author-informations";
+            window.location.href = "/user/submission/author-informations";
           }, 500);
         } else {
           this.userToastNotificationService.showToast('Error', `${response.message}`, 'danger');

@@ -39,5 +39,13 @@
 }
 .form-check-label {
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.card-header {
+  /* padding: 1rem 1.5rem; */
+  font-weight: 500;
+}
+.card-body {
+  padding: 1.5rem;
 }

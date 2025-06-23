@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BootstrapModalService } from '../../site-settings/services/bootstrap-modal.service';
 import { Editor, EditorialManagementService, Journal } from '../../site-settings/admin/editorial-management.service';
 import { UserToastNotificationService } from '../../site-settings/toast-popup/user-toast-notification.service';
+import { PopupMessageService } from '../../site-settings/toast-popup/popup-message.service';
 
 @Component({
   selector: 'app-admin-editorial-management',
@@ -33,9 +34,10 @@ export class AdminEditorialManagementComponent implements OnInit {
   constructor(
     private modalService: BootstrapModalService,
     private editorialService: EditorialManagementService,
-    private toastService: UserToastNotificationService
+    private toastService: UserToastNotificationService,
+    private popupMessageService: PopupMessageService,
 
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -108,20 +110,34 @@ export class AdminEditorialManagementComponent implements OnInit {
 
 
   removeEditorFromJournal(editor: Editor): void {
-    if (this.selectedJournal) {
-      this.editorialService
-        .removeEditor(editor.profileId, this.selectedJournal.id)
-        .subscribe({
-          next: () => {
-            this.toastService.showToast('Success', 'Editor removed successfully!', 'success');
-            this.loadData();
-          },
-          error: (err) => {
-            this.toastService.showToast('Error', 'Failed to remove editor.', 'danger');
-            console.error(err);
-          },
+    const journal = this.selectedJournal;
+
+    if (journal) {
+      this.popupMessageService
+        .confirm(
+          'Remove Editor?',
+          `Are you sure you want to remove this editor from "${journal.journalName}"?`,
+          'Yes, Remove',
+          'Cancel'
+        )
+        .then((confirmed) => {
+          if (confirmed) {
+            this.editorialService
+              .removeEditor(editor.profileId, journal.id)
+              .subscribe({
+                next: () => {
+                  this.toastService.showToast('Success', 'Editor removed successfully!', 'success');
+                  this.loadData();
+                },
+                error: (err) => {
+                  this.toastService.showToast('Error', 'Failed to remove editor.', 'danger');
+                  console.error(err);
+                },
+              });
+          }
         });
     }
   }
+
 
 }

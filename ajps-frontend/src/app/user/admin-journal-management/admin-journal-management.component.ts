@@ -60,7 +60,7 @@ export class AdminJournalManagementComponent implements OnInit {
 
   deleteJournal(index: number): void {
     const journal = this.journals[index];
-    this.popup.confirm('Delete Journal?', `Delete "${journal.journalName}" permanently?`, 'Yes', 'Cancel')
+    this.popup.confirm('Delete Journal?', `Delete "${journal.journalName}" permanently?`, 'Yes, Delete', 'Cancel')
       .then(confirm => {
         if (confirm && journal.id) {
           this.journalService.delete(journal.id).subscribe({

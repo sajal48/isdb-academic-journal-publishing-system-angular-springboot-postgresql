@@ -7,17 +7,11 @@
 <div class="container">
   <!-- Search Card -->
   <div class="card mb-4 shadow-sm">
+    <div class="card-header">Search Reviewers</div>
     <div class="card-body">
-      <h2 class="card-title h5 mb-3 text-primary">Search Reviewers</h2>
       <div class="input-group mb-3">
-        <input
-          type="text"
-          [(ngModel)]="reviewerSearchQuery"
-          (input)="searchReviewers()"
-          class="form-control"
-          placeholder="Search by first name, last name, or email"
-          aria-label="Search reviewers"
-        />
+        <input type="text" [(ngModel)]="reviewerSearchQuery" (input)="searchReviewers()" class="form-control"
+          placeholder="Search by first name, last name, or email" aria-label="Search reviewers" />
         <button class="btn btn-outline-secondary" type="button" (click)="clearReviewerSearch()">
           <i class="bi bi-x-lg"></i> Clear
         </button>
@@ -26,19 +20,14 @@
   </div>
 
   <!-- Reviewer Table Card -->
-  <div class="card shadow-sm">
+  <div class="card mb-4 shadow-sm rounded">
+    <div class="card-header">Manage Reviewers</div>
     <div class="card-body">
-      <h2 class="card-title h5 mb-3 text-primary">Manage Reviewers</h2>
-
       <!-- Filter Dropdown -->
       <div class="row g-3 mb-3">
         <div class="col-md-4">
-          <select
-            [(ngModel)]="journalFilter"
-            (change)="searchReviewers()"
-            class="form-select"
-            aria-label="Filter by journal"
-          >
+          <select [(ngModel)]="journalFilter" (change)="searchReviewers()" class="form-select"
+            aria-label="Filter by journal">
             <option value="">Show All</option>
             <option value="__UNASSIGNED__">Unassigned</option>
             <option *ngFor="let journal of journals" [value]="journal.title">
@@ -46,6 +35,11 @@
             </option>
           </select>
         </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredReviewers.length === 0" class="alert alert-info">
+        No reviewers found.
       </div>
 
       <!-- Reviewer Table -->
@@ -77,42 +71,36 @@
   </div>
 
   <!-- Edit Assigned Journals Modal -->
-  <div
-    class="modal fade"
-    id="editAssignedJournalsModal"
-    tabindex="-1"
-    aria-labelledby="editAssignedJournalsModalLabel"
-    aria-hidden="true"
-  >
+  <div class="modal fade" id="editAssignedJournalsModal" tabindex="-1" aria-labelledby="editAssignedJournalsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <form #checkboxForm="ngForm">
           <div class="modal-header">
             <h5 class="modal-title" id="editAssignedJournalsModalLabel">
-              Edit Assigned Journals for {{ selectedReviewer?.firstName }} {{ selectedReviewer?.lastName }}
+              <!-- Edit Assigned Journals for {{ selectedReviewer?.firstName }} {{ selectedReviewer?.lastName }} -->
+              Assign Journals
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
           <div class="modal-body">
-            <div *ngFor="let journal of journals" class="form-check mb-2">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                [id]="'journal-' + journal.id"
+            <label class="form-label mb-2 text-primary-emphasis fs-6">Select Journals:</label>
+            <div *ngFor="let journal of journals" class="form-check mb-2" style="margin-left: 10px;">
+              <input class="form-check-input" type="checkbox" [id]="'journal-' + journal.id"
                 [checked]="journalSelections[journal.id]"
-                (change)="journalSelections[journal.id] = !journalSelections[journal.id]"
-              />
+                (change)="journalSelections[journal.id] = !journalSelections[journal.id]" />
               <label class="form-check-label" [for]="'journal-' + journal.id">
                 {{ journal.title }}
               </label>
             </div>
           </div>
 
+
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-primary" (click)="saveAssignedJournals()" data-bs-dismiss="modal">
-              Save
+              <i class="bi bi-floppy"></i> Save
             </button>
           </div>
         </form>
