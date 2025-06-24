@@ -1,245 +1,279 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, KeyValuePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
-// --- Interfaces for data structure ---
-interface File {
-  name: string;
-  size: number; // in bytes
-  url: string;
-}
+import { Discussion, Manuscript, SubmissionFile } from '../user-manuscript.component';
+import { DiscussionOrigin } from '../manuscript-submission/manuscript-submission.component';
+import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
+import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
-interface Discussion {
-  id: string;
-  title: string;
-  content: string;
-  creatorName: string;
-  createdAt: Date;
-}
+declare var bootstrap: any;
 
-interface User {
-  userId: string;
-  // ... other user properties
-}
-
-interface Manuscript {
-  id: string;
-  submissionFiles: File[];
-  revisionFiles: File[];
-  reviewDiscussions: Discussion[];
-  owner: User;
-  // ... other manuscript properties
-}
 @Component({
   selector: 'app-manuscript-review',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './manuscript-review.component.html',
-  styleUrl: './manuscript-review.component.css'
+  styleUrls: ['./manuscript-review.component.css'],
+  standalone: true
 })
 export class ManuscriptReviewComponent implements OnInit {
+  manuscript!: Manuscript;
+  currentUserId: number = 0;
 
-  manuscript: Manuscript | null = null;
-  currentUserId: string = 'reviewer123'; // Simulate current user ID for conditional display
-
+  newReviewDiscussionOrigin: any;
   selectedRevisionFile: File | null = null;
   newReviewDiscussionTitle: string = '';
   newReviewDiscussionMessage: string = '';
   selectedDiscussion: Discussion | null = null;
 
   confirmationMessage: string = '';
-  currentAction: string = ''; // Stores the action type for the confirmation modal
+  currentAction: string = '';
 
-  constructor(private http: HttpClient) { }
+  submissionFiles: SubmissionFile[] = [];
+  revisionFiles: SubmissionFile[] = [];
+  reviewDiscussions: Discussion[] = [];
+
+  DiscussionOrigin = DiscussionOrigin;
+
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private userManuscriptService: UserManuscriptService,
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private userToastNotificationService: UserToastNotificationService
+  ) {}
 
   ngOnInit(): void {
-    this.loadManuscriptDetails('manuscript123'); // Load a dummy manuscript for demonstration
+    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.route.parent?.paramMap.pipe(
+      switchMap(params => {
+        const manuscriptId = params.get('manuscriptId');
+        if (manuscriptId && this.currentUserId) {
+          return this.userManuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
+        }
+        return of(undefined);
+      })
+    ).subscribe(manuscript => {
+      if (manuscript) {
+        this.manuscript = manuscript;
+        console.log('Manuscript loaded:', this.manuscript);
+        this.loadDiscussions(Number(this.manuscript.id)); // filter happens inside this
+      } else {
+        console.error('Manuscript not found.');
+        this.userToastNotificationService.showToast('Error', 'Manuscript not found.', 'danger');
+        this.router.navigate(['/user/dashboard']);
+      }
+    });
   }
 
-  /**
-   * Loads manuscript details from a (mock) API.
-   * In a real application, you'd fetch this dynamically based on route parameters.
-   */
-  loadManuscriptDetails(manuscriptId: string): void {
-    // Simulate API call
-    setTimeout(() => {
-      this.manuscript = {
-        id: manuscriptId,
-        submissionFiles: [
-          { name: 'Original Manuscript.pdf', size: 2500000, url: '/assets/original_manuscript.pdf' },
-          { name: 'Figures.zip', size: 1200000, url: '/assets/figures.zip' }
-        ],
-        revisionFiles: [
-          { name: 'Revised Manuscript V1.pdf', size: 2600000, url: '/assets/revised_manuscript_v1.pdf' }
-        ],
-        reviewDiscussions: [
-          {
-            id: 'disc1',
-            title: 'Minor Revisions Required',
-            content: 'The introduction needs to be expanded to provide more context on previous research.',
-            creatorName: 'Editor Alice',
-            createdAt: new Date('2025-06-20T10:00:00Z')
-          },
-          {
-            id: 'disc2',
-            title: 'Figures Clarity',
-            content: 'Figure 3 is blurry; please provide a higher resolution version.',
-            creatorName: 'Reviewer Bob',
-            createdAt: new Date('2025-06-21T14:30:00Z')
-          }
-        ],
-        owner: { userId: 'author456' } // Example owner
-      };
-      console.log('Manuscript loaded:', this.manuscript);
-    }, 500);
+  loadDiscussions(submissionId: number): void {
+    this.userManuscriptService.getDiscussionsForSubmission(submissionId).subscribe({
+      next: (discussions) => {
+        this.manuscript.discussions = discussions;
+        console.log('Discussions loaded:', this.manuscript.discussions);
+        this.filterFilesAndDiscussions(); // Now that discussions are available
+      },
+      error: (err) => {
+        console.error('Error loading discussions:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load discussions.', 'danger');
+      }
+    });
   }
 
-  /**
-   * Downloads a file.
-   */
+  filterFilesAndDiscussions(): void {
+    if (this.manuscript) {
+      this.submissionFiles = this.manuscript.files?.filter(file =>
+        file.fileOrigin === 'PRE_REVIEW' && file.isReviewFile) || [];
+      this.revisionFiles = this.manuscript.files?.filter(file =>
+        file.fileOrigin === 'REVISION') || [];
+      this.reviewDiscussions = this.manuscript.discussions?.filter(discussion =>
+        discussion.origin === DiscussionOrigin.IN_REVIEW) || [];
+    } else {
+      this.submissionFiles = [];
+      this.revisionFiles = [];
+      this.reviewDiscussions = [];
+    }
+  }
+
   downloadFile(url: string, fileName: string): void {
-    console.log(`Downloading: ${fileName} from ${url}`);
-    // In a real application, you'd use HttpClient to fetch the blob and then trigger download.
-    // For demonstration, a simple alert or console log.
-    alert(`Initiating download for: ${fileName}`);
-    window.open(url, '_blank'); // Opens the URL in a new tab for download
+    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.href = downloadUrl;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        a.remove();
+        this.userToastNotificationService.showToast('Success', `${fileName} downloaded successfully!`, 'success');
+      },
+      error: (error) => {
+        console.error('Download error:', error);
+        this.userToastNotificationService.showToast('Error', `Failed to download ${fileName}.`, 'danger');
+      }
+    });
   }
 
-  // --- Revision File Upload Functions ---
-
-  /**
-   * Handles the selection of a revision file.
-   */
   onRevisionFileSelected(event: any): void {
     const file: File = event.target.files[0];
-    if (file) {
-      this.selectedRevisionFile = {
-        name: file.name,
-        size: file.size,
-        url: URL.createObjectURL(file as unknown as Blob) // Create a temporary URL for preview/display
-      };
-      console.log('Revision file selected:', this.selectedRevisionFile);
-    } else {
-      this.selectedRevisionFile = null;
-    }
+    this.selectedRevisionFile = file || null;
   }
 
-  /**
-   * Uploads the selected revision file.
-   */
   uploadRevisionFile(): void {
-    if (this.selectedRevisionFile && this.manuscript) {
-      console.log('Uploading revision file:', this.selectedRevisionFile.name);
-      // Simulate file upload to a backend
-      // In a real application, you'd use HttpClient to send FormData
-      // this.http.post('/api/upload-revision', formData).subscribe(...)
-
-      // Add to manuscript's revisionFiles array for immediate UI update
-      this.manuscript.revisionFiles.push({ ...this.selectedRevisionFile });
-      this.selectedRevisionFile = null; // Clear selected file after upload
-      this.closeModal('uploadRevisionFileModal'); // Close the modal
-      alert('Revision file uploaded successfully!');
+    if (this.selectedRevisionFile && this.manuscript?.id) {
+      // this.userToastNotificationService.showToast('Info', 'Uploading revision file...', 'info');
+      this.userManuscriptService.uploadRevisionFile(Number(this.manuscript.id), this.selectedRevisionFile).subscribe({
+        next: (response) => {
+          if (response?.code === 200 && response.data) {
+            const newFile = {
+              id: response.data.id,
+              name: response.data.originalName,
+              url: response.data.fileUrl,
+              size: response.data.size,
+              storedName: response.data.storedName,
+              isReviewFile: response.data.isReviewFile,
+              isCopyEditingFile: response.data.isCopyEditingFile,
+              fileOrigin: response.data.fileOrigin
+            };
+            if (!this.manuscript.files) this.manuscript.files = [];
+            this.manuscript.files.push(newFile);
+            this.filterFilesAndDiscussions();
+            this.selectedRevisionFile = null;
+            this.closeModal('uploadRevisionFileModal');
+            this.userToastNotificationService.showToast('Success', 'Revision file uploaded successfully!', 'success');
+          } else {
+            this.userToastNotificationService.showToast('Error', 'Unexpected server response.', 'danger');
+          }
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          this.userToastNotificationService.showToast('Error', error.error?.message || 'Upload failed.', 'danger');
+        }
+      });
     } else {
-      alert('No revision file selected to upload.');
+      this.userToastNotificationService.showToast('Warning', 'No file selected or manuscript ID missing.', 'warning');
     }
   }
 
-  // --- Review Discussion Functions ---
-
-  /**
-   * Opens the "Add New Review Discussion" modal.
-   */
   addReviewDiscussion(): void {
     this.newReviewDiscussionTitle = '';
     this.newReviewDiscussionMessage = '';
+    this.newReviewDiscussionOrigin = DiscussionOrigin.IN_REVIEW;
     this.openModal('addReviewDiscussionModal');
   }
 
-  /**
-   * Confirms and adds a new review discussion.
-   */
   confirmAddReviewDiscussion(): void {
-    if (this.newReviewDiscussionTitle && this.newReviewDiscussionMessage && this.manuscript) {
-      const newDisc: Discussion = {
-        id: `disc${Date.now()}`, // Simple unique ID
-        title: this.newReviewDiscussionTitle,
-        content: this.newReviewDiscussionMessage,
-        creatorName: 'Current User (Reviewer)', // Replace with actual current user
-        createdAt: new Date()
-      };
-      this.manuscript.reviewDiscussions.push(newDisc);
-      console.log('New review discussion added:', newDisc);
-      this.closeModal('addReviewDiscussionModal');
-      alert('Discussion added successfully!');
+    if (this.newReviewDiscussionTitle && this.newReviewDiscussionMessage && this.manuscript?.id && this.newReviewDiscussionOrigin) {
+      // this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
+      this.userManuscriptService.createDiscussion(
+        Number(this.manuscript.id),
+        this.currentUserId,
+        this.newReviewDiscussionTitle,
+        this.newReviewDiscussionMessage,
+        this.newReviewDiscussionOrigin
+      ).subscribe({
+        next: (newDisc) => {
+          if (!this.manuscript.discussions) this.manuscript.discussions = [];
+          this.manuscript.discussions.push(newDisc);
+          this.filterFilesAndDiscussions();
+          this.closeModal('addReviewDiscussionModal');
+          this.newReviewDiscussionTitle = '';
+          this.newReviewDiscussionMessage = '';
+          this.newReviewDiscussionOrigin = null;
+          this.userToastNotificationService.showToast('Success', 'Discussion added!', 'success');
+        },
+        error: (err) => {
+          console.error('Discussion error:', err);
+          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to add discussion.', 'danger');
+        }
+      });
     } else {
-      alert('Please enter both title and message for the discussion.');
+      this.userToastNotificationService.showToast('Warning', 'Fill all discussion fields.', 'warning');
     }
   }
 
-  /**
-   * Views the content of a selected discussion in a modal.
-   */
   viewDiscussionContent(discussion: Discussion): void {
     this.selectedDiscussion = discussion;
     this.openModal('discussionContentModal');
   }
 
-  // --- Review Action Functions ---
-
-  /**
-   * Opens the confirmation modal for various review actions.
-   */
   openReviewActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
-      case 'submitReview':
-        this.confirmationMessage = 'Are you sure you want to submit your review for this manuscript?';
+      case 'acceptReview':
+        this.confirmationMessage = 'Are you sure you want to accept this manuscript and send it for copy-editing?';
         break;
       case 'requestRevision':
-        this.confirmationMessage = 'Are you sure you want to request revisions for this manuscript? This will notify the author.';
+        this.confirmationMessage = 'Are you sure you want to request revisions?';
         break;
-      case 'assignNewReviewer':
-        this.confirmationMessage = 'Are you sure you want to assign a new reviewer? This action may require additional steps.';
+      case 'declineSubmission':
+        this.confirmationMessage = 'Are you sure you want to decline this submission?';
         break;
       default:
-        this.confirmationMessage = 'Are you sure you want to proceed with this action?';
-        break;
+        this.confirmationMessage = 'Are you sure you want to proceed?';
     }
     this.openModal('reviewConfirmationModal');
   }
 
-  /**
-   * Executes the confirmed review action.
-   */
   confirmReviewAction(): void {
-    console.log(`Confirmed action: ${this.currentAction}`);
-    // Implement the actual logic for each action here
+    if (!this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID missing.', 'danger');
+      return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    let statusToUpdate = '';
+    let successMessage = '';
+    let errorMessage = '';
+
     switch (this.currentAction) {
-      case 'submitReview':
-        alert('Review submitted successfully!');
-        // Call service to submit review data
+      case 'acceptReview':
+        statusToUpdate = 'ACCEPTED';
+        successMessage = 'Manuscript accepted!';
+        errorMessage = 'Failed to accept manuscript.';
         break;
       case 'requestRevision':
-        alert('Revision request sent to author!');
-        // Call service to update manuscript status and notify author
+        statusToUpdate = 'REVISION_REQUIRED';
+        successMessage = 'Revision requested!';
+        errorMessage = 'Failed to request revision.';
         break;
-      case 'assignNewReviewer':
-        alert('Prompting for new reviewer details...');
-        // Open another modal or navigate to assignment page
+      case 'declineSubmission':
+        statusToUpdate = 'REJECTED';
+        successMessage = 'Submission declined.';
+        errorMessage = 'Failed to decline submission.';
         break;
+      default:
+        this.userToastNotificationService.showToast('Error', 'Invalid action.', 'danger');
+        return;
     }
-    this.closeModal('reviewConfirmationModal');
-  }
 
-  // --- Utility Functions for Modals (using Bootstrap 5's JS API) ---
-  // You might want to use a dedicated Angular library for modals (like ng-bootstrap or Angular Material)
-  // for a more "Angular" way of handling them. This is a direct JS approach.
+    // this.userToastNotificationService.showToast('Info', `Performing action: ${this.currentAction}...`, 'info');
+    this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate).subscribe({
+      next: (response) => {
+        this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+        this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+        this.manuscript.isEditable = response.data?.isEditable ?? (statusToUpdate === 'REVISION_REQUIRED');
+        this.closeModal('reviewConfirmationModal');
+      },
+      error: (err) => {
+        console.error('Review action error:', err);
+        this.userToastNotificationService.showToast('Error', err.error?.message || errorMessage, 'danger');
+      }
+    });
+  }
 
   openModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      // Ensure Bootstrap's JS is loaded
-      const bootstrapModal = new (window as any).bootstrap.Modal(modalElement);
+      const bootstrapModal = new bootstrap.Modal(modalElement);
       bootstrapModal.show();
     }
   }
@@ -247,7 +281,7 @@ export class ManuscriptReviewComponent implements OnInit {
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
       if (bootstrapModal) {
         bootstrapModal.hide();
       }

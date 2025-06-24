@@ -524,4 +524,16 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
+    // --- NEW METHOD: Upload Revision File ---
+    @Transactional
+    public FileUpload uploadRevisionFile(Long submissionId, MultipartFile file) throws IOException {
+        Submission existingSubmission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // You might want to add logic here to unmark previous revisions as 'latest' if you implement that concept.
+        // For now, it simply adds the new revision file.
+
+        return saveFile(submissionId, FileUploadOrigin.REVISION.name(), file);
+    }
+
 }

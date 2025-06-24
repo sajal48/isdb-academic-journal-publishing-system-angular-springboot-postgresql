@@ -6,11 +6,12 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li *ngFor="let file of manuscript.submissionFiles"
+                    <li *ngFor="let file of submissionFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
                             <small class="text-muted">{{ (file.size / 1024).toFixed(2) }} KB</small>
+                            <!-- <span *ngIf="file.isReviewFile" class="badge bg-primary ms-2">Current Review File</span> -->
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-primary"
                             (click)="downloadFile(file.url, file.name)">
@@ -18,8 +19,8 @@
                         </button>
                     </li>
                 </ul>
-                <div *ngIf="!manuscript.submissionFiles || manuscript.submissionFiles.length === 0" class="text-muted mt-3">
-                    No submission files available.
+                <div *ngIf="!submissionFiles || submissionFiles.length === 0" class="text-muted mt-3">
+                    No original submission files available.
                 </div>
             </div>
         </div>
@@ -28,12 +29,14 @@
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Revision Files</h5>
                 <div>
+                    <!-- <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#uploadRevisionFileModal"
+                            [disabled]="manuscript.submissionStatus !== 'REVISION_REQUIRED'">Upload Revision</button> -->
                     <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#uploadRevisionFileModal">Upload Revision</button>
                 </div>
             </div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li *ngFor="let file of manuscript.revisionFiles"
+                    <li *ngFor="let file of revisionFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
@@ -45,7 +48,7 @@
                         </button>
                     </li>
                 </ul>
-                <div *ngIf="!manuscript.revisionFiles || manuscript.revisionFiles.length === 0" class="text-muted mt-3">
+                <div *ngIf="!revisionFiles || revisionFiles.length === 0" class="text-muted mt-3">
                     No revision files uploaded yet.
                 </div>
             </div>
@@ -57,10 +60,10 @@
                 <button class="btn btn-sm btn-outline-secondary" (click)="addReviewDiscussion()">Add discussion</button>
             </div>
             <div class="card-body">
-                <div *ngIf="!manuscript.reviewDiscussions || manuscript.reviewDiscussions.length === 0" class="text-muted mb-3">
-                    No discussions yet.
+                <div *ngIf="!reviewDiscussions || reviewDiscussions.length === 0" class="text-muted mb-3">
+                    No review discussions yet.
                 </div>
-                <table class="table" *ngIf="manuscript.reviewDiscussions && manuscript.reviewDiscussions.length > 0">
+                <table class="table" *ngIf="reviewDiscussions && reviewDiscussions.length > 0">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -69,7 +72,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let discussion of manuscript.reviewDiscussions">
+                        <tr *ngFor="let discussion of reviewDiscussions">
                             <td>
                                 <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();" class="text-decoration-none text-primary">
                                     <i class="bi bi-chat-dots"></i> {{ discussion.title }}
@@ -77,6 +80,8 @@
                             </td>
                             <td>{{ discussion.creatorName }}</td>
                             <td style="white-space: nowrap;">{{ discussion.createdAt | date:'longDate' }}</td>
+                            <!-- <td><span class="badge bg-info text-dark">{{ discussion.origin | titlecase | replaceUnderscore }}</span></td> -->
+                            <!-- <td><span class="badge bg-info text-dark">{{ discussion.origin | titlecase }}</span></td> -->
                         </tr>
                     </tbody>
                 </table>
@@ -85,16 +90,46 @@
     </div>
 
     <div class="col-md-3">
+        <!-- Review Status / Decision Display (Optional: Add more detailed status here) -->
+        <div class="card mb-4 p-2 bg-info-subtle text-success-emphasis"
+             *ngIf="manuscript.submissionStatus === 'UNDER_REVIEW'">
+            <a><i class="bi bi-person-lines-fill"></i> Manuscript is Under Review</a>
+        </div>
+         <div class="card mb-4 p-2 bg-info-subtle text-warning-emphasis"
+             *ngIf="manuscript.submissionStatus === 'REVISION_REQUIRED'">
+            <a><i class="bi bi-exclamation-triangle-fill"></i> Revision Required</a>
+        </div>
+        <div class="card mb-4 p-2 bg-info-subtle text-danger-emphasis"
+             *ngIf="manuscript.submissionStatus === 'REJECTED'">
+            <a><i class="bi bi-x-circle-fill"></i> Submission Rejected</a>
+        </div>
+         <div class="card mb-4 p-2 bg-info-subtle text-primary-emphasis"
+             *ngIf="manuscript.submissionStatus === 'ACCEPTED'">
+            <a><i class="bi bi-check-circle-fill"></i> Submission Accepted</a>
+        </div>
+
+
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-primary" style="font-size: 14px;" (click)="openReviewActionModal('sendToReview')">Accept Review</button>
-                <button class="btn btn-warning" style="font-size: 14px;" (click)="openReviewActionModal('requestRevision')">Request Revision</button>
-                <button class="btn btn-danger" style="font-size: 14px;" (click)="openReviewActionModal('declineSubmission')">Decline Submission</button>
+                <button class="btn btn-primary" style="font-size: 14px;" (click)="openReviewActionModal('acceptReview')"
+                        [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW' && manuscript.submissionStatus !== 'REVISION_REQUIRED'">
+                    Accept Manuscript
+                </button>
+                <!-- <button class="btn btn-warning" style="font-size: 14px;" (click)="openReviewActionModal('requestRevision')"
+                        [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW'">
+                    Request Revision
+                </button> -->
+                <button class="btn btn-danger" style="font-size: 14px;" (click)="openReviewActionModal('declineSubmission')"
+                        [disabled]="manuscript.submissionStatus === 'REJECTED'">
+                    Decline Submission
+                </button>
+                <!-- Add other review actions like "Assign New Reviewer" here if needed -->
             </div>
         </div>
     </div>
 </div>
 
+<!-- Upload Revision File Modal -->
 <div class="modal fade" id="uploadRevisionFileModal" tabindex="-1" aria-labelledby="uploadRevisionFileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -119,6 +154,7 @@
     </div>
 </div>
 
+<!-- Add Review Discussion Modal -->
 <div class="modal fade" id="addReviewDiscussionModal" tabindex="-1" aria-labelledby="addReviewDiscussionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -135,6 +171,14 @@
                     <label for="reviewDiscussionMessage" class="form-label">Message</label>
                     <textarea class="form-control" id="reviewDiscussionMessage" rows="3" [(ngModel)]="newReviewDiscussionMessage" required></textarea>
                 </div>
+                <!-- Origin is automatically set to IN_REVIEW by addReviewDiscussion() for this modal -->
+                 <!-- <div class="mb-3" *ngIf="newReviewDiscussionOrigin">
+                    <label for="reviewDiscussionOriginDisplay" class="form-label">Origin</label> -->
+                    <!-- <input type="text" class="form-control" id="reviewDiscussionOriginDisplay"
+                           [ngModel]="newReviewDiscussionOrigin | titlecase | replaceUnderscore" readonly> -->
+                    <!-- <input type="text" class="form-control" id="reviewDiscussionOriginDisplay"
+                           [ngModel]="newReviewDiscussionOrigin | titlecase" readonly> -->
+                <!-- </div> -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -144,6 +188,7 @@
     </div>
 </div>
 
+<!-- Generic Confirmation Modal -->
 <div class="modal fade" id="reviewConfirmationModal" tabindex="-1" aria-labelledby="reviewConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -162,40 +207,41 @@
     </div>
 </div>
 
+<!-- Discussion Content Modal -->
 <div class="modal fade" id="discussionContentModal" tabindex="-1" aria-labelledby="discussionContentModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div *ngIf="selectedDiscussion">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <p class="mb-0 text-muted">
-                <strong>From:</strong> {{ selectedDiscussion.creatorName }}
-              </p>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-md-6 text-md-end">
-              <p class="mb-0 text-muted">
-                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at {{ selectedDiscussion.createdAt | date:'shortTime' }}
-              </p>
+            <div class="modal-body">
+                <div *ngIf="selectedDiscussion">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-0 text-muted">
+                                <strong>From:</strong> {{ selectedDiscussion.creatorName }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="mb-0 text-muted">
+                                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at {{ selectedDiscussion.createdAt | date:'shortTime' }}
+                            </p>
+                        </div>
+                    </div>
+                    <hr class="my-3">
+                    <h6 class="mb-2">Message:</h6>
+                    <div class="p-3 border rounded bg-light">
+                        <p class="mb-0">{{ selectedDiscussion.content }}</p>
+                    </div>
+                </div>
+                <div *ngIf="!selectedDiscussion" class="text-muted text-center py-4">
+                    Discussion details not available.
+                </div>
             </div>
-          </div>
-          <hr class="my-3">
-          <h6 class="mb-2">Message:</h6>
-          <div class="p-3 border rounded bg-light">
-            <p class="mb-0">{{ selectedDiscussion.content }}</p>
-          </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div *ngIf="!selectedDiscussion" class="text-muted text-center py-4">
-          Discussion details not available.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
     </div>
-  </div>
 </div>

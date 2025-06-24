@@ -6,5 +6,6 @@ public enum FileUploadOrigin {
     REVIEW,
     COPY_EDIT,
     PRODUCTION,
-    PUBLICATION
+    PUBLICATION,
+    REVISION
 }

@@ -76,6 +76,7 @@ public class DiscussionService {
                 .title(discussion.getTitle())
                 .content(discussion.getContent())
                 .createdAt(discussion.getCreatedAt())
+                .origin(discussion.getOrigin())
                 .build();
     }
 }

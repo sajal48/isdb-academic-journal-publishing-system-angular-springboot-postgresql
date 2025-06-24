@@ -17,7 +17,9 @@ export interface Manuscript {
   submissionStatus: string;
   author?: string;
   abstract?: string;
-  files?: { id: number; name: string; url: string; size: string; storedName: string }[]; // <--- UPDATED
+  // files?: { id: number; name: string; url: string; size: string; storedName: string }[]; // <--- UPDATED
+  // files?: { id: number; name: string; url: string; size: string; storedName: string, fileOrigin: string; isReviewFile: boolean; isCopyEditingFile: boolean; }[]; // <--- UPDATED
+  files?: SubmissionFile[]; // <--- UPDATED
   status?: {
     submission: string;
     review: string;
@@ -50,6 +52,7 @@ export interface Manuscript {
   };
   discussions?: Discussion[];
   owner: ManuscriptOwner;
+  isEditable?: boolean;
 }
 
 // --- SIMPLIFIED INTERFACE FOR DISCUSSIONS ---
@@ -68,10 +71,20 @@ export interface SubmissionFile {
   id: number;
   name: string;
   url: string;
-  size: string; // Or number, depending on how you receive it from the backend
+  size: any; // Or number, depending on how you receive it from the backend
   storedName?: string; // Optional, if your backend provides it
   isReviewFile?: boolean; // Existing
   isCopyEditingFile?: boolean; 
+  fileOrigin?: string;
+}
+
+export interface Reviewer {
+  id?: number;
+  name: string;
+  email: string;
+  institution: string;
+  status?: string; // e.g., 'PENDING', 'COMPLETED', 'ACCEPTED'
+  comments?: string; // Reviewer comments
 }
 
 export enum DiscussionOrigin {

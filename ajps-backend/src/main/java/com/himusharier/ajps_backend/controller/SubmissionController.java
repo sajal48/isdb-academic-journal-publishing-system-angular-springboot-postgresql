@@ -3,6 +3,7 @@ package com.himusharier.ajps_backend.controller;
 import com.himusharier.ajps_backend.dto.request.SendToReviewRequest;
 import com.himusharier.ajps_backend.dto.response.ApiResponse;
 import com.himusharier.ajps_backend.dto.response.SuccessResponseModel;
+import com.himusharier.ajps_backend.dto.response.submission.FileUploadResponse;
 import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.dto.response.SubmissionListResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
@@ -314,6 +315,32 @@ public class SubmissionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Failed to select file for copy-editing.", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to select file for copy-editing."));
+        }
+    }
+
+    // --- NEW ENDPOINT: Upload Revision File ---
+    @PostMapping("/{submissionId}/upload-revision-file")
+    public ResponseEntity<ApiResponse<FileUploadResponse>> uploadRevisionFile(
+            @PathVariable Long submissionId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            FileUpload uploadedFile = submissionService.uploadRevisionFile(submissionId, file);
+            FileUploadResponse response = FileUploadResponse.builder()
+                    .id(uploadedFile.getId())
+                    .fileOrigin(uploadedFile.getFileOrigin().name())
+                    .originalName(uploadedFile.getOriginalName())
+                    .storedName(uploadedFile.getStoredName())
+                    .size(uploadedFile.getSize())
+                    .type(uploadedFile.getType())
+                    .fileUrl(uploadedFile.getFileUrl())
+                    .isReviewFile(uploadedFile.isReviewFile())
+                    .isCopyEditingFile(uploadedFile.isCopyEditingFile())
+                    .build();
+            return ResponseEntity.ok(new ApiResponse<>(200, "Revision file uploaded successfully.", response));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(400, e.getMessage(), null));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(500, "Failed to upload revision file: " + e.getMessage(), null));
         }
     }
 

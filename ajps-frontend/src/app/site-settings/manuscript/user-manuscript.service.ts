@@ -42,7 +42,10 @@ export class UserManuscriptService {
               name: file.originalName,
               url: file.fileUrl,
               size: (file.size / 1024).toFixed(2), // Convert bytes to KB
-              storedName: file.storedName // Might be useful for debugging or specific backend calls
+              storedName: file.storedName, // Might be useful for debugging or specific backend calls
+              fileOrigin: file.fileOrigin,
+              isReviewFile: file.reviewFile,
+              isCopyEditingFile: file.copyEditingFile
             })) : [],
             status: {
               submission: backendData.submissionStatus,
@@ -225,6 +228,28 @@ acceptAndSkipReview(submissionId: number): Observable<any> {
       catchError(error => {
         console.error('Error selecting file for copy-editing:', error);
         return throwError(() => error);
+      })
+    );
+  }
+
+  uploadRevisionFile(submissionId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file); // Append the actual File object
+    // No need for 'fileOrigin' here as the backend endpoint specifically handles 'REVISION'
+    // formData.append('fileOrigin', 'REVISION'); // This is handled by backend logic for this specific endpoint
+
+    return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-revision-file`, formData).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to upload revision file: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error uploading revision file:', error);
+        const errorMessage = error.error?.message || error.statusText || 'Server error during revision file upload.';
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
