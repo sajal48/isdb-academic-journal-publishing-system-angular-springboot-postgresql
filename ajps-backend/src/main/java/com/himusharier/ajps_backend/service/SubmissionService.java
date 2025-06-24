@@ -368,4 +368,55 @@ public class SubmissionService {
         // The cascade will handle authors, files, and reviewers deletion from DB
         submissionRepository.deleteById(submissionId);
     }
+
+    public void updateSubmissionStatus(Long submissionId, String newStatusString)
+            throws Exception {
+
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // --- Business Logic for Status Transitions ---
+        // This is crucial. You need to define valid state transitions.
+        // For simplicity, I'm using a direct string comparison, but an enum or
+        // a more complex state machine pattern would be better for real-world.
+
+        String currentStatus = submission.getSubmissionStatus().toString(); // Assuming your entity has this field
+
+        // Example business rules:
+        /*switch (newStatusString) {
+            case "SENT_TO_REVIEW":
+                // Only allow sending to review from "Submitted" or "Under Review" (if re-submitting)
+                if (!"SUBMITTED".equals(currentStatus) && !"UNDER_REVIEW".equals(currentStatus)) {
+                    throw new SubmissionRequestException("Cannot send to review from status: " + currentStatus);
+                }
+                break;
+            case "ACCEPTED":
+                // Only allow acceptance from "Under Review" or "Submitted" (if skipping review)
+                if (!"UNDER_REVIEW".equals(currentStatus) && !"SUBMITTED".equals(currentStatus)) {
+                    throw new SubmissionRequestException("Cannot accept from status: " + currentStatus);
+                }
+                break;
+            case "REJECTED":
+                // Can be rejected from various stages
+                if ("ACCEPTED".equals(currentStatus) || "PUBLISHED".equals(currentStatus)) {
+                    throw new SubmissionRequestException("Cannot reject an accepted or published submission.");
+                }
+                break;
+            case "COPYEDITING": // New status for after 'Accept and Skip Review'
+                if (!"ACCEPTED".equals(currentStatus) && !"IN_PRODUCTION".equals(currentStatus)) {
+                    throw new SubmissionRequestException("Cannot move to copyediting from status: " + currentStatus);
+                }
+                break;
+            // Add more cases for other statuses (e.g., IN_PRODUCTION, PUBLISHED)
+            default:
+                throw new SubmissionRequestException("Invalid or unsupported new status: " + newStatusString);
+        }*/
+
+        // Update the status in the entity
+        submission.setSubmissionStatus(SubmissionStatus.valueOf(newStatusString)); // Assuming a setter exists
+        // You might also want to set a timestamp for status change, e.g., submission.setUpdatedAt(new Date());
+
+        submissionRepository.save(submission); // Save the updated submission
+    }
+
 }

@@ -36,7 +36,7 @@
                 <div *ngIf="!manuscript.discussions || manuscript.discussions.length === 0" class="text-muted mb-3">
                     No discussions yet.
                 </div>
-                <table class="table table-striped" *ngIf="manuscript.discussions && manuscript.discussions.length > 0">
+                <table class="table" *ngIf="manuscript.discussions && manuscript.discussions.length > 0">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -99,7 +99,7 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-  <label for="manuscriptFile" class="form-label">Upload Manuscript File</label>
+  <label for="manuscriptFile" class="form-label">Select your file</label>
   <input class="form-control" type="file" id="manuscriptFile" (change)="onFileSelected($event)">
 </div>
                 <div *ngIf="selectedFile">

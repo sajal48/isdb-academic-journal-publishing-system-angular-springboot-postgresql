@@ -9,7 +9,8 @@ public enum SubmissionStatus {
     DUE_PAYMENT,
     COPY_EDITING,
     PUBLICATION,
-    PUBLISHED
+    PUBLISHED,
+    REJECTED
 }
 
 /*

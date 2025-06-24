@@ -91,6 +91,10 @@ export class UserDashboardComponent implements OnInit {
         bgColor = '#008000'; // Green
         textColor = '#FFFFFF';
         break;
+      case 'REJECTED':
+        bgColor = '#BB2D3B'; // Red
+        textColor = '#FFFFFF';
+        break;
       default:
         // Keep default gray if status is not recognized
         break;

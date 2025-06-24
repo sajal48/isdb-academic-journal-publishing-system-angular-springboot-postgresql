@@ -246,4 +246,22 @@ public class SubmissionController {
                         "Submission deleted successfully."),
                 HttpStatus.OK);
     }
+
+    @PutMapping("/update-status/{submissionId}")
+    public ResponseEntity<?> updateSubmissionStatus(@PathVariable Long submissionId, @RequestBody Map<String, String> statusUpdate) {
+        String newStatusString = statusUpdate.get("status");
+
+        if (newStatusString == null || newStatusString.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ApiResponse(400, "error", "New status cannot be empty."));
+        }
+
+        try {
+            // Call your service layer to update the status
+            submissionService.updateSubmissionStatus(submissionId, newStatusString);
+            return ResponseEntity.ok(new ApiResponse(200, "success", "Submission status updated successfully."));
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            return ResponseEntity.status(500).body(new ApiResponse(500, "error", "Failed to update submission status: " + e.getMessage()));
+        }
+    }
 }

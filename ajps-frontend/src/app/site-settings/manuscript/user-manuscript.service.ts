@@ -161,5 +161,28 @@ deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
     );
   }
 
+  updateSubmissionStatus(submissionId: number, newStatus: string): Observable<any> {
+    const url = `${this.baseUrl}/update-status/${submissionId}`;
+    // The backend endpoint might expect a specific body, e.g., { status: newStatus }
+    const body = { status: newStatus };
+    console.log(`Updating submission status for ${submissionId} to ${newStatus} via ${url}`);
+
+    return this.http.put<any>(url, body).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success') {
+          console.log(`Status update successful: ${response.message}`);
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to update status: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error updating submission status:', error);
+        // Extract a more specific error message if available
+        const errorMessage = error.error?.message || error.statusText || 'Server error during status update.';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
 
 }

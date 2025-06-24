@@ -263,24 +263,69 @@ export class ManuscriptSubmissionComponent implements OnInit {
   }
 
   private _sendToReview(): void {
-    this.userToastNotificationService.showToast('Info', 'Manuscript sent to review!', 'info');
-    if (this.manuscript) {
-      this.manuscript.status!.submission = 'Sent to Review';
+    if (this.manuscript && this.manuscript.id) {
+      this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'ACCEPTED').subscribe({
+        next: (response) => {
+          this.userToastNotificationService.showToast('Success', 'Manuscript successfully sent to review!', 'success');
+          // Update local status after successful backend update
+          if (this.manuscript.status) {
+            this.manuscript.status.submission = 'Sent to Review';
+            this.manuscript.status.review = 'In Progress'; // Or 'Pending Assignment'
+          }
+        },
+        error: (err) => {
+          console.error('Error sending to review:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to send to review: ' + err.message, 'danger');
+        }
+      });
+    } else {
+      this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot send to review.', 'warning');
     }
   }
 
   private _acceptAndSkipReview(): void {
-    this.userToastNotificationService.showToast('Info', 'Manuscript accepted and review skipped!', 'info');
-    if (this.manuscript) {
-      this.manuscript.status!.submission = 'Accepted';
-      this.manuscript.status!.review = 'Skipped';
+    if (this.manuscript && this.manuscript.id) {
+      this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'UNDER_REVIEW').subscribe({
+        next: (response) => {
+          this.userToastNotificationService.showToast('Success', 'Manuscript accepted and review skipped!', 'success');
+          // Update local status after successful backend update
+          if (this.manuscript.status) {
+            this.manuscript.status.submission = 'Accepted';
+            this.manuscript.status.review = 'Skipped';
+            this.manuscript.status.copyEditing = 'In Progress'; // Transition to copy editing
+          }
+        },
+        error: (err) => {
+          console.error('Error accepting and skipping review:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to accept and skip review: ' + err.message, 'danger');
+        }
+      });
+    } else {
+      this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot accept and skip review.', 'warning');
     }
   }
 
   private _declineSubmission(): void {
-    this.userToastNotificationService.showToast('Info', 'Manuscript submission declined!', 'info');
-    if (this.manuscript) {
-      this.manuscript.status!.submission = 'Declined';
+    if (this.manuscript && this.manuscript.id) {
+      this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'REJECTED').subscribe({
+        next: (response) => {
+          this.userToastNotificationService.showToast('Success', 'Manuscript submission successfully declined!', 'success');
+          // Update local status after successful backend update
+          if (this.manuscript.status) {
+            this.manuscript.status.submission = 'Declined';
+            this.manuscript.status.review = 'N/A'; // Or 'Not Applicable'
+            this.manuscript.status.copyEditing = 'N/A';
+            this.manuscript.status.production = 'N/A';
+            this.manuscript.status.publication = 'N/A';
+          }
+        },
+        error: (err) => {
+          console.error('Error declining submission:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to decline submission.', 'danger');
+        }
+      });
+    } else {
+      this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot decline submission.', 'warning');
     }
   }
 
