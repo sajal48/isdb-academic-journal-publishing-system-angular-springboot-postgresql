@@ -1,159 +1,192 @@
-import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs/internal/Subscription';
+// submission-view.component.ts
+import { CommonModule, TitleCasePipe, DecimalPipe, DatePipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserSubmissionDetailsService } from '../../../site-settings/submission/user-submission-details.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
+import { HttpClient } from '@angular/common/http';
 
-declare const bootstrap: any;
+// Interfaces for the backend response structure
+interface Journal {
+  journalName: string;
+  id: number;
+}
+
+interface FileDetails {
+  id: number;
+  fileOrigin: string;
+  storedName: string;
+  originalName: string;
+  size: number;
+  type: string;
+  fileUrl: string;
+}
+
+interface Reviewer {
+  id: number;
+  name: string;
+  email: string;
+  institution: string;
+}
+
+interface Author {
+  id: number;
+  name: string;
+  email: string;
+  institution: string;
+  corresponding: boolean;
+}
+
+// Unified Backend Response Interface
+interface BackendResponse {
+    code: number;
+    status: string;
+    message?: string;
+    data?: SubmissionResponseData;
+}
+
+interface SubmissionResponseData {
+  submissionNumber: number;
+  manuscriptCategory: string;
+  manuscriptKeywords: string;
+  comments?: string; // Made optional
+  submissionConfirmation: boolean;
+  abstractContent: string;
+  completedSteps: string;
+  createdAt: string;
+  journal?: Journal; // Made optional
+  submissionStatus: string;
+  isEditable: boolean;
+  isPaymentDue: boolean;
+  files?: FileDetails[]; // Made optional
+  manuscriptTitle: string;
+  id: number;
+  submittedAt?: string; // Made optional
+  submissionReviewers?: Reviewer[]; // Made optional
+  updatedAt?: string; // Made optional
+  authors?: Author[]; // Made optional
+}
 
 @Component({
   selector: 'app-submission-view',
-  imports: [CommonModule, FormsModule],
+  standalone: true,
+  imports: [CommonModule, TitleCasePipe, DecimalPipe, DatePipe],
   templateUrl: './submission-view.component.html',
-  styleUrl: '../user-submission.component.css'
+  styleUrl: './submission-view.component.css'
 })
-export class SubmissionViewComponent implements OnInit, AfterViewInit, OnDestroy {
-  
-  manuscript = {
-    id: 'MS12345',
-    title: 'Monitoring the Seasonal Distribution and Variation of Sea Surface Temperature and Chlorophyll Concentration in Bay of Bengal using MODIS Satellite Images',
-    journalName: 'Journal of Modern Science',
-    submissionDate: new Date('2025-05-01'),
-    author: 'Dr. Jane Smith',
-    abstract: 'This paper explores recent advancements in quantum computing technologies...',
-    files: [
-      { name: 'manuscript.pdf', url: '#', size: '1024' },
-      { name: 'supplementary.docx', url: '#', size: '512' }
-    ],
-    status: {
-      submission: 'Submitted',
-      review: 'Under Review',
-      copyEditing: 'In Progress',
-      production: 'In Progress',
-      publication: 'Not Published'
-    },
-    review: {
-      startDate: new Date('2025-05-10'),
-      reviewers: [
-        { name: 'Reviewer 1', status: 'In Progress', comments: 'Needs clarification...' },
-        { name: 'Reviewer 2', status: 'Pending', comments: '' }
-      ],
-      decision: ''
-    },
-    copyEditing: {
-      startDate: new Date('2025-06-01'),
-      editor: 'Emily Johnson',
-      changes: [
-        { description: 'Revise section 2.3 for clarity', status: 'Pending' },
-        { description: 'Correct figure 4 caption', status: 'Completed' }
-      ]
-    },
-    production: {
-      startDate: new Date('2025-06-10'),
-      typesetting: 'In Progress',
-      proofs: [
-        { name: 'first_proof.pdf', url: '#', sentDate: new Date('2025-06-12') },
-        { name: 'second_proof.pdf', url: '#', sentDate: new Date('2025-06-15') }
-      ]
-    },
-    publication: {
-      status: 'Not Published',
-      date: null,
-      doi: '',
-      volumeIssue: '',
-      accessType: 'Open Access',
-      url: ''
-    },
-    discussions: [
-      {
-        name: 'IRN/MHSJ A message regarding journal of Research in Nursing, Midwifery and Health Sciences',
-        from: 'lighton',
-        lastReply: new Date('2022-08-01'),
-        replies: 0,
-        closed: true
-      }
-    ]
-  };
+export class SubmissionViewComponent implements OnInit {
 
-  private fragmentSubscription: Subscription | undefined;
+  submissionDetails: SubmissionResponseData | null = null;
+  isLoading: boolean = true;
+  error: string | null = null;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private router: Router,
+    private userSubmissionDetailsService: UserSubmissionDetailsService,
+    private userToastNotificationService: UserToastNotificationService,
+    private http: HttpClient
+  ) { }
 
   ngOnInit(): void {
-    this.fragmentSubscription = this.route.fragment.subscribe(fragment => {
-      this.handleFragment(fragment);
+    const submissionId = this.userSubmissionDetailsService.getSubmissionId();
+
+    if (submissionId !== null) {
+      this.fetchSubmissionDetails(submissionId);
+    } else {
+      this.error = 'Submission ID not found. Please select a manuscript from the dashboard.';
+      this.isLoading = false;
+      this.userToastNotificationService.showToast('Error', this.error, 'danger');
+      // Optionally navigate back to dashboard if no ID is found
+      // this.router.navigate(['/user/dashboard']);
+    }
+  }
+
+  /**
+   * Fetches the submission details from the backend.
+   * @param id The ID of the submission to fetch.
+   */
+  fetchSubmissionDetails(id: number): void {
+    this.isLoading = true;
+    this.error = null;
+
+    this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(id).subscribe({
+      next: (response: BackendResponse) => {
+        if (response.code === 200 && response.status === 'success' && response.data) {
+          this.submissionDetails = response.data;
+        } else {
+          this.error = response.message || 'Failed to load submission details.';
+          this.userToastNotificationService.showToast('Error', this.error, 'danger');
+        }
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching submission details:', err);
+        this.error = 'An unexpected error occurred while fetching details.';
+        this.userToastNotificationService.showToast('Error', this.error, 'danger');
+        this.isLoading = false;
+      }
     });
   }
 
-  ngAfterViewInit(): void {
-    const tabs = document.querySelectorAll('#mainTabs .nav-link');
-    tabs.forEach(tab => {
-      tab.addEventListener('shown.bs.tab', (event) => {
-        const target = (event.target as HTMLElement).getAttribute('href')?.substring(1);
-        this.router.navigate([], { fragment: target, relativeTo: this.route });
+  /**
+   * Navigates back to the user dashboard and clears the stored submission ID.
+   */
+  goBack(): void {
+    this.userSubmissionDetailsService.clearSubmissionId();
+    this.router.navigate(['/user/dashboard']);
+  }
+
+  downloadFile(fileUrl: string, originalFileName: string): void {
+    this.isLoading = true;
+
+    const downloadUrl = fileUrl;
+
+    this.http.get(downloadUrl, { responseType: 'blob' })
+      .subscribe({
+        next: (response: Blob) => {
+          // Create a blob URL and trigger the download
+          const blob = new Blob([response], { type: response.type });
+          const url = window.URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = originalFileName; // Use the original file name
+          document.body.appendChild(a); // Append to body (required for Firefox)
+          a.click(); // Programmatically click the link to trigger download
+          window.URL.revokeObjectURL(url); // Clean up the URL object
+
+          this.isLoading = false; // Re-enable buttons
+        },
+        error: (error: any) => {
+          // console.error('Error downloading file:', error);
+          // alert('Failed to download file. Please try again.');
+          this.userToastNotificationService.showToast('Error', 'Failed to download file. Please try again.', 'danger');
+          this.isLoading = false; // Re-enable buttons even on error
+        }
       });
-    });
   }
 
-  ngOnDestroy(): void {
-    if (this.fragmentSubscription) {
-      this.fragmentSubscription.unsubscribe();
+  /**
+   * Returns Bootstrap badge classes based on the submission status for styling.
+   */
+  getSubmissionStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'SUBMITTED':
+        return 'bg-info text-dark';
+      case 'UNDER_REVIEW':
+        return 'bg-warning text-dark';
+      case 'REVISION_REQUIRED':
+        return 'bg-danger';
+      case 'ACCEPTED':
+        return 'bg-success';
+      case 'PUBLISHED':
+        return 'bg-primary';
+      case 'SAVED':
+        return 'bg-secondary';
+      case 'DUE_PAYMENT':
+        return 'bg-dark';
+      default:
+        return 'bg-light text-muted border';
     }
   }
-
-  private handleFragment(fragment: string | null): void {
-    const validTabs = ['submission', 'review', 'copyediting', 'production', 'publication'];
-    const tabToActivate = fragment && validTabs.includes(fragment) ? fragment : 'submission';
-    this.activateTab(tabToActivate);
-  }
-
-  private activateTab(tab: string): void {
-    const tabElement = document.querySelector(`#${tab}-tab`) as HTMLElement;
-    if (tabElement) {
-      const tabInstance = new bootstrap.Tab(tabElement);
-      tabInstance.show();
-    }
-  }
-
-  uploadFile(): void {
-    // Placeholder for file upload logic
-    alert('File upload functionality to be implemented');
-  }
-
-  downloadAllFiles(): void {
-    // Placeholder for download all files logic
-    alert('Download all files functionality to be implemented');
-  }
-
-  addDiscussion(): void {
-    // Placeholder for add discussion logic
-    alert('Add discussion functionality to be implemented');
-  }
-
-  sendToReview(): void {
-    alert('Send to Review functionality to be implemented');
-  }
-
-  acceptAndSkipReview(): void {
-    alert('Accept and Skip Review functionality to be implemented');
-  }
-
-  declineSubmission(): void {
-    alert('Decline Submission functionality to be implemented');
-  }
-
-  assignParticipant(): void {
-    alert('Assign Participant functionality to be implemented');
-  }
-
-  downloadFile(fileUrl: string, fileName: string): void {
-  const link = document.createElement('a');
-  link.href = fileUrl;
-  link.download = fileName;
-  link.target = '_blank'; // Optional: opens in new tab
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
 }

@@ -44,6 +44,11 @@ export class UserDashboardComponent implements OnInit {
     this.router.navigate(['/user/submission']);
   }
 
+  viewManuscript(id: number) {
+    this.userSubmissionDetailsService.setSubmissionId(id);
+    this.router.navigate(['/user/submission/view-submission']);
+  }
+
   // Method to map submission status to color
   getSubmissionStatusColor(status: string): { 'background-color': string, color: string } {
     let bgColor = '#808080'; // Default gray for unknown or initial states

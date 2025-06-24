@@ -62,6 +62,7 @@ import { ManuscriptCopyeditingComponent } from './user/user-manuscript/manuscrip
 import { ManuscriptProductionComponent } from './user/user-manuscript/manuscript-production/manuscript-production.component';
 import { ManuscriptPublicationComponent } from './user/user-manuscript/manuscript-publication/manuscript-publication.component';
 import { AdminEditorManagementComponent } from './user/admin-editor-management/admin-editor-management.component';
+import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -112,6 +113,7 @@ export const routes: Routes = [
                     {path: 'suggested-reviewers', component: SubmissionStepFourComponent, title: 'Suggested Reviewers Submission - ScholarPress'},
                     {path: 'additional-informations', component: SubmissionStepFiveComponent, title: 'Additional Information Submission - ScholarPress'},
                     {path: 'submission-confirmation', component: SubmissionStepSixComponent, title: 'Article Confirmation Submission - ScholarPress'},
+                    {path: 'view-submission', component: SubmissionViewComponent, title: 'View Submission - ScholarPress'},
                     {path: '', redirectTo: 'manuscript-details', pathMatch: 'full'},
                 ]
             },

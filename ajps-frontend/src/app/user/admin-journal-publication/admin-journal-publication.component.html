@@ -32,7 +32,8 @@
                     </li>
                 </ul>
 
-                <button class="btn btn-primary mb-3" (click)="openAddIssueModal()"><i class="bi bi-plus-lg"></i> Add New Issue</button>
+                <button class="btn btn-primary mb-3" (click)="openAddIssueModal()"><i class="bi bi-plus-lg"></i> Add New
+                    Issue</button>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -51,9 +52,12 @@
                                 <td>{{ issue.publicationDate | date:'shortDate' }}</td>
                                 <td>{{ issue.status }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info" (click)="viewPapers(issue)"><i class="bi bi-eye"></i> View Papers</button>
-                                    <button class="btn btn-sm btn-warning" (click)="editIssue(issue)"><i class="bi bi-pencil"></i> Edit</button>
-                                    <button class="btn btn-sm btn-danger" (click)="deleteIssue(issue)"><i class="bi bi-trash3"> </i>Delete</button>
+                                    <button class="btn btn-sm btn-info" (click)="viewPapers(issue)"><i
+                                            class="bi bi-eye"></i> View Papers</button>
+                                    <button class="btn btn-sm btn-warning" (click)="editIssue(issue)"><i
+                                            class="bi bi-pencil"></i> Edit</button>
+                                    <button class="btn btn-sm btn-danger" (click)="deleteIssue(issue)"><i
+                                            class="bi bi-trash3"> </i>Delete</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -89,8 +93,10 @@
                                 <td>{{ paper.authors }}</td>
                                 <td>{{ paper.status }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning" (click)="editPaper(paper)"><i class="bi bi-pencil"></i> Edit</button>
-                                    <button class="btn btn-sm btn-danger" (click)="deletePaper(paper)"><i class="bi bi-trash3"> </i>Delete</button>
+                                    <button class="btn btn-sm btn-warning" (click)="editPaper(paper)"><i
+                                            class="bi bi-pencil"></i> Edit</button>
+                                    <button class="btn btn-sm btn-danger" (click)="deletePaper(paper)"><i
+                                            class="bi bi-trash3"> </i>Delete</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -113,33 +119,38 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="volumeInput">Volume</label>
-                                <input id="volumeInput" type="number" class="form-control" [(ngModel)]="newIssue.volume" name="volume" required />
+                                <input id="volumeInput" type="number" class="form-control" [(ngModel)]="newIssue.volume"
+                                    name="volume" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="numberInput">Issue Number</label>
-                                <input id="numberInput" type="number" class="form-control" [(ngModel)]="newIssue.number" name="number" required />
+                                <input id="numberInput" type="number" class="form-control" [(ngModel)]="newIssue.number"
+                                    name="number" required />
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="pubDateInput">Publication Date</label>
-                                <input id="pubDateInput" type="date" class="form-control" [(ngModel)]="newIssue.publicationDate" name="publicationDate" required />
+                                <input id="pubDateInput" type="date" class="form-control"
+                                    [(ngModel)]="newIssue.publicationDate" name="publicationDate" required />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label" for="statusSelect">Status</label>
-                                <select id="statusSelect" class="form-select" [(ngModel)]="newIssue.status" name="status" required>
-                                    <option value="" disabled>Select issue status</option>
-                                    <option value="Published">Published</option>
-                                    <option value="Future">Future</option>
+                                <select class="form-select" [(ngModel)]="newIssue.status" name="status">
+                                    <option [ngValue]="undefined" disabled>Select status</option>
+                                    <option [ngValue]="'Published'">Published</option>
+                                    <option [ngValue]="'Future'">Future</option>
                                 </select>
+
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" [disabled]="!isIssueFormValid()" (click)="submitNewIssue()">
+                    <button type="button" class="btn btn-primary" [disabled]="!isIssueFormValid()"
+                        (click)="submitNewIssue()">
                         <i class="bi bi-floppy"></i> Submit
                     </button>
                 </div>

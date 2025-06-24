@@ -1,229 +1,193 @@
+<!-- submission-view.component.html -->
 <div class="container-fluid">
-    <!-- Manuscript Header -->
-    <div class="mb-4">
-        <div>
-            <p class="mt-2">Manuscript ID: {{ manuscript.id }} | Submitted on: {{ manuscript.submissionDate |
-                date:'mediumDate' }}</p>
-            <h3>{{ manuscript.title }}</h3>
-            <h5 class="text-muted">{{ manuscript.journalName }}</h5>
+    <!-- General Information Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-journal-text me-2"></i> General Information</h5>
+        </div>
+        <div class="card-body">
+            <!-- Use *ngIf as-syntax to create a local variable 'details' that is guaranteed non-null -->
+            <div *ngIf="submissionDetails as details; else loadingOrError">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Submission Number:</strong> {{ details.submissionNumber }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Submission Status: </strong>
+                            <span class="badge rounded-pill" [ngClass]="getSubmissionStatusBadgeClass(details.submissionStatus)">
+                                {{ details.submissionStatus }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-12">
+                        <p class="mb-1"><strong>Journal:</strong> {{ details.journal?.journalName }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <p class="mb-1"><strong>Article Title:</strong> {{ details.manuscriptTitle }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Article Category:</strong> {{ details.manuscriptCategory | titlecase }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Keywords:</strong> {{ details.manuscriptKeywords }}</p>
+                    </div>
+                    <div class="col-md-12">
+                        <p class="mb-1"><strong>Abstract:</strong></p>
+                            <p class="mb-0">{{ details.abstractContent }}</p>
+                    </div>
+                </div>
+            </div>
+            <ng-template #loadingOrError>
+                <div *ngIf="isLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading submission details...</p>
+                </div>
+                <div *ngIf="!isLoading && error" class="alert alert-danger" role="alert">
+                    <h5 class="alert-heading">Error!</h5>
+                    <p class="mb-0">{{ error }}</p>
+                </div>
+            </ng-template>
         </div>
     </div>
 
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="submission-tab" data-bs-toggle="tab" href="#submission"
-                role="tab">Submission</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="review-tab" data-bs-toggle="tab" href="#review" role="tab">Review</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="copyediting-tab" data-bs-toggle="tab" href="#copyediting"
-                role="tab">Copy-editing</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="production-tab" data-bs-toggle="tab" href="#production" role="tab">Production</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="publication-tab" data-bs-toggle="tab" href="#publication" role="tab">Publication</a>
-        </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content" id="mainTabsContent">
-        <!-- Submission Tab -->
-        <div class="tab-pane fade show active" id="submission" role="tabpanel">
-
-            <!-- Main Content with Two Columns -->
-            <div class="row">
-                <!-- Left Column (Existing Content) -->
-                <div class="col-md-9">
-                    <!-- Submission Files Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Submission Files</h5>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary" (click)="uploadFile()">Upload
-                                    File</button>
+    <!-- Author Information Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-people-fill me-2"></i> Author Information</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="submissionDetails as details">
+                <div *ngIf="details.authors && details.authors.length > 0; else noAuthors">
+                    <div class="row g-3">
+                        <div *ngFor="let author of details.authors; let i = index" class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                <h6 class="text-primary mb-2">Author {{ i + 1 }}</h6>
+                                <p class="mb-1"><strong>Name:</strong> {{ author.name }}
+                                    <span *ngIf="author.corresponding" class="badge bg-info ms-2">Corresponding</span>
+                                </p>
+                                <p class="mb-1"><strong>Email:</strong> {{ author.email }}</p>
+                                <p class="mb-0"><strong>Institution:</strong> {{ author.institution }}</p>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <ul class="list-group">
-                                <li *ngFor="let file of manuscript.files"
-                                    class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-semibold">{{ file.name }}</div>
-                                        <small class="text-muted">{{ file.size }} KB</small>
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                        (click)="downloadFile(file.url, file.name)">
-                                        <i class="bi bi-download"></i> Download
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-
                     </div>
-
-                    <!-- Pre-Review Discussions Section -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Pre-Review Discussions</h5>
-                            <button class="btn btn-sm btn-outline-secondary" (click)="addDiscussion()">Add
-                                discussion</button>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>From</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let discussion of manuscript.discussions">
-                                        <td>{{ discussion.name }}</td>
-                                        <td>{{ discussion.from }}</td>
-                                        <td>{{ discussion.lastReply | date:'MMM/yy' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column (Action Buttons and Participants) -->
-                <div class="col-md-3">
-                    <!-- Action Buttons Section -->
-                    <div class="card mb-4">
-                        <div class="card-body d-flex flex-column gap-2">
-                            <button class="btn btn-primary" style="font-size: 14px;" (click)="sendToReview()">Send to
-                                Review</button>
-                            <button class="btn btn-secondary" style="font-size: 14px;"
-                                (click)="acceptAndSkipReview()">Accept and Skip
-                                Review</button>
-                            <button class="btn btn-danger" style="font-size: 14px;"
-                                (click)="declineSubmission()">Decline Submission</button>
-                        </div>
-                    </div>
-
-                    <!-- Participants Section -->
-                    <div class="card">
-                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0 fs-6">Participants</h5>
-                            <button class="btn btn-sm btn-outline-primary" (click)="assignParticipant()">Assign</button>
-                        </div>
-                        <div class="card-body">
-                            <p class="fw-bold mb-1">Journal editor:</p>
-                            <ul class="list-unstyled m-0">
-                                <li>
-                                    <a href="https://example.com/patricia-profile"
-                                        class="text-decoration-none text-body">
-                                        Patricia Katowa Mukwato
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Review Tab -->
-        <div class="tab-pane fade" id="review" role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Review Process</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Review Start Date:</strong> {{ manuscript.review.startDate | date:'mediumDate' }}</p>
-                    <p><strong>Reviewers Assigned:</strong> {{ manuscript.review.reviewers.length }}</p>
-                    <div *ngIf="manuscript.review.reviewers.length > 0">
-                        <h6>Reviewer Feedback:</h6>
-                        <ul>
-                            <li *ngFor="let reviewer of manuscript.review.reviewers">
-                                <strong>{{ reviewer.name }}:</strong> {{ reviewer.status }}
-                                <span *ngIf="reviewer.comments"> - {{ reviewer.comments }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <p><strong>Decision:</strong> {{ manuscript.review.decision || 'Pending' }}</p>
-                    <p><strong>Status:</strong> <span class="badge bg-warning">{{ manuscript.status.review }}</span></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Copy-editing Tab -->
-        <div class="tab-pane fade" id="copyediting" role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Copy-editing</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Copy-editing Start Date:</strong> {{ manuscript.copyEditing.startDate | date:'mediumDate'
-                        }}</p>
-                    <p><strong>Editor:</strong> {{ manuscript.copyEditing.editor }}</p>
-                    <p><strong>Changes Requested:</strong></p>
-                    <ul *ngIf="manuscript.copyEditing.changes.length > 0">
-                        <li *ngFor="let change of manuscript.copyEditing.changes">
-                            {{ change.description }} (Status: {{ change.status }})
-                        </li>
-                    </ul>
-                    <p *ngIf="manuscript.copyEditing.changes.length === 0">No changes requested yet.</p>
-                    <p><strong>Status:</strong> <span class="badge bg-info">{{ manuscript.status.copyEditing }}</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Production Tab -->
-        <div class="tab-pane fade" id="production" role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Production</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Production Start Date:</strong> {{ manuscript.production.startDate | date:'mediumDate' }}
-                    </p>
-                    <p><strong>Typesetting Status:</strong> {{ manuscript.production.typesetting }}</p>
-                    <p><strong>Proofs:</strong></p>
-                    <ul *ngIf="manuscript.production.proofs.length > 0">
-                        <li *ngFor="let proof of manuscript.production.proofs">
-                            <a href="{{ proof.url }}" target="_blank">{{ proof.name }}</a> (Sent: {{ proof.sentDate |
-                            date:'mediumDate' }})
-                        </li>
-                    </ul>
-                    <p *ngIf="manuscript.production.proofs.length === 0">No proofs available yet.</p>
-                    <p><strong>Status:</strong> <span class="badge bg-primary">{{ manuscript.status.production }}</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Publication Tab -->
-        <div class="tab-pane fade" id="publication" role="tabpanel">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Publication Details</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Publication Status:</strong> {{ manuscript.publication.status }}</p>
-                    <p><strong>Publication Date:</strong> {{ manuscript.publication.date | date:'mediumDate' }}</p>
-                    <p><strong>DOI:</strong> {{ manuscript.publication.doi || 'Not assigned yet' }}</p>
-                    <p><strong>Volume/Issue:</strong> {{ manuscript.publication.volumeIssue || 'Pending' }}</p>
-                    <p><strong>Access Type:</strong> {{ manuscript.publication.accessType }}</p>
-                    <p *ngIf="manuscript.publication.url">
-                        <strong>Published URL:</strong> <a href="{{ manuscript.publication.url }}" target="_blank">View
-                            Publication</a>
-                    </p>
-                    <p><strong>Status:</strong> <span class="badge bg-success">{{ manuscript.status.publication
-                            }}</span></p>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Manuscript File Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up-fill me-2"></i> Manuscript File</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="submissionDetails as details">
+                <div *ngIf="details.files && details.files.length > 0; else noFile">
+                    <div class="list-group">
+                        <div *ngFor="let file of details.files"
+                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <i class="bi bi-file-earmark-pdf me-2 text-danger fs-5"></i>
+                                <span class="fw-bold">{{ file.originalName }}</span>
+                                <small class="text-muted ms-2">({{ file.size / 1024 | number:'1.0-2' }} KB)</small>
+                            </div>
+                            <div>
+                                <!-- <a [href]="file.fileUrl" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="bi bi-eye"></i> View
+                                </a> -->
+                                <a (click)="downloadFile(file.fileUrl, file.originalName)"
+                                    class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-download"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suggested Reviewers Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-search me-2"></i> Suggested Reviewers</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="submissionDetails as details">
+                <div *ngIf="details.submissionReviewers && details.submissionReviewers.length > 0; else noReviewers">
+                    <div class="row g-3">
+                        <div *ngFor="let reviewer of details.submissionReviewers; let i = index" class="col-md-6">
+                            <div class="p-3 border rounded-3 bg-light-subtle h-100">
+                                <h6 class="text-primary mb-2">Reviewer {{ i + 1 }}</h6>
+                                <p class="mb-1"><strong>Name:</strong> {{ reviewer.name }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ reviewer.email }}</p>
+                                <p class="mb-0"><strong>Institution:</strong> {{ reviewer.institution }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-chat-left-text-fill me-2"></i> Additional Information</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-1"><strong>Comments to the Editor:</strong></p>
+            <div *ngIf="submissionDetails as details">
+                    <p class="mb-0">{{ details.comments || 'No comments provided by the author.' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission Timeline Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-fill me-2"></i> Submission Timeline</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="submissionDetails as details">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Submitted At:</strong> {{ details.submittedAt | date:'medium' }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Last Updated:</strong> {{ details.updatedAt | date:'medium' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end pt-3">
+        <button type="button" class="btn btn-outline-secondary me-2" (click)="goBack()">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </button>
+        <!-- FIX: Reverted to optional chaining for isEditable. -->
+        <!-- The 'as details' is already providing null safety for the main content -->
+        <!-- and directly chaining it with '&&' for a boolean check can cause parser issues. -->
+        <!-- <button *ngIf="submissionDetails?.isEditable" type="button" class="btn btn-primary">
+            <i class="bi bi-pencil-square"></i> Edit Submission
+        </button> -->
+    </div>
+
+    <!-- IMPORTANT: All ng-templates for 'else' conditions here -->
+    <ng-template #noAuthors>
+        <p class="text-muted fst-italic py-3">No author information available.</p>
+    </ng-template>
+
+    <ng-template #noFile>
+        <p class="text-muted fst-italic py-3">No manuscript file uploaded for this submission.</p>
+    </ng-template>
+
+    <ng-template #noReviewers>
+        <p class="text-muted fst-italic py-3">No suggested reviewers were provided for this submission.</p>
+    </ng-template>
+
 </div>

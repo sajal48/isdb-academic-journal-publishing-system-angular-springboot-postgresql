@@ -138,7 +138,7 @@ export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
     this.isEditingIssue = false;
     this.modalTitle = 'Add New Issue';
 
-    // Also reset any dropdown/select default visually
+    // Also reset any dropdown/select default visually (not mandatory)
     const statusSelect = document.querySelector<HTMLSelectElement>('select[name="status"]');
     if (statusSelect) {
       statusSelect.selectedIndex = 0; // reset to placeholder/default
