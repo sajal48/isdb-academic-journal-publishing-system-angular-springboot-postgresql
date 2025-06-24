@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 // Ensure these imports are correct and Discussion interface has createdAt: Date; and origin: DiscussionOrigin;
-import { Discussion, Manuscript } from '../user-manuscript.component';
+import { Discussion, Manuscript, SubmissionFile } from '../user-manuscript.component';
 import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { HttpClient } from '@angular/common/http';
@@ -43,6 +43,10 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   currentUserId: number = 0;
 
+  // New properties for review file selection
+  selectedFileForReviewId: number | null = null;
+  filesForReview: SubmissionFile[] = [];
+
   // Expose the enum to the template for dropdown options
   DiscussionOrigin = DiscussionOrigin;
 
@@ -51,7 +55,8 @@ export class ManuscriptSubmissionComponent implements OnInit {
     private manuscriptService: UserManuscriptService,
     private authLoginRegisterService: AuthLoginRegisterService,
     private http: HttpClient,
-    private userToastNotificationService: UserToastNotificationService
+    private userToastNotificationService: UserToastNotificationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -135,41 +140,6 @@ export class ManuscriptSubmissionComponent implements OnInit {
       this.userToastNotificationService.showToast('Warning', 'No file selected or manuscript ID is missing.', 'warning');
     }
   }
-
-  /*deleteFile(fileId: number, fileName: string): void {
-    // Replaced confirm() with a custom message using toast for better UX, as per guidelines.
-    // If you need a full confirmation dialog, you would implement a custom modal.
-    this.userToastNotificationService.showToast(
-      'Confirm Deletion',
-      `Are you sure you want to delete the file "${fileName}"? This action cannot be undone.`,
-      'warning',
-      true, // Make it dismissible manually
-      () => { // Callback for 'Yes' equivalent
-        if (this.manuscript && this.manuscript.id) {
-          this.manuscriptService.deleteManuscriptFile(Number(this.manuscript.id), fileId).subscribe(
-            response => {
-              if (response && response.code === 200) {
-                console.log('File deleted successfully:', response.message);
-                this.userToastNotificationService.showToast('Success', 'File deleted successfully!', 'success');
-                if (this.manuscript.files) {
-                  this.manuscript.files = this.manuscript.files.filter(f => f.id !== fileId);
-                }
-              } else {
-                console.error('Delete response not as expected:', response);
-                this.userToastNotificationService.showToast('Error', 'File deletion failed: Unexpected response from server.', 'danger');
-              }
-            },
-            error => {
-              console.error('File deletion error:', error);
-              this.userToastNotificationService.showToast('Error', 'File deletion failed: ' + (error.error?.message || 'Server error.'), 'danger');
-            }
-          );
-        } else {
-          this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot delete file.', 'warning');
-        }
-      }
-    );
-  }*/
 
   downloadFile(fileUrl: string, originalFileName: string): void {
     const downloadUrl = fileUrl;
@@ -255,11 +225,6 @@ export class ManuscriptSubmissionComponent implements OnInit {
         let buttonAction: () => void;
 
         switch (action) {
-          case 'sendToReview':
-            titleText = 'Confirm Send to Review';
-            bodyText = 'Are you sure you want to send this manuscript to review? This action cannot be undone.';
-            buttonAction = () => this._sendToReview();
-            break;
           case 'acceptAndSkipReview':
             titleText = 'Confirm Accept and Skip Review';
             bodyText = 'Are you sure you want to accept this manuscript and skip the review process?';
@@ -290,19 +255,64 @@ export class ManuscriptSubmissionComponent implements OnInit {
     }
   }
 
-  private _sendToReview(): void {
+  // New method to open the "Send to Review" file selection modal
+  openSendToReviewModal(): void {
+    if (!this.manuscript || !this.manuscript.files || this.manuscript.files.length === 0) {
+      this.userToastNotificationService.showToast('Info', 'No submission files available to send for review. Please upload a file first.', 'info');
+      return;
+    }
+    this.selectedFileForReviewId = null; // Reset selection
+    this.filesForReview = this.manuscript.files; // Populate files for the dropdown
+
+    const sendToReviewModal = new bootstrap.Modal(document.getElementById('sendToReviewFileModal'));
+    sendToReviewModal.show();
+  }
+
+  // Modified: Confirm action to send to review with selected file
+  confirmSendToReview(): void {
+    if (this.selectedFileForReviewId && this.manuscript && this.manuscript.id) {
+      this._sendToReview(this.selectedFileForReviewId);
+      const modal = bootstrap.Modal.getInstance(document.getElementById('sendToReviewFileModal'));
+      if (modal) {
+        modal.hide();
+      }
+    } else {
+      this.userToastNotificationService.showToast('Warning', 'Please select a file to send for review.', 'warning');
+    }
+  }
+
+  // Modified: _sendToReview now accepts a fileId
+  private _sendToReview(fileId: number): void {
     if (this.manuscript && this.manuscript.id) {
+      // First, update the submission status
       this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'ACCEPTED').subscribe({
         next: (response) => {
-          this.userToastNotificationService.showToast('Success', 'Manuscript successfully sent to review!', 'success');
-          // Update local status after successful backend update
+          this.userToastNotificationService.showToast('Success', 'Manuscript status updated to ACCEPTED.', 'success');
+          // Update local status
           if (this.manuscript.status) {
             this.manuscript.status.submission = 'Sent to Review';
             this.manuscript.status.review = 'In Progress'; // Or 'Pending Assignment'
           }
+
+          // Then, add the review file reference
+          this.manuscriptService.addReviewFileReference(Number(this.manuscript.id), fileId).subscribe({
+            next: (fileResponse) => {
+              // this.userToastNotificationService.showToast('Success', 'Selected file added as review file!', 'success');
+              this.userToastNotificationService.showToast('Success', fileResponse.message, 'success');
+              // Potentially reload manuscript or update UI to show review file
+              // For now, a full reload might be simpler to ensure all UI elements are consistent
+
+              // document.location.reload();
+               this.router.navigate([`/user/manuscript/${this.manuscript.id}/review`]);
+            },
+            error: (fileError) => {
+              console.error('Error adding review file reference:', fileError);
+              this.userToastNotificationService.showToast('Error', 'Failed to add review file: ' + (fileError.error?.message || 'Server error.'), 'danger');
+            }
+          });
         },
         error: (err) => {
-          console.error('Error sending to review:', err);
+          console.error('Error sending to review (status update):', err);
           this.userToastNotificationService.showToast('Error', 'Failed to send to review: ' + (err.error?.message || 'Server error.'), 'danger');
         }
       });
@@ -310,6 +320,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
       this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot send to review.', 'warning');
     }
   }
+
 
   private _acceptAndSkipReview(): void {
     if (this.manuscript && this.manuscript.id) {
@@ -321,7 +332,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
             this.manuscript.status.submission = 'Accepted';
             this.manuscript.status.review = 'Skipped';
             this.manuscript.status.copyEditing = 'In Progress'; // Transition to copy editing
-          }          
+          }
             document.location.reload();
         },
         error: (err) => {

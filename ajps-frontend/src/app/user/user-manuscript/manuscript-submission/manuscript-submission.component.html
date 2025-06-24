@@ -68,33 +68,13 @@
             <a><i class="bi bi-megaphone-fill"></i> Submission rejected.</a>
         </div>
 
-        <!-- <div class="card mb-4" *ngIf="manuscript && currentUserId !== manuscript.owner.userId"> -->
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-primary" style="font-size: 14px;" (click)="openConfirmationModal('sendToReview')">Send to Review</button>
+                <button class="btn btn-primary" style="font-size: 14px;" (click)="openSendToReviewModal()">Send to Review</button>
                 <button class="btn btn-secondary" style="font-size: 14px;" (click)="openConfirmationModal('acceptAndSkipReview')">Accept and Skip Review</button>
                 <button class="btn btn-danger" style="font-size: 14px;" (click)="openConfirmationModal('declineSubmission')">Decline Submission</button>
             </div>
         </div>
-
-        <!-- <div class="card">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fs-6">Participants</h5>
-                <button class="btn btn-sm btn-outline-primary" (click)="assignParticipant()">Assign</button>
-            </div>
-            <div class="card-body">
-                <p class="fw-bold mb-1">Journal editor:</p>
-                <ul class="list-unstyled m-0">
-                    <li>
-                        <a href="https://example.com/patricia-profile"
-                            class="text-decoration-none text-body">
-                            Patricia Katowa Mukwato
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div> -->
-
     </div>
 </div>
 
@@ -107,9 +87,9 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-  <label for="manuscriptFile" class="form-label">Select your file</label>
-  <input class="form-control" type="file" id="manuscriptFile" (change)="onFileSelected($event)">
-</div>
+                    <label for="manuscriptFile" class="form-label">Select your file</label>
+                    <input class="form-control" type="file" id="manuscriptFile" (change)="onFileSelected($event)">
+                </div>
                 <div *ngIf="selectedFile">
                     Selected file: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
                 </div>
@@ -155,7 +135,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="confirmActionButton">Confirm</button>
@@ -185,65 +165,65 @@
     </div>
 </div>
 
-<!-- <div class="modal fade" id="addDiscussionModal" tabindex="-1" aria-labelledby="addDiscussionModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addDiscussionModalLabel">Start New Discussion</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="discussionTitle" class="form-label">Discussion Title</label>
-          <input type="text" class="form-control" id="discussionTitle" [(ngModel)]="newDiscussionTitle">
-        </div>
-        <div class="mb-3">
-          <label for="discussionMessage" class="form-label">Message Content</label>
-          <textarea class="form-control" id="discussionMessage" rows="5" [(ngModel)]="newDiscussionMessage"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="confirmAddDiscussion()">Create Discussion</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <div class="modal fade" id="discussionContentModal" tabindex="-1" aria-labelledby="discussionContentModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div *ngIf="selectedDiscussion">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <p class="mb-0 text-muted">
-                <strong>From:</strong> {{ selectedDiscussion.creatorName }}
-              </p>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="col-md-6 text-md-end">
-              <p class="mb-0 text-muted">
-                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at {{ selectedDiscussion.createdAt | date:'shortTime' }}
-              </p>
+            <div class="modal-body">
+                <div *ngIf="selectedDiscussion">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-0 text-muted">
+                                <strong>From:</strong> {{ selectedDiscussion.creatorName }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="mb-0 text-muted">
+                                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at {{ selectedDiscussion.createdAt | date:'shortTime' }}
+                            </p>
+                        </div>
+                    </div>
+                    <hr class="my-3">
+                    <h6 class="mb-2">Message:</h6>
+                    <div class="p-3 border rounded bg-light">
+                        <p class="mb-0">{{ selectedDiscussion.content }}</p>
+                    </div>
+                </div>
+                <div *ngIf="!selectedDiscussion" class="text-muted text-center py-4">
+                    Discussion details not available.
+                </div>
             </div>
-          </div>
-          <hr class="my-3">
-          <h6 class="mb-2">Message:</h6>
-          <div class="p-3 border rounded bg-light">
-            <p class="mb-0">{{ selectedDiscussion.content }}</p>
-          </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div *ngIf="!selectedDiscussion" class="text-muted text-center py-4">
-          Discussion details not available.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
     </div>
-  </div>
+</div>
+
+<div class="modal fade" id="sendToReviewFileModal" tabindex="-1" aria-labelledby="sendToReviewFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendToReviewFileModalLabel">Select File for Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Please select the submission file to send for review:</p>
+                <div class="mb-3">
+                    <label for="reviewFileSelect" class="form-label">Choose File</label>
+                    <select class="form-select" id="reviewFileSelect" [(ngModel)]="selectedFileForReviewId">
+                        <option [ngValue]="null" disabled>Select a file</option>
+                        <option *ngFor="let file of manuscript?.files" [ngValue]="file.id">{{ file.name }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="confirmSendToReview()" [disabled]="!selectedFileForReviewId">Send to Review</button>
+            </div>
+        </div>
+    </div>
 </div>

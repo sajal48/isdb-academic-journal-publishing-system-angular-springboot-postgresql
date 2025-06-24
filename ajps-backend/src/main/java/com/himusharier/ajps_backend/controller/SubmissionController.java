@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.controller;
 
+import com.himusharier.ajps_backend.dto.request.SendToReviewRequest;
 import com.himusharier.ajps_backend.dto.response.ApiResponse;
 import com.himusharier.ajps_backend.dto.response.SuccessResponseModel;
 import com.himusharier.ajps_backend.dto.submission.*;
@@ -270,4 +271,21 @@ public class SubmissionController {
             return ResponseEntity.status(500).body(new ApiResponse(500, "error", "Failed to update submission status: " + e.getMessage()));
         }
     }
+
+    // --- NEW ENDPOINT FOR SENDING TO REVIEW ---
+    // --- CORRECTED ENDPOINT FOR SENDING TO REVIEW ---
+    @PostMapping("/{submissionId}/send-to-review")
+    public ResponseEntity<ApiResponse<?>> sendSubmissionToReview(
+            @PathVariable Long submissionId,
+            @RequestBody SendToReviewRequest request) { // <--- CHANGE to use the DTO
+        try {
+            Submission updatedSubmission = submissionService.sendSubmissionToReview(submissionId, request.getFileId()); // Access fileId from DTO
+            return ResponseEntity.ok(new ApiResponse(200, "Submission sent to review successfully.", updatedSubmission));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(HttpStatus.NOT_FOUND.value(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to send submission to review: " + e.getMessage()));
+        }
+    }
+
 }

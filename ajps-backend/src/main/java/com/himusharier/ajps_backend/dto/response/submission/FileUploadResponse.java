@@ -14,4 +14,5 @@ public class FileUploadResponse {
     private long size;
     private String type;
     private String fileUrl;
+    private boolean isReviewFile;
 }

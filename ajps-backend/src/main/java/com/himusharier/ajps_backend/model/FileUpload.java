@@ -36,6 +36,9 @@ public class FileUpload {
     @Column(nullable = false)
     private String fileUrl;
 
+    @Column(nullable = false)
+    private boolean isReviewFile = false;
+
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
     @JsonBackReference

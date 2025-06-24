@@ -64,6 +64,14 @@ export interface Discussion {
   createdAt: Date; // Or Date, depending on how you handle dates
 }
 
+export interface SubmissionFile {
+  id: number;
+  name: string;
+  url: string;
+  size: string; // Or number, depending on how you receive it from the backend
+  storedName?: string; // Optional, if your backend provides it
+}
+
 export enum DiscussionOrigin {
   PRE_REVIEW = 'PRE_REVIEW',
   IN_REVIEW = 'IN_REVIEW',

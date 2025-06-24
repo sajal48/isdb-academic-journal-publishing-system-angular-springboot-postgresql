@@ -8,6 +8,7 @@ import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.*;
 import com.himusharier.ajps_backend.repository.*;
+import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,10 @@ public class SubmissionService {
             submission.getFiles().size();
             submission.getSubmissionReviewers().size();
             // submission.getJournal().getJournalName(); // Also accesses related entity
+            // Access journal to ensure it's loaded if needed for the response
+            if (submission.getJournal() != null) {
+                submission.getJournal().getId();
+            }
         });
 
         return optionalSubmission.orElseThrow(() ->
@@ -69,11 +74,10 @@ public class SubmissionService {
     }
 
     // New method to return SubmissionDetailsResponse DTO
-    @Transactional(readOnly = true) // Ensure collections are accessible within the transaction
+    @Transactional(readOnly = true)
     public SubmissionDetailsResponse getSubmissionDetailsAsDto(Profile profile, Long submissionId) {
-        Submission submission = returnSubmissionDetails(profile, submissionId); // Fetches and initializes
+        Submission submission = returnSubmissionDetails(profile, submissionId);
 
-        // Map the Submission entity to the SubmissionDetailsResponse DTO
         return SubmissionDetailsResponse.builder()
                 .id(submission.getId())
                 .submissionNumber(submission.getSubmissionNumber())
@@ -82,6 +86,7 @@ public class SubmissionService {
                                 .id(submission.getJournal().getId())
                                 .journalName(submission.getJournal().getJournalName())
                                 .build() : null)
+                // Add owner details if needed for the DTO
                 .manuscriptTitle(submission.getManuscriptTitle())
                 .manuscriptCategory(submission.getManuscriptCategory())
                 .abstractContent(submission.getAbstractContent())
@@ -95,7 +100,6 @@ public class SubmissionService {
                 .isPaymentDue(submission.isPaymentDue())
                 .completedSteps(submission.getCompletedSteps())
                 .isEditable(submission.isEditable())
-                // Map collections to their respective DTOs
                 .authors(submission.getAuthors() != null ? submission.getAuthors().stream()
                         .map(author -> AuthorResponse.builder()
                                 .id(author.getId())
@@ -108,12 +112,13 @@ public class SubmissionService {
                 .files(submission.getFiles() != null ? submission.getFiles().stream()
                         .map(file -> FileUploadResponse.builder()
                                 .id(file.getId())
-                                .fileOrigin(file.getFileOrigin().name()) // Assuming fileOrigin enum needs to be string
+                                .fileOrigin(file.getFileOrigin().name())
                                 .storedName(file.getStoredName())
                                 .originalName(file.getOriginalName())
                                 .size(file.getSize())
                                 .type(file.getType())
                                 .fileUrl(file.getFileUrl())
+                                .isReviewFile(file.isReviewFile()) // --- INCLUDE NEW FIELD ---
                                 .build())
                         .collect(Collectors.toList()) : List.of())
                 .submissionReviewers(submission.getSubmissionReviewers() != null ? submission.getSubmissionReviewers().stream()
@@ -126,7 +131,6 @@ public class SubmissionService {
                         .collect(Collectors.toList()) : List.of())
                 .build();
     }
-
 
     public Submission returnSubmission(Long submissionId) {
         Optional<Submission> optionalSubmission = submissionRepository.findById(submissionId);
@@ -417,6 +421,41 @@ public class SubmissionService {
         // You might also want to set a timestamp for status change, e.g., submission.setUpdatedAt(new Date());
 
         submissionRepository.save(submission); // Save the updated submission
+    }
+
+    // --- NEW METHOD FOR SENDING TO REVIEW ---
+    @Transactional // Ensures both status update and file marking succeed or fail together
+    public Submission sendSubmissionToReview(Long submissionId, Long fileIdForReview) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        boolean fileFoundAndMarked = false;
+        if (submission.getFiles() != null) {
+            for (FileUpload file : submission.getFiles()) {
+                if (file.getId().equals(fileIdForReview)) {
+                    file.setReviewFile(true); // Mark this file for review
+                    fileFoundAndMarked = true;
+//                    fileUploadRepository.save(file);
+                } else {
+                    file.setReviewFile(false); // Unmark any other files
+                }
+                // Due to CascadeType.ALL on `files` list in Submission,
+                // changes to FileUpload objects within the collection
+                // will be persisted when the parent Submission is saved.
+                // fileUploadRepository.save(file); // No need to explicitly save each file
+            }
+        }
+
+        if (!fileFoundAndMarked) {
+            throw new SubmissionRequestException("File with ID: " + fileIdForReview + " not found within submission ID: " + submissionId);
+        }
+
+        // Set submission status to UNDER_REVIEW
+        submission.setSubmissionStatus(SubmissionStatus.UNDER_REVIEW);
+        submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
+
+        // Save the submission, which will cascade changes to its associated FileUploads
+        return submissionRepository.save(submission);
     }
 
 }

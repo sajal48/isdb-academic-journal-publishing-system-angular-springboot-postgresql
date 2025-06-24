@@ -207,4 +207,8 @@ export class UserManuscriptService {
     );
   }
 
+ addReviewFileReference(manuscriptId: number, fileId: number): Observable<any> {
+  return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId }); // This works directly with the DTO
+}
+
 }
