@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.himusharier.ajps_backend.constants.DiscussionOrigin;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,14 +25,18 @@ public class Discussion implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
-    private Auth creator; // The user who started this discussion
+    private Auth creator;
 
     @Column(nullable = false)
     private String title;
 
-    @Lob // For potentially long text content of the initial message
+    @Lob
     @Column(nullable = false)
-    private String content; // The single message content for this discussion
+    private String content;
+
+    @Enumerated(EnumType.STRING) // Important: Store enum name as a string in DB
+    @Column(nullable = false) // Consider if origin should be nullable or always required
+    private DiscussionOrigin origin; // Changed to enum type
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

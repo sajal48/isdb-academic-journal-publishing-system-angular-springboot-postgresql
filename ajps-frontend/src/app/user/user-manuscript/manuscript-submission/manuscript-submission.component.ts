@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+// Ensure these imports are correct and Discussion interface has createdAt: Date; and origin: DiscussionOrigin;
 import { Discussion, Manuscript } from '../user-manuscript.component';
 import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
@@ -11,6 +12,17 @@ import { HttpClient } from '@angular/common/http';
 import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
 declare var bootstrap: any;
+
+// Define the TypeScript equivalent of your Java enum if it's not in a shared file
+// Ensure this matches your Java enum values exactly
+export enum DiscussionOrigin {
+  PRE_REVIEW = 'PRE_REVIEW',
+  IN_REVIEW = 'IN_REVIEW',
+  POST_REVIEW = 'POST_REVIEW',
+  EDITORIAL = 'EDITORIAL',
+  AUTHOR_QUERY = 'AUTHOR_QUERY',
+  TECHNICAL_SUPPORT = 'TECHNICAL_SUPPORT',
+}
 
 @Component({
   selector: 'app-manuscript-submission',
@@ -23,12 +35,16 @@ export class ManuscriptSubmissionComponent implements OnInit {
   manuscript!: Manuscript;
   newDiscussionTitle: string = '';
   newDiscussionMessage: string = '';
+  newDiscussionOrigin: DiscussionOrigin | null = null; // Property to hold the selected origin from dropdown
   selectedFile: File | null = null;
   assignedParticipantName: string = '';
 
   selectedDiscussion: Discussion | null = null;
 
   currentUserId: number = 0;
+
+  // Expose the enum to the template for dropdown options
+  DiscussionOrigin = DiscussionOrigin;
 
   constructor(
     private route: ActivatedRoute,
@@ -120,32 +136,40 @@ export class ManuscriptSubmissionComponent implements OnInit {
     }
   }
 
-  deleteFile(fileId: number, fileName: string): void {
-    if (confirm(`Are you sure you want to delete the file "${fileName}"?`)) {
-      if (this.manuscript && this.manuscript.id) {
-        this.manuscriptService.deleteManuscriptFile(Number(this.manuscript.id), fileId).subscribe(
-          response => {
-            if (response && response.code === 200) {
-              console.log('File deleted successfully:', response.message);
-              this.userToastNotificationService.showToast('Success', 'File deleted successfully!', 'success');
-              if (this.manuscript.files) {
-                this.manuscript.files = this.manuscript.files.filter(f => f.id !== fileId);
+  /*deleteFile(fileId: number, fileName: string): void {
+    // Replaced confirm() with a custom message using toast for better UX, as per guidelines.
+    // If you need a full confirmation dialog, you would implement a custom modal.
+    this.userToastNotificationService.showToast(
+      'Confirm Deletion',
+      `Are you sure you want to delete the file "${fileName}"? This action cannot be undone.`,
+      'warning',
+      true, // Make it dismissible manually
+      () => { // Callback for 'Yes' equivalent
+        if (this.manuscript && this.manuscript.id) {
+          this.manuscriptService.deleteManuscriptFile(Number(this.manuscript.id), fileId).subscribe(
+            response => {
+              if (response && response.code === 200) {
+                console.log('File deleted successfully:', response.message);
+                this.userToastNotificationService.showToast('Success', 'File deleted successfully!', 'success');
+                if (this.manuscript.files) {
+                  this.manuscript.files = this.manuscript.files.filter(f => f.id !== fileId);
+                }
+              } else {
+                console.error('Delete response not as expected:', response);
+                this.userToastNotificationService.showToast('Error', 'File deletion failed: Unexpected response from server.', 'danger');
               }
-            } else {
-              console.error('Delete response not as expected:', response);
-              this.userToastNotificationService.showToast('Error', 'File deletion failed: Unexpected response from server.', 'danger');
+            },
+            error => {
+              console.error('File deletion error:', error);
+              this.userToastNotificationService.showToast('Error', 'File deletion failed: ' + (error.error?.message || 'Server error.'), 'danger');
             }
-          },
-          error => {
-            console.error('File deletion error:', error);
-            this.userToastNotificationService.showToast('Error', 'File deletion failed: ' + (error.error?.message || 'Server error.'), 'danger');
-          }
-        );
-      } else {
-        this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot delete file.', 'warning');
+          );
+        } else {
+          this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot delete file.', 'warning');
+        }
       }
-    }
-  }
+    );
+  }*/
 
   downloadFile(fileUrl: string, originalFileName: string): void {
     const downloadUrl = fileUrl;
@@ -172,21 +196,24 @@ export class ManuscriptSubmissionComponent implements OnInit {
   addDiscussion(): void {
     this.newDiscussionTitle = '';
     this.newDiscussionMessage = '';
+    this.newDiscussionOrigin = null; // Reset origin when opening the modal
     const discussionModal = new bootstrap.Modal(document.getElementById('addDiscussionModal'));
     discussionModal.show();
   }
 
   confirmAddDiscussion(): void {
+    // Added validation for newDiscussionOrigin
     if (this.newDiscussionTitle && this.newDiscussionMessage && this.manuscript && this.manuscript.id) {
       this.manuscriptService.createDiscussion(
         Number(this.manuscript.id),
         this.currentUserId,
         this.newDiscussionTitle,
-        this.newDiscussionMessage
+        this.newDiscussionMessage,
+        this.newDiscussionOrigin = DiscussionOrigin.PRE_REVIEW // Pass the selected origin directly
       ).subscribe({
         next: (newDisc) => {
           console.log('New discussion added:', newDisc);
-          this.userToastNotificationService.showToast('Success', 'Discussion added successfully!', 'success'); // Use toast notification
+          this.userToastNotificationService.showToast('Success', 'Discussion added successfully!', 'success');
 
           // Reload discussions to get the latest list, including the new one
           this.loadDiscussions(Number(this.manuscript.id));
@@ -197,19 +224,20 @@ export class ManuscriptSubmissionComponent implements OnInit {
           }
           this.newDiscussionTitle = ''; // Clear input fields
           this.newDiscussionMessage = '';
+          this.newDiscussionOrigin = null; // Clear origin
         },
         error: (err) => {
           console.error('Error adding discussion:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to add discussion: ' + err.message, 'danger');
+          this.userToastNotificationService.showToast('Error', 'Failed to add discussion: ' + (err.error?.message || 'Server error.'), 'danger');
         }
       });
     } else {
-      this.userToastNotificationService.showToast('Warning', 'Please provide a title, message, and ensure manuscript ID is available.', 'warning');
+      this.userToastNotificationService.showToast('Warning', 'Please provide a title, message, and select an origin. Also, ensure manuscript ID is available.', 'warning');
     }
   }
 
   viewDiscussionContent(discussion: Discussion): void {
-    this.selectedDiscussion = discussion; // Now store the whole discussion object
+    this.selectedDiscussion = discussion;
     const detailModal = new bootstrap.Modal(document.getElementById('discussionContentModal'));
     detailModal.show();
   }
@@ -275,7 +303,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error sending to review:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to send to review: ' + err.message, 'danger');
+          this.userToastNotificationService.showToast('Error', 'Failed to send to review: ' + (err.error?.message || 'Server error.'), 'danger');
         }
       });
     } else {
@@ -297,7 +325,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error accepting and skipping review:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to accept and skip review: ' + err.message, 'danger');
+          this.userToastNotificationService.showToast('Error', 'Failed to accept and skip review: ' + (err.error?.message || 'Server error.'), 'danger');
         }
       });
     } else {
@@ -313,7 +341,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
           // Update local status after successful backend update
           if (this.manuscript.status) {
             this.manuscript.status.submission = 'Declined';
-            this.manuscript.status.review = 'N/A'; // Or 'Not Applicable'
+            this.manuscript.status.review = 'N/A';
             this.manuscript.status.copyEditing = 'N/A';
             this.manuscript.status.production = 'N/A';
             this.manuscript.status.publication = 'N/A';

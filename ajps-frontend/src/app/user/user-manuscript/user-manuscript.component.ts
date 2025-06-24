@@ -58,8 +58,19 @@ export interface Discussion {
   creatorId: number;
   creatorName: string;
   title: string;
-  content: string; // The single message content
-  createdAt: string; // Use string for ISO date from backend
+  content: string;
+  origin: DiscussionOrigin; // <-- Add this
+  createdAt: Date; // Or Date, depending on how you handle dates
+}
+
+export enum DiscussionOrigin {
+  PRE_REVIEW = 'PRE_REVIEW',
+  IN_REVIEW = 'IN_REVIEW',
+  POST_REVIEW = 'POST_REVIEW',
+  EDITORIAL = 'EDITORIAL',
+  AUTHOR_QUERY = 'AUTHOR_QUERY',
+  TECHNICAL_SUPPORT = 'TECHNICAL_SUPPORT',
+  // Ensure this matches your Java enum values exactly
 }
 
 export interface ManuscriptOwner {

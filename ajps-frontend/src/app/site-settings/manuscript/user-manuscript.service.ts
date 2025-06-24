@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
-import { Discussion, Manuscript } from '../../user/user-manuscript/user-manuscript.component';
-import { of } from 'rxjs/internal/observable/of';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/internal/operators/map';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Discussion, DiscussionOrigin, Manuscript } from '../../user/user-manuscript/user-manuscript.component';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -98,31 +96,31 @@ export class UserManuscriptService {
   }
 
   // --- NEW: Upload File Method ---
-uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('fileOrigin', 'PRE_REVIEW');
-  formData.append('submissionId', submissionId.toString()); // Backend expects Long
+  uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('fileOrigin', 'PRE_REVIEW');
+    formData.append('submissionId', submissionId.toString()); // Backend expects Long
 
-  return this.http.post<any>(`${this.baseUrl}/manuscript-files/upload`, formData).pipe(
-    catchError(error => {
-      console.error('Error uploading file:', error);
-      return throwError(() => error); // Corrected
-    })
-  );
-}
+    return this.http.post<any>(`${this.baseUrl}/manuscript-files/upload`, formData).pipe(
+      catchError(error => {
+        console.error('Error uploading file:', error);
+        return throwError(() => error); // Corrected
+      })
+    );
+  }
 
-// --- NEW: Delete File Method ---
-deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
-  return this.http.delete<any>(`${this.baseUrl}/manuscript-files/remove/${submissionId}/${fileId}`).pipe(
-    catchError(error => {
-      console.error('Error deleting file:', error);
-      return throwError(() => error); // Corrected
-    })
-  );
-}
+  // --- NEW: Delete File Method ---
+  deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/manuscript-files/remove/${submissionId}/${fileId}`).pipe(
+      catchError(error => {
+        console.error('Error deleting file:', error);
+        return throwError(() => error); // Corrected
+      })
+    );
+  }
 
-// --- NEW: Get Discussions for a Submission ---
+  // --- NEW: Get Discussions for a Submission ---
   getDiscussionsForSubmission(submissionId: number): Observable<Discussion[]> {
     return this.http.get<any>(`${this.discussionUrl}/submission/${submissionId}`).pipe(
       map(response => {
@@ -142,23 +140,43 @@ deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
     );
   }
 
-  // --- NEW: Create New Discussion (Simplified) ---
-  createDiscussion(submissionId: number, userId: number, title: string, content: string): Observable<Discussion> {
-    const body = { title, content }; // Use 'content' for the message
-    // Pass userId as query param, as defined in backend controller
-    return this.http.post<any>(`${this.discussionUrl}/${submissionId}?userId=${userId}`, body).pipe(
+  /**
+   * Creates a new discussion for a given submission.
+   * This method is updated to align with the backend controller's endpoint signature.
+   * @param submissionId The ID of the submission to which the discussion belongs.
+   * @param creatorId The ID of the user creating the discussion (now a path variable).
+   * @param title The title of the discussion.
+   * @param content The initial message content of the discussion.
+   * @param origin The origin/category of the discussion (e.g., 'PRE_REVIEW', 'EDITORIAL').
+   * @returns An Observable that emits the newly created Discussion object.
+   */
+  createDiscussion(submissionId: number, creatorId: number, title: string, content: string, origin: DiscussionOrigin): Observable<Discussion> {
+    // Construct the request body with title, content, and origin
+    const body = { title, content, origin };
+
+    // FIX HERE: Use this.discussionUrl as the base for discussion creation
+    return this.http.post<any>(`${this.discussionUrl}/${submissionId}/discussions/create/${creatorId}`, body).pipe(
       map(response => {
+        // Check for successful response structure from the backend's SuccessResponseModel
         if (response && response.code === 201 && response.status === 'success' && response.data) {
           const d = response.data;
+          // Map the backend DiscussionResponse DTO to the frontend Discussion interface
           return {
-            ...d,
-            createdAt: new Date(d.createdAt)
+            id: d.id,
+            submissionId: d.submissionId,
+            creatorId: d.creatorId,
+            creatorName: d.creatorName, // Assuming the backend returns creatorName
+            title: d.title,
+            content: d.content,
+            origin: d.origin, // Assuming the backend returns the enum value directly
+            createdAt: new Date(d.createdAt) // Convert to Date object
           };
         }
-        throw new Error('Failed to create discussion: Unexpected response');
+        throw new Error('Failed to create discussion: Unexpected response from server.');
       }),
       catchError(error => {
         console.error('Error creating discussion:', error);
+        // Extract a more specific error message if available, otherwise use a generic one
         return throwError(() => new Error(error.error?.message || 'Server error during discussion creation.'));
       })
     );

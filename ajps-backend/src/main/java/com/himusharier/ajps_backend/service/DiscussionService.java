@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.service;
 
+import com.himusharier.ajps_backend.constants.DiscussionOrigin;
 import com.himusharier.ajps_backend.dto.request.CreateDiscussionRequest;
 import com.himusharier.ajps_backend.dto.response.DiscussionResponse;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
@@ -15,6 +16,7 @@ import com.himusharier.ajps_backend.repository.SubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,24 +39,23 @@ public class DiscussionService {
     }
 
     @Transactional
-    public DiscussionResponse createDiscussion(Long submissionId, Long userId, CreateDiscussionRequest request) {
+    public Discussion createDiscussion(Long submissionId, Long creatorId, String title, String content, DiscussionOrigin origin) { // Use enum
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
 
-        Auth profile = profileService.userProfileDetailsByUserId(userId).getAuth();
-
-        Auth creator = authRepository.findById(profile.getId())
-                .orElseThrow(() -> new UserProfileException("User not found with ID: " + userId));
+        Auth creator = authRepository.findByUserId(creatorId)
+                .orElseThrow(() -> new SubmissionRequestException("Creator (Auth) not found with ID: " + creatorId));
 
         Discussion discussion = Discussion.builder()
                 .submission(submission)
                 .creator(creator)
-                .title(request.getTitle())
-                .content(request.getContent()) // Use 'content' from the request
+                .title(title)
+                .content(content)
+                .origin(origin) // Set the enum value directly
+                .createdAt(LocalDateTime.now())
                 .build();
-        discussion = discussionRepository.save(discussion);
 
-        return mapToDiscussionResponse(discussion);
+        return discussionRepository.save(discussion);
     }
 
     @Transactional(readOnly = true)
