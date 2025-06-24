@@ -288,4 +288,33 @@ public class SubmissionController {
         }
     }
 
+    // --- NEW ENDPOINT: ACCEPT AND SKIP REVIEW ---
+    @PutMapping("/{submissionId}/accept-skip-review")
+    public ResponseEntity<ApiResponse<?>> acceptAndSkipReview(
+            @PathVariable Long submissionId) {
+        try {
+            Submission updatedSubmission = submissionService.acceptAndSkipReview(submissionId);
+            return ResponseEntity.ok(new ApiResponse(200, "Submission accepted and moved to copy-editing.", updatedSubmission));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), "error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "error", "Failed to accept and skip review: " + e.getMessage()));
+        }
+    }
+
+    // --- NEW ENDPOINT: SELECT FILE FOR COPY EDITING ---
+    @PutMapping("/{submissionId}/select-copy-editing-file")
+    public ResponseEntity<ApiResponse<?>> selectCopyEditingFile(
+            @PathVariable Long submissionId,
+            @RequestBody SendToReviewRequest request) { // Reusing SendToReviewRequest as it just needs fileId
+        try {
+            Submission updatedSubmission = submissionService.selectFileForCopyEditing(submissionId, request.getFileId());
+            return ResponseEntity.ok(new ApiResponse(200, "File selected for copy-editing successfully.", updatedSubmission));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Failed to select file for copy-editing.", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to select file for copy-editing."));
+        }
+    }
+
 }

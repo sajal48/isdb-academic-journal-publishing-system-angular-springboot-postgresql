@@ -211,4 +211,22 @@ export class UserManuscriptService {
   return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId }); // This works directly with the DTO
 }
 
+acceptAndSkipReview(submissionId: number): Observable<any> {
+    // The endpoint is PUT /api/user/submission/{submissionId}/accept-skip-review
+    // No request body is needed for this operation.
+    return this.http.put(`${this.baseUrl}/${submissionId}/accept-skip-review`, {});
+  }
+
+  // --- NEW METHOD: SELECT FILE FOR COPY EDITING ---
+  selectFileForCopyEditing(submissionId: number, fileId: number): Observable<any> {
+    // The endpoint is PUT /api/user/submission/{submissionId}/select-copy-editing-file
+    // The backend expects a request body like { fileId: fileId }
+    return this.http.put(`${this.baseUrl}/${submissionId}/select-copy-editing-file`, { fileId }).pipe(
+      catchError(error => {
+        console.error('Error selecting file for copy-editing:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
 }

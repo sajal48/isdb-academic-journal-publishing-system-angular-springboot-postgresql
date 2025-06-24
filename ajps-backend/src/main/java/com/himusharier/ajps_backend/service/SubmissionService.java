@@ -119,6 +119,7 @@ public class SubmissionService {
                                 .type(file.getType())
                                 .fileUrl(file.getFileUrl())
                                 .isReviewFile(file.isReviewFile()) // --- INCLUDE NEW FIELD ---
+                                .isCopyEditingFile(file.isCopyEditingFile())
                                 .build())
                         .collect(Collectors.toList()) : List.of())
                 .submissionReviewers(submission.getSubmissionReviewers() != null ? submission.getSubmissionReviewers().stream()
@@ -260,6 +261,8 @@ public class SubmissionService {
                 .type(file.getContentType())
                 .size(file.getSize())
                 .fileUrl(fullFileUrl)
+                .isReviewFile(false)
+                .isCopyEditingFile(false)
                 .build();
 
         return fileUploadRepository.save(fileUpload);
@@ -455,6 +458,69 @@ public class SubmissionService {
         submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
 
         // Save the submission, which will cascade changes to its associated FileUploads
+        return submissionRepository.save(submission);
+    }
+
+    // --- NEW METHOD: ACCEPT AND SKIP REVIEW ---
+    @Transactional
+    public Submission acceptAndSkipReview(Long submissionId) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Optional business logic: Ensure current status allows skipping review
+        /*if (submission.getSubmissionStatus() != SubmissionStatus.SUBMITTED &&
+                submission.getSubmissionStatus() != SubmissionStatus.SAVED &&
+                submission.getSubmissionStatus() != SubmissionStatus.REVISION_REQUIRED) {
+            throw new SubmissionRequestException("Cannot skip review for a submission with status: " + submission.getSubmissionStatus());
+        }*/
+
+//        submission.setSubmissionStatus(SubmissionStatus.ACCEPTED); // First set to accepted
+        submission.setSubmissionStatus(SubmissionStatus.COPY_EDITING); // Then immediately set to copy editing
+
+        submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
+        submission.setEditable(false); // Lock submission for editing after this stage
+
+        // Unmark any review files and copy-editing files if they were marked before skipping review
+        if (submission.getFiles() != null) {
+            for (FileUpload file : submission.getFiles()) {
+                file.setReviewFile(false);
+                file.setCopyEditingFile(false); // <--- ADDED THIS LINE FOR CONSISTENCY
+            }
+        }
+
+        return submissionRepository.save(submission);
+    }
+
+    // --- NEW METHOD: SELECT FILE FOR COPY EDITING ---
+    @Transactional
+    public Submission selectFileForCopyEditing(Long submissionId, Long fileIdForCopyEditing) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Business logic: Ensure the submission is in a copy-editing phase or equivalent
+        /*if (submission.getSubmissionStatus() != SubmissionStatus.COPY_EDITING) {
+            throw new SubmissionRequestException("Cannot select file for copy-editing as the submission is not in 'COPY_EDITING' status. Current status: " + submission.getSubmissionStatus());
+        }*/
+
+        boolean fileFoundAndMarked = false;
+        if (submission.getFiles() != null) {
+            for (FileUpload file : submission.getFiles()) {
+                if (file.getId().equals(fileIdForCopyEditing)) {
+                    file.setCopyEditingFile(true); // Mark this file for copy-editing
+                    fileFoundAndMarked = true;
+                } else {
+                    file.setCopyEditingFile(false); // Unmark any other files
+                }
+                // Ensure review file flag is false for all files here, as we are in copy-editing phase
+                file.setReviewFile(false);
+            }
+        }
+
+        if (!fileFoundAndMarked) {
+            throw new SubmissionRequestException("File with ID: " + fileIdForCopyEditing + " not found within submission ID: " + submissionId);
+        }
+
+        submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
         return submissionRepository.save(submission);
     }
 

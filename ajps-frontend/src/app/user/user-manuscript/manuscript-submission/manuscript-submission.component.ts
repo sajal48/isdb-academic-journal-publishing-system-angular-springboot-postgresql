@@ -47,6 +47,10 @@ export class ManuscriptSubmissionComponent implements OnInit {
   selectedFileForReviewId: number | null = null;
   filesForReview: SubmissionFile[] = [];
 
+  // --- NEW PROPERTIES FOR COPY EDITING FILE SELECTION ---
+  selectedFileForCopyEditingId: number | null = null;
+  filesForCopyEditing: SubmissionFile[] = [];
+
   // Expose the enum to the template for dropdown options
   DiscussionOrigin = DiscussionOrigin;
 
@@ -322,29 +326,48 @@ export class ManuscriptSubmissionComponent implements OnInit {
   }
 
 
+  // --- MODIFIED METHOD: ACCEPT AND SKIP REVIEW ---
   private _acceptAndSkipReview(): void {
     if (this.manuscript && this.manuscript.id) {
-      this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'UNDER_REVIEW').subscribe({
+      // Call the dedicated service method for "accept and skip review"
+      this.manuscriptService.acceptAndSkipReview(Number(this.manuscript.id)).subscribe({
         next: (response) => {
-          this.userToastNotificationService.showToast('Success', 'Manuscript accepted and review skipped!', 'success');
-          // Update local status after successful backend update
-          if (this.manuscript.status) {
-            this.manuscript.status.submission = 'Accepted';
-            this.manuscript.status.review = 'Skipped';
-            this.manuscript.status.copyEditing = 'In Progress'; // Transition to copy editing
+          console.log('Accept and Skip Review response:', response);
+          this.userToastNotificationService.showToast('Success', response.message || 'Manuscript accepted and review skipped!', 'success');
+
+          // Update local manuscript object based on backend response
+          if (response.data && response.data.newStatus) {
+            this.manuscript.submissionStatus = response.data.newStatus; // Should be COPY_EDITING
+            if (this.manuscript.status) {
+              this.manuscript.status.submission = 'Accepted'; // Or status from backend
+              this.manuscript.status.review = 'Skipped';
+              this.manuscript.status.copyEditing = 'In Progress';
+            }
+            // this.manuscript.isEditable = false; // As per backend logic
+          } else {
+            // Fallback if backend response doesn't explicitly contain newStatus in data
+            this.manuscript.submissionStatus = 'COPY_EDITING';
+            if (this.manuscript.status) {
+              this.manuscript.status.submission = 'Accepted';
+              this.manuscript.status.review = 'Skipped';
+              this.manuscript.status.copyEditing = 'In Progress';
+            }
+            // this.manuscript.isEditable = false;
           }
-            document.location.reload();
+          // No need for document.location.reload() if UI is updated dynamically
+          // If you have a separate route for copy-editing, you might navigate:
+          // this.router.navigate([`/user/manuscript/${this.manuscript.id}/copy-editing`]);
         },
         error: (err) => {
           console.error('Error accepting and skipping review:', err);
-          this.userToastNotificationService.showToast('Error', 'Failed to accept and skip review: ' + (err.error?.message || 'Server error.'), 'danger');
+          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to accept and skip review.', 'danger');
         }
       });
     } else {
       this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot accept and skip review.', 'warning');
     }
   }
-
+  
   private _declineSubmission(): void {
     if (this.manuscript && this.manuscript.id) {
       this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'REJECTED').subscribe({
@@ -388,4 +411,75 @@ export class ManuscriptSubmissionComponent implements OnInit {
       this.userToastNotificationService.showToast('Warning', 'Please enter a participant name.', 'warning');
     }
   }
+
+  // --- NEW METHOD: Open Select File for Copy Editing Modal ---
+  openSelectCopyEditingFileModal(): void {
+    if (!this.manuscript || !this.manuscript.files || this.manuscript.files.length === 0) {
+      this.userToastNotificationService.showToast('Info', 'No submission files available to select for copy-editing.', 'info');
+      return;
+    }
+    this.selectedFileForCopyEditingId = null; // Reset selection
+    this.filesForCopyEditing = this.manuscript.files; // Populate files for the dropdown
+
+    const selectCopyEditingFileModal = new bootstrap.Modal(document.getElementById('selectCopyEditingFileModal'));
+    selectCopyEditingFileModal.show();
+  }
+
+  // --- MODIFIED METHOD: Confirm Select File for Copy Editing and Update Status ---
+  confirmSelectCopyEditingFile(): void {
+    if (this.selectedFileForCopyEditingId && this.manuscript && this.manuscript.id) {
+      // this.userToastNotificationService.showToast('Info', 'Selecting file for copy-editing...', 'info');
+
+      // Step 1: Select the file for copy-editing
+      this.manuscriptService.selectFileForCopyEditing(Number(this.manuscript.id), this.selectedFileForCopyEditingId).subscribe({
+        next: (fileResponse) => {
+          console.log('File selected for copy-editing response:', fileResponse);
+          this.userToastNotificationService.showToast('Success', fileResponse.message || 'File marked for copy-editing!', 'success');
+
+          // Update local file status (assuming backend response confirms this)
+          this.manuscript.files = this.manuscript.files?.map(file => ({
+              ...file,
+              isCopyEditingFile: file.id === this.selectedFileForCopyEditingId,
+              isReviewFile: false // Ensure review file is un-marked
+          })) || [];
+
+          // Step 2: Update submission status to PUBLICATION
+          // this.userToastNotificationService.showToast('Info', 'Updating submission status to Publication...', 'info');
+          this.manuscriptService.updateSubmissionStatus(Number(this.manuscript.id), 'COPY_EDITING').subscribe({
+            next: (statusResponse) => {
+              console.log('Status update to COPY_EDITING response:', statusResponse);
+              // this.userToastNotificationService.showToast('Success', statusResponse.message || 'Submission moved to Publication!', 'success');
+
+              // Update local manuscript status
+              if (statusResponse.data && statusResponse.data.submissionStatus) {
+                this.manuscript.submissionStatus = statusResponse.data.submissionStatus;
+                // this.manuscript.isEditable = statusResponse.data.editable; // Assuming this is also in status update response
+              } else {
+                this.manuscript.submissionStatus = 'COPY_EDITING';
+                // You might need to make another API call to get the updated 'isEditable' status
+              }
+
+              const modal = bootstrap.Modal.getInstance(document.getElementById('selectCopyEditingFileModal'));
+              if (modal) {
+                modal.hide();
+              }
+
+              this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+            },
+            error: (statusError) => {
+              console.error('Error updating status to COPY_EDITING:', statusError);
+              this.userToastNotificationService.showToast('Error', statusError.error?.message || 'Failed to update status to Publication.', 'danger');
+            }
+          });
+        },
+        error: (fileError) => {
+          console.error('Error selecting file for copy-editing:', fileError);
+          this.userToastNotificationService.showToast('Error', fileError.error?.message || 'Failed to select file for copy-editing.', 'danger');
+        }
+      });
+    } else {
+      this.userToastNotificationService.showToast('Warning', 'Please select a file to mark for copy-editing.', 'warning');
+    }
+  }
+
 }

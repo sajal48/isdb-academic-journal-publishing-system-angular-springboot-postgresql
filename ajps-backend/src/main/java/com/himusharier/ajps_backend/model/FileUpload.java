@@ -39,6 +39,9 @@ public class FileUpload {
     @Column(nullable = false)
     private boolean isReviewFile = false;
 
+    @Column(nullable = false)
+    private boolean isCopyEditingFile = false;
+
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
     @JsonBackReference

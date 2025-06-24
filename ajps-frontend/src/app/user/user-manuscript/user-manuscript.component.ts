@@ -70,6 +70,8 @@ export interface SubmissionFile {
   url: string;
   size: string; // Or number, depending on how you receive it from the backend
   storedName?: string; // Optional, if your backend provides it
+  isReviewFile?: boolean; // Existing
+  isCopyEditingFile?: boolean; 
 }
 
 export enum DiscussionOrigin {
