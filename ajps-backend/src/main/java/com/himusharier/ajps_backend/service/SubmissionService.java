@@ -1,7 +1,9 @@
+// src/main/java/com/himusharier/ajps_backend/service/SubmissionService.java
 package com.himusharier.ajps_backend.service;
 
 import com.himusharier.ajps_backend.constants.FileUploadOrigin;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
+import com.himusharier.ajps_backend.dto.response.submission.*; // Import new DTOs
 import com.himusharier.ajps_backend.dto.submission.*;
 import com.himusharier.ajps_backend.exception.SubmissionRequestException;
 import com.himusharier.ajps_backend.model.*;
@@ -48,16 +50,83 @@ public class SubmissionService {
         this.journalRepository = journalRepository;
     }
 
+    // Existing method to return raw Submission entity
     public Submission returnSubmissionDetails(Profile profile, Long submissionId) {
+        // Using findByIdAndProfile ensures the submission belongs to the user
         Optional<Submission> optionalSubmission = submissionRepository.findByIdAndProfile(submissionId, profile);
 
-        if (optionalSubmission.isPresent()) {
-            return optionalSubmission.get();
+        // Crucial for lazy loading: explicitly initialize collections if you return the entity directly
+        // If using DTOs as suggested, the mapping process will implicitly initialize them.
+        optionalSubmission.ifPresent(submission -> {
+            submission.getAuthors().size(); // Forces initialization
+            submission.getFiles().size();
+            submission.getSubmissionReviewers().size();
+            // submission.getJournal().getJournalName(); // Also accesses related entity
+        });
 
-        } else {
-            throw new SubmissionRequestException("Submission not found for given user and submission ID.");
-        }
+        return optionalSubmission.orElseThrow(() ->
+                new SubmissionRequestException("Submission not found for given user and submission ID."));
     }
+
+    // New method to return SubmissionDetailsResponse DTO
+    @Transactional(readOnly = true) // Ensure collections are accessible within the transaction
+    public SubmissionDetailsResponse getSubmissionDetailsAsDto(Profile profile, Long submissionId) {
+        Submission submission = returnSubmissionDetails(profile, submissionId); // Fetches and initializes
+
+        // Map the Submission entity to the SubmissionDetailsResponse DTO
+        return SubmissionDetailsResponse.builder()
+                .id(submission.getId())
+                .submissionNumber(submission.getSubmissionNumber())
+                .journal(submission.getJournal() != null ?
+                        JournalResponse.builder()
+                                .id(submission.getJournal().getId())
+                                .journalName(submission.getJournal().getJournalName())
+                                .build() : null)
+                .manuscriptTitle(submission.getManuscriptTitle())
+                .manuscriptCategory(submission.getManuscriptCategory())
+                .abstractContent(submission.getAbstractContent())
+                .manuscriptKeywords(submission.getManuscriptKeywords())
+                .comments(submission.getComments())
+                .submissionConfirmation(submission.isSubmissionConfirmation())
+                .submissionStatus(submission.getSubmissionStatus())
+                .createdAt(submission.getCreatedAt())
+                .submittedAt(submission.getSubmittedAt())
+                .updatedAt(submission.getUpdatedAt())
+                .isPaymentDue(submission.isPaymentDue())
+                .completedSteps(submission.getCompletedSteps())
+                .isEditable(submission.isEditable())
+                // Map collections to their respective DTOs
+                .authors(submission.getAuthors() != null ? submission.getAuthors().stream()
+                        .map(author -> AuthorResponse.builder()
+                                .id(author.getId())
+                                .name(author.getName())
+                                .email(author.getEmail())
+                                .institution(author.getInstitution())
+                                .corresponding(author.isCorresponding())
+                                .build())
+                        .collect(Collectors.toList()) : List.of())
+                .files(submission.getFiles() != null ? submission.getFiles().stream()
+                        .map(file -> FileUploadResponse.builder()
+                                .id(file.getId())
+                                .fileOrigin(file.getFileOrigin().name()) // Assuming fileOrigin enum needs to be string
+                                .storedName(file.getStoredName())
+                                .originalName(file.getOriginalName())
+                                .size(file.getSize())
+                                .type(file.getType())
+                                .fileUrl(file.getFileUrl())
+                                .build())
+                        .collect(Collectors.toList()) : List.of())
+                .submissionReviewers(submission.getSubmissionReviewers() != null ? submission.getSubmissionReviewers().stream()
+                        .map(reviewer -> SubmissionReviewerResponse.builder()
+                                .id(reviewer.getId())
+                                .name(reviewer.getName())
+                                .email(reviewer.getEmail())
+                                .institution(reviewer.getInstitution())
+                                .build())
+                        .collect(Collectors.toList()) : List.of())
+                .build();
+    }
+
 
     public Submission returnSubmission(Long submissionId) {
         Optional<Submission> optionalSubmission = submissionRepository.findById(submissionId);
@@ -82,6 +151,7 @@ public class SubmissionService {
                 .manuscriptCategory(request.manuscriptCategory())
                 .abstractContent(request.abstractContent())
                 .manuscriptKeywords(request.manuscriptKeywords())
+                .comments("") // Default empty comments
                 .completedSteps(request.completedSteps())
                 .submissionConfirmation(false) // Default value
                 .submissionStatus(SubmissionStatus.SAVED) // Default status
@@ -106,45 +176,6 @@ public class SubmissionService {
         submission.setCompletedSteps(request.completedSteps());
         return submissionRepository.save(submission);
     }
-
-    /*@Transactional
-    public Long saveManuscriptDetails(ManuscriptDetailsRequest request, Profile profile) {
-        Submission manuscriptDetails = Submission.builder()
-                .journalName(request.journalName())
-                .manuscriptTitle(request.manuscriptTitle())
-                .manuscriptCategory(request.manuscriptCategory())
-                .abstractContent(request.abstractContent())
-                .manuscriptKeywords(request.manuscriptKeywords())
-                .completedSteps(request.completedSteps())
-                .submissionStatus(SubmissionStatus.SAVED)
-                .isEditable(true)
-                .profile(profile)
-                .build();
-
-        Submission savedSubmission = submissionRepository.save(manuscriptDetails);
-        return savedSubmission.getId();
-    }
-
-    public Submission updateManuscriptDetails(ManuscriptDetailsRequest updatedSubmission) {
-        Long submissionId = updatedSubmission.submissionId();
-        if (submissionId == null) {
-            throw new IllegalArgumentException("Submission ID must not be null for update.");
-        }
-
-        Submission existingSubmission = submissionRepository.findById(submissionId)
-                .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + submissionId));
-
-        // Update fields
-        existingSubmission.setJournalName(updatedSubmission.journalName());
-        existingSubmission.setManuscriptTitle(updatedSubmission.manuscriptTitle());
-        existingSubmission.setManuscriptCategory(updatedSubmission.manuscriptCategory());
-        existingSubmission.setAbstractContent(updatedSubmission.abstractContent());
-        existingSubmission.setManuscriptKeywords(updatedSubmission.manuscriptKeywords());
-        existingSubmission.setCompletedSteps(updatedSubmission.completedSteps());
-
-//        Submission updateSubmission = submissionRepository.save(existingSubmission);
-        return submissionRepository.save(existingSubmission);
-    }*/
 
     @Transactional
     public void updateCompletedSteps(Long submissionId, List<String> completedSteps) {
@@ -173,9 +204,6 @@ public class SubmissionService {
         submissionRepository.save(existingSubmission);
     }
 
-
-
-
     @Transactional
     public List<Author> saveAuthors(List<AuthorDTO> authors, Submission submission) {
         List<Author> savedAuthors = new ArrayList<>();
@@ -199,10 +227,6 @@ public class SubmissionService {
         authorRepository.deleteBySubmissionIdAndId(submissionId, authorId);
     }
 
-
-
-
-
     public FileUpload saveFile(Long submissionId, MultipartFile file) throws IOException {
         if (file.isEmpty() || file.getOriginalFilename() == null) {
             throw new IOException("Invalid file: file is empty or has no original name");
@@ -224,7 +248,6 @@ public class SubmissionService {
         Submission existingSubmission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found with ID: " + submissionId));
 
-
         FileUpload fileUpload = FileUpload.builder()
                 .submission(existingSubmission)
                 .fileOrigin(FileUploadOrigin.SUBMISSION)
@@ -232,7 +255,6 @@ public class SubmissionService {
                 .storedName(storedName)
                 .type(file.getContentType())
                 .size(file.getSize())
-//                .path(filePath.toString())
                 .fileUrl(fullFileUrl)
                 .build();
 
@@ -240,37 +262,22 @@ public class SubmissionService {
     }
 
     public void deleteFile(Long submissionId, Long fileId) throws IOException {
-        List<FileUpload> files = fileUploadRepository.findBySubmissionId(submissionId);
-        for (FileUpload file : files) {
-            if (file.getId().equals(fileId)) {
-                Path uploadPath = Paths.get(uploadDirectory);
-                Path filePath = uploadPath.resolve(file.getStoredName());
-                Files.deleteIfExists(Paths.get(filePath.toString()));
-                fileUploadRepository.delete(file);
-                break;
-            }
+        // Fetch the file to get its stored name for physical deletion
+        FileUpload fileToDelete = fileUploadRepository.findById(fileId)
+                .orElseThrow(() -> new SubmissionRequestException("File not found with ID: " + fileId));
+
+        // Ensure the file belongs to the correct submission before deleting
+        if (!fileToDelete.getSubmission().getId().equals(submissionId)) {
+            throw new SubmissionRequestException("File does not belong to the specified submission.");
         }
+
+        Path uploadPath = Paths.get(uploadDirectory);
+        Path filePath = uploadPath.resolve(fileToDelete.getStoredName());
+        Files.deleteIfExists(filePath); // Physically delete the file
+
+        fileUploadRepository.delete(fileToDelete); // Delete from database
     }
 
-
-
-
-
-
-    /*public void saveReviewers(ReviewerSubmissionRequest request) {
-        Submission submission = submissionRepository.findById(request.submissionId())
-                .orElseThrow(() -> new IllegalArgumentException("Submission not found"));
-
-        for (ReviewerDTO dto : request.reviewers()) {
-            Reviewer reviewer = new Reviewer(
-                    dto.name(),
-                    dto.email(),
-                    dto.institution(),
-                    submission
-            );
-            reviewerRepository.save(reviewer);
-        }
-    }*/
 
     public List<SubmissionReviewer> saveReviewers(ReviewerSubmissionRequest request) {
         Submission submission = submissionRepository.findById(request.submissionId())
@@ -291,13 +298,11 @@ public class SubmissionService {
         return savedSubmissionReviewers;
     }
 
-
-
     public List<ReviewerDTO> getReviewersBySubmissionId(Long submissionId) {
         return submissionReviewerRepository.findBySubmissionId(submissionId)
                 .stream()
                 .map(r -> new ReviewerDTO(
-                        r.getId(),
+                        r.getId(), // Assuming ReviewerDTO has an ID field now
                         r.getName(),
                         r.getEmail(),
                         r.getInstitution()
@@ -309,11 +314,6 @@ public class SubmissionService {
     public void removeReviewer(Long submissionId, Long reviewerId) {
         submissionReviewerRepository.deleteByIdAndSubmissionId(reviewerId, submissionId);
     }
-
-
-
-
-
 
     @Transactional
     public Submission saveAdditionalInformation(AdditionalInformationRequest request) {
@@ -328,9 +328,6 @@ public class SubmissionService {
 
         return submissionRepository.save(submission);
     }
-
-
-
 
     @Transactional
     public Submission submitManuscript(SubmitManuscriptRequest request) {
@@ -353,10 +350,6 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
-
-
-
-
     @Transactional
     public void deleteSubmission(Long submissionId) {
         // First delete associated files physically from storage
@@ -367,14 +360,12 @@ public class SubmissionService {
                 Path filePath = uploadPath.resolve(file.getStoredName());
                 Files.deleteIfExists(filePath);
             } catch (IOException e) {
-                throw new SubmissionRequestException("Failed to delete file: " + file.getOriginalName());
+                // Log the exception, but don't prevent DB deletion if file system is the only issue
+                System.err.println("Failed to delete physical file: " + file.getOriginalName() + " - " + e.getMessage());
             }
         }
 
-        // The cascade will handle authors, files, and reviewers deletion
+        // The cascade will handle authors, files, and reviewers deletion from DB
         submissionRepository.deleteById(submissionId);
     }
-
-
-
 }

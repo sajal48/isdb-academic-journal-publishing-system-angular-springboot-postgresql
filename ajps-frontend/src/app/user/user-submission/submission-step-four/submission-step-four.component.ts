@@ -52,8 +52,8 @@ export class SubmissionStepFourComponent implements OnInit {
     this.userSubmissionDetailsService.getManuscriptDetailsBySubmissionId(this.submissionId)
       .subscribe({
         next: (response) => {
-          if (response.code === 200 && Array.isArray(response.data.reviewers)) {
-            this.reviewers = response.data.reviewers.map((reviewer: any) => ({
+          if (response.code === 200 && Array.isArray(response.data.submissionReviewers)) {
+            this.reviewers = response.data.submissionReviewers.map((reviewer: any) => ({
               id: reviewer.id || 0,
               name: reviewer.name || '',
               email: reviewer.email || '',

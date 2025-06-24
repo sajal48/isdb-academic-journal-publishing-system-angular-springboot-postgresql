@@ -1,14 +1,10 @@
-<!-- Main Content with Two Columns -->
-<div class="row">
-    <!-- Left Column (Existing Content) -->
+<div class="row" *ngIf="manuscript">
     <div class="col-md-9">
-        <!-- Submission Files Section -->
         <div class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Submission Files</h5>
                 <div>
-                    <button class="btn btn-sm btn-outline-secondary" (click)="uploadFile()">Upload
-                        File</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#uploadFileModal">Upload File</button>
                 </div>
             </div>
             <div class="card-body">
@@ -25,19 +21,22 @@
                         </button>
                     </li>
                 </ul>
+                <div *ngIf="!manuscript.files || manuscript.files.length === 0" class="text-muted mt-3">
+                    No submission files uploaded yet.
+                </div>
             </div>
-
         </div>
 
-        <!-- Pre-Review Discussions Section -->
         <div class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Pre-Review Discussions</h5>
-                <button class="btn btn-sm btn-outline-secondary" (click)="addDiscussion()">Add
-                    discussion</button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="addDiscussion()">Add discussion</button>
             </div>
             <div class="card-body">
-                <table class="table table-striped">
+                <div *ngIf="!manuscript.discussions || manuscript.discussions.length === 0" class="text-muted mb-3">
+                    No discussions yet.
+                </div>
+                <table class="table table-striped" *ngIf="manuscript.discussions && manuscript.discussions.length > 0">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -47,7 +46,11 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let discussion of manuscript.discussions">
-                            <td>{{ discussion.name }}</td>
+                            <td>
+                                <a href="#" (click)="viewDiscussionDetails(discussion); $event.preventDefault();" class="text-decoration-none">
+                                    {{ discussion.name }}
+                                </a>
+                            </td>
                             <td>{{ discussion.from }}</td>
                             <td>{{ discussion.lastReply | date:'MMM/yy' }}</td>
                         </tr>
@@ -57,22 +60,15 @@
         </div>
     </div>
 
-    <!-- Right Column (Action Buttons and Participants) -->
     <div class="col-md-3">
-        <!-- Action Buttons Section -->
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-primary" style="font-size: 14px;" (click)="sendToReview()">Send to
-                    Review</button>
-                <button class="btn btn-secondary" style="font-size: 14px;"
-                    (click)="acceptAndSkipReview()">Accept and Skip
-                    Review</button>
-                <button class="btn btn-danger" style="font-size: 14px;"
-                    (click)="declineSubmission()">Decline Submission</button>
+                <button class="btn btn-primary" style="font-size: 14px;" (click)="openConfirmationModal('sendToReview')">Send to Review</button>
+                <button class="btn btn-secondary" style="font-size: 14px;" (click)="openConfirmationModal('acceptAndSkipReview')">Accept and Skip Review</button>
+                <button class="btn btn-danger" style="font-size: 14px;" (click)="openConfirmationModal('declineSubmission')">Decline Submission</button>
             </div>
         </div>
 
-        <!-- Participants Section -->
         <div class="card">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fs-6">Participants</h5>
@@ -89,7 +85,126 @@
                     </li>
                 </ul>
             </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="uploadFileModal" tabindex="-1" aria-labelledby="uploadFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadFileModalLabel">Upload Submission File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="formFile" class="form-label">Select file to upload</label>
+                    <input class="form-control" type="file" id="formFile" (change)="onFileSelected($event)">
+                </div>
+                <div *ngIf="selectedFile">
+                    Selected file: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="uploadFile()" [disabled]="!selectedFile">Upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addDiscussionModal" tabindex="-1" aria-labelledby="addDiscussionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDiscussionModalLabel">Add New Discussion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="discussionTitle" class="form-label">Discussion Title</label>
+                    <input type="text" class="form-control" id="discussionTitle" [(ngModel)]="newDiscussionTitle" required>
+                </div>
+                <div class="mb-3">
+                    <label for="discussionMessage" class="form-label">Message</label>
+                    <textarea class="form-control" id="discussionMessage" rows="3" [(ngModel)]="newDiscussionMessage" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="confirmAddDiscussion()" [disabled]="!newDiscussionTitle || !newDiscussionMessage">Add Discussion</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmActionButton">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="assignParticipantModal" tabindex="-1" aria-labelledby="assignParticipantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignParticipantModalLabel">Assign Participant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body ">
+                <div class="mb-3">
+                    <label for="participantName" class="form-label">Participant Name</label>
+                    <input type="text" class="form-control" id="participantName" [(ngModel)]="assignedParticipantName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="confirmAssignParticipant()" [disabled]="!assignedParticipantName">Assign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="discussionDetailModal" tabindex="-1" aria-labelledby="discussionDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="discussionDetailModalLabel">Discussion: {{ selectedDiscussion?.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="selectedDiscussion">
+                    <p><strong>From:</strong> {{ selectedDiscussion.from }}</p>
+                    <p><strong>Last Reply:</strong> {{ selectedDiscussion.lastReply | date:'medium' }}</p>
+                    <hr>
+                    <h6>Messages:</h6>
+                    <div *ngIf="selectedDiscussion.messages && selectedDiscussion.messages.length > 0">
+                        <div *ngFor="let message of selectedDiscussion.messages" class="card mb-2">
+                            <div class="card-body p-2">
+                                <small class="text-muted">{{ message.sender }} on {{ message.date | date:'short' }}</small>
+                                <p class="mb-0">{{ message.text }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="!selectedDiscussion.messages || selectedDiscussion.messages.length === 0" class="text-muted">
+                        No messages in this discussion yet.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public record SubmissionListResponse(
         Long id,
         String journalName,
+        Long submissionNumber,
         String manuscriptTitle,
         String manuscriptCategory,
         SubmissionStatus submissionStatus,

@@ -1,34 +1,31 @@
 <div class="container-fluid">
-    <!-- Manuscript Header -->
-    <div class="mb-4">
-      <div>
-        <p class="mt-2">Manuscript ID: {{ manuscript.id }} | Submitted on: {{ manuscript.submissionDate | date:'mediumDate' }}</p>
-        <h4>{{ manuscript.title }}</h4>
-        <h6 class="text-muted">{{ manuscript.journalName }}</h6>
-      </div>
+    <div class="mb-4" *ngIf="manuscript">
+        <div>
+            <p class="mt-2">Manuscript ID: {{ manuscript.id }} | Submitted on: {{ manuscript.submissionDate | date:'mediumDate' }}</p>
+            <h4>{{ manuscript.title }}</h4>
+            <h6 class="text-muted">{{ manuscript.journalName }}</h6>
+        </div>
     </div>
 
-    <!-- Navigation Buttons (Tab Style) -->
-    <div class="mb-4">
-      <ul class="nav nav-tabs-custom" role="tablist">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="submission" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Submission</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="review" routerLinkActive="active">Review</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="copyediting" routerLinkActive="active">Copyediting</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="production" routerLinkActive="active">Production</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="publication" routerLinkActive="active">Publication</a>
-        </li>
-      </ul>
+    <div class="mb-4" *ngIf="manuscript">
+        <ul class="nav nav-tabs-custom" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="submission" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Submission</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="review" routerLinkActive="active">Review</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="copyediting" routerLinkActive="active">Copyediting</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="production" routerLinkActive="active">Production</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="publication" routerLinkActive="active">Publication</a>
+            </li>
+        </ul>
     </div>
 
-    <!-- Content (Default to Submission) -->
     <router-outlet></router-outlet>
-  </div>
+</div>

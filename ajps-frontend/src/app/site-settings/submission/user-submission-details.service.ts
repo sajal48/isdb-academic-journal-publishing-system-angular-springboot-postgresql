@@ -49,7 +49,6 @@ export class UserSubmissionDetailsService {
 
   // step-1: manuscript details:
   saveManuscriptDetails(payload: any): Observable<any> {
-    debugger
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript-details/save`, payload, { headers });
   }

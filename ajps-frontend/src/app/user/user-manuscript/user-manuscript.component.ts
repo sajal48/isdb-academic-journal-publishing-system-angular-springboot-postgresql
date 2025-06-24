@@ -1,19 +1,102 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink, RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, RouterLink, RouterModule } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { UserManuscriptService } from '../../site-settings/manuscript/user-manuscript.service';
+import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
+
+// Define an interface for Manuscript data for better type safety
+// Keep this here or move it to a shared 'models' file if you prefer
+export interface Manuscript {
+  id: string; // Keep internal ID
+  submissionNumber?: number; // <-- Add submission number to interface
+  title: string;
+  journalName: string;
+  submissionDate: Date;
+  author?: string;
+  abstract?: string;
+  files?: { name: string; url: string; size: string }[];
+  status?: {
+    submission: string;
+    review: string;
+    copyEditing: string;
+    production: string;
+    publication: string;
+  };
+  review?: {
+    startDate: Date;
+    reviewers: { name: string; status: string; comments: string }[];
+    decision: string;
+  };
+  copyEditing?: {
+    startDate: Date;
+    editor: string;
+    changes: { description: string; status: string }[];
+  };
+  production?: {
+    startDate: Date;
+    typesetting: string;
+    proofs: { name: string; url: string; sentDate: Date }[];
+  };
+  publication?: {
+    status: string;
+    date: Date | null;
+    doi: string;
+    volumeIssue: string;
+    accessType: string;
+    url: string;
+  };
+  discussions?: {
+    name: string;
+    from: string;
+    lastReply: Date;
+    replies: number;
+    closed: boolean;
+    messages?: { sender: string; text: string; date: Date }[];
+  }[];
+}
 
 @Component({
   selector: 'app-user-manuscript',
   imports: [CommonModule, RouterModule, RouterLink],
   templateUrl: './user-manuscript.component.html',
-  styleUrl: './user-manuscript.component.css'
+  styleUrl: './user-manuscript.component.css',
+  standalone: true
 })
-export class UserManuscriptComponent {
-  manuscript = {
-    id: 'MS12345',
-    title: 'Monitoring the Seasonal Distribution and Variation of Sea Surface Temperature and Chlorophyll Concentration in Bay of Bengal using MODIS Satellite Images',
-    journalName: 'Journal of Modern Science',
-    submissionDate: new Date('2025-05-01'),
-  }
+export class UserManuscriptComponent implements OnInit {
+  manuscript!: Manuscript; // Use definite assignment assertion if you initialize in ngOnInit
 
+  // IMPORTANT: Replace with a dynamic userId from authentication or user session
+  // For now, hardcode a placeholder or get from route if you have a /user/:userId/manuscript/:manuscriptId route
+  private currentUserId: number = 0; // <<--- SET A VALID USER ID HERE (e.g., from logged-in user)
+
+  constructor(
+    private route: ActivatedRoute, 
+    private manuscriptService: UserManuscriptService,
+    private authLoginRegisterService: AuthLoginRegisterService
+  ) {}
+
+  ngOnInit(): void {
+    this.currentUserId = this.authLoginRegisterService.getUserID();
+
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const manuscriptId = params.get('manuscriptId');
+        if (manuscriptId && this.currentUserId) {
+          // Pass both userId and manuscriptId to the service
+          return this.manuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
+        }
+        return of(undefined);
+      })
+    ).subscribe(manuscript => {
+      if (manuscript) {
+        this.manuscript = manuscript;
+        console.log('Manuscript loaded:', this.manuscript);
+      } else {
+        console.error('Manuscript not found or ID/User ID missing.');
+        // Optionally navigate to an error page or show a message
+      }
+    });
+  }
 }
