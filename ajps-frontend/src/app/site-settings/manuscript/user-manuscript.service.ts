@@ -5,6 +5,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/internal/operators/map';
 import { catchError } from 'rxjs/internal/operators/catchError';
+import { throwError } from 'rxjs/internal/observable/throwError';
 
 @Injectable({
   providedIn: 'root'
@@ -30,43 +31,46 @@ export class UserManuscriptService {
           // Map backend data to your frontend Manuscript interface
           const manuscript: Manuscript = {
             id: backendData.id,
+            submissionNumber: backendData.submissionNumber,
             title: backendData.manuscriptTitle,
-            journalName: backendData.journal ? backendData.journal.journalName : 'N/A', // Handle nested journal object
-            submissionDate: new Date(backendData.submittedAt || backendData.createdAt), // Use submittedAt, fallback to createdAt
-            author: backendData.authors && backendData.authors.length > 0 ? backendData.authors[0].name : 'N/A', // Get first author's name
+            journalName: backendData.journal ? backendData.journal.journalName : 'N/A',
+            submissionDate: new Date(backendData.submittedAt || backendData.createdAt),
+            author: backendData.authors && backendData.authors.length > 0 ? backendData.authors[0].name : 'N/A',
             abstract: backendData.abstractContent,
             files: backendData.files ? backendData.files.map((file: any) => ({
-              name: file.originalName, // Backend has originalName
-              url: file.fileUrl,       // Backend has fileUrl
-              size: (file.size / 1024).toFixed(2) // Convert bytes to KB and format
+              id: file.id, // Include file ID
+              name: file.originalName,
+              url: file.fileUrl,
+              size: (file.size / 1024).toFixed(2), // Convert bytes to KB
+              storedName: file.storedName // Might be useful for debugging or specific backend calls
             })) : [],
             status: {
               submission: backendData.submissionStatus,
-              review: 'Not Started', // Placeholder or derive from backend status if available
-              copyEditing: 'Not Started', // Placeholder
-              production: 'Not Started', // Placeholder
-              publication: 'Not Published' // Placeholder
+              review: 'Not Started',
+              copyEditing: 'Not Started',
+              production: 'Not Started',
+              publication: 'Not Published'
             },
-            review: { // Placeholder for now; map real data when available from backend
+            review: {
               startDate: new Date(),
               reviewers: backendData.submissionReviewers ? backendData.submissionReviewers.map((reviewer: any) => ({
                 name: reviewer.name,
-                status: 'Pending', // Placeholder
-                comments: '' // Placeholder
+                status: 'Pending',
+                comments: ''
               })) : [],
               decision: ''
             },
-            copyEditing: { // Placeholder
+            copyEditing: {
               startDate: new Date(),
               editor: 'N/A',
               changes: []
             },
-            production: { // Placeholder
+            production: {
               startDate: new Date(),
               typesetting: 'N/A',
               proofs: []
             },
-            publication: { // Placeholder
+            publication: {
               status: 'Not Published',
               date: null,
               doi: '',
@@ -74,7 +78,7 @@ export class UserManuscriptService {
               accessType: 'Open Access',
               url: ''
             },
-            discussions: [] // Assuming discussions will be fetched separately or integrated later
+            discussions: []
           };
           return manuscript;
         } else {
@@ -88,4 +92,31 @@ export class UserManuscriptService {
       })
     );
   }
+
+  // --- NEW: Upload File Method ---
+uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('fileOrigin', 'PRE_REVIEW');
+  formData.append('submissionId', submissionId.toString()); // Backend expects Long
+
+  return this.http.post<any>(`${this.baseUrl}/manuscript-files/upload`, formData).pipe(
+    catchError(error => {
+      console.error('Error uploading file:', error);
+      return throwError(() => error); // Corrected
+    })
+  );
+}
+
+// --- NEW: Delete File Method ---
+deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
+  return this.http.delete<any>(`${this.baseUrl}/manuscript-files/remove/${submissionId}/${fileId}`).pipe(
+    catchError(error => {
+      console.error('Error deleting file:', error);
+      return throwError(() => error); // Corrected
+    })
+  );
+}
+
+
 }

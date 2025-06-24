@@ -71,6 +71,7 @@ export class UserSubmissionDetailsService {
   uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
+  formData.append('fileOrigin', 'SUBMISSION');
     formData.append('submissionId', submissionId.toString());
     return this.http.post(`${apiConfig.apiBaseUrl}/user/submission/manuscript-files/upload`, formData);
   }

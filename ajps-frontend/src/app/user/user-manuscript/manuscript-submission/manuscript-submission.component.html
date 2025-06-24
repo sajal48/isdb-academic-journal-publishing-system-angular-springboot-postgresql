@@ -98,9 +98,9 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="formFile" class="form-label">Select file to upload</label>
-                    <input class="form-control" type="file" id="formFile" (change)="onFileSelected($event)">
-                </div>
+  <label for="manuscriptFile" class="form-label">Upload Manuscript File</label>
+  <input class="form-control" type="file" id="manuscriptFile" (change)="onFileSelected($event)">
+</div>
                 <div *ngIf="selectedFile">
                     Selected file: {{ selectedFile.name }} ({{ (selectedFile.size / 1024).toFixed(2) }} KB)
                 </div>

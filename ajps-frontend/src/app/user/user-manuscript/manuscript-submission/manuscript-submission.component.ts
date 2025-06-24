@@ -70,31 +70,74 @@ export class ManuscriptSubmissionComponent implements OnInit {
     }
   }
 
+  // --- UPDATED uploadFile method ---
   uploadFile(): void {
     if (this.selectedFile && this.manuscript && this.manuscript.id) {
-      console.log('Uploading file:', this.selectedFile.name);
-      // In a real scenario, you'd send this.selectedFile to a backend upload endpoint
-      // and then update the manuscript.files array with the actual server response.
-      // For now, simulate adding the file:
-      if (!this.manuscript.files) {
-        this.manuscript.files = [];
-      }
-      this.manuscript.files.push({
-        name: this.selectedFile.name,
-        url: URL.createObjectURL(this.selectedFile), // This is a temporary client-side URL
-        size: (this.selectedFile.size / 1024).toFixed(2)
-      });
-      alert('File upload simulated successfully!');
-      this.selectedFile = null;
-      const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
-      if (uploadModal) {
-        uploadModal.hide();
-      }
+      this.manuscriptService.uploadManuscriptFile(Number(this.manuscript.id), this.selectedFile).subscribe(
+        response => {
+          if (response && response.code === 200 && response.data) {
+            console.log('File uploaded successfully:', response.data);
+            alert('File uploaded successfully!');
+            // Add the new file to the manuscript's file list
+            if (!this.manuscript.files) {
+              this.manuscript.files = [];
+            }
+            this.manuscript.files.push({
+              id: response.data.id, // Backend returns the ID
+              name: response.data.originalName,
+              url: response.data.fileUrl,
+              size: (response.data.size / 1024).toFixed(2),
+              storedName: response.data.storedName
+            });
+            this.selectedFile = null; // Clear selected file
+            const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
+            if (uploadModal) {
+              uploadModal.hide();
+            }
+          } else {
+            console.error('Upload response not as expected:', response);
+            alert('File upload failed: Unexpected response from server.');
+          }
+        },
+        error => {
+          console.error('File upload error:', error);
+          alert('File upload failed: ' + (error.error?.message || 'Server error.'));
+        }
+      );
     } else {
       alert('No file selected or manuscript ID is missing.');
     }
   }
 
+  // --- NEW deleteFile method ---
+  deleteFile(fileId: number, fileName: string): void {
+    if (confirm(`Are you sure you want to delete the file "${fileName}"?`)) {
+      if (this.manuscript && this.manuscript.id) {
+        this.manuscriptService.deleteManuscriptFile(Number(this.manuscript.id), fileId).subscribe(
+          response => {
+            if (response && response.code === 200) {
+              console.log('File deleted successfully:', response.message);
+              alert('File deleted successfully!');
+              // Remove the file from the local list
+              if (this.manuscript.files) {
+                this.manuscript.files = this.manuscript.files.filter(f => f.id !== fileId);
+              }
+            } else {
+              console.error('Delete response not as expected:', response);
+              alert('File deletion failed: Unexpected response from server.');
+            }
+          },
+          error => {
+            console.error('File deletion error:', error);
+            alert('File deletion failed: ' + (error.error?.message || 'Server error.'));
+          }
+        );
+      } else {
+        alert('Manuscript ID is missing. Cannot delete file.');
+      }
+    }
+  }
+  
   /*downloadFile(fileUrl: string, fileName: string): void {
     // For real backend files, fileUrl will be the direct URL from the backend
     const link = document.createElement('a');

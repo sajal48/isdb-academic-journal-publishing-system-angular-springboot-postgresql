@@ -227,7 +227,7 @@ public class SubmissionService {
         authorRepository.deleteBySubmissionIdAndId(submissionId, authorId);
     }
 
-    public FileUpload saveFile(Long submissionId, MultipartFile file) throws IOException {
+    public FileUpload saveFile(Long submissionId, String fileOrigin, MultipartFile file) throws IOException {
         if (file.isEmpty() || file.getOriginalFilename() == null) {
             throw new IOException("Invalid file: file is empty or has no original name");
         }
@@ -250,7 +250,7 @@ public class SubmissionService {
 
         FileUpload fileUpload = FileUpload.builder()
                 .submission(existingSubmission)
-                .fileOrigin(FileUploadOrigin.SUBMISSION)
+                .fileOrigin(FileUploadOrigin.valueOf(fileOrigin))
                 .originalName(originalName)
                 .storedName(storedName)
                 .type(file.getContentType())

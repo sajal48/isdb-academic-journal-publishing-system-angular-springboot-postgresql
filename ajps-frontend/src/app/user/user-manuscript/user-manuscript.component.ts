@@ -16,7 +16,7 @@ export interface Manuscript {
   submissionDate: Date;
   author?: string;
   abstract?: string;
-  files?: { name: string; url: string; size: string }[];
+  files?: { id: number; name: string; url: string; size: string; storedName: string }[]; // <--- UPDATED
   status?: {
     submission: string;
     review: string;

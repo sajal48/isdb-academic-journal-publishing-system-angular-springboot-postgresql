@@ -178,10 +178,11 @@ public class SubmissionController {
     @PostMapping("/manuscript-files/upload")
     public ResponseEntity<?> uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("submissionId") Long submissionId
+            @RequestParam("submissionId") Long submissionId,
+            @RequestParam("fileOrigin") String fileOrigin
     ) {
         try {
-            FileUpload savedFile = submissionService.saveFile(submissionId, file);
+            FileUpload savedFile = submissionService.saveFile(submissionId, fileOrigin, file);
             Map<String, Object> data = new HashMap<>();
             data.put("id", savedFile.getId());
             data.put("fileName", savedFile.getStoredName());
