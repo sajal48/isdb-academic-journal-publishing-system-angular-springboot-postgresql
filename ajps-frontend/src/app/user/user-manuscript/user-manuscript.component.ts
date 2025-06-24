@@ -48,6 +48,7 @@ export interface Manuscript {
     url: string;
   };
   discussions?: Discussion[];
+  owner: ManuscriptOwner;
 }
 
 // --- SIMPLIFIED INTERFACE FOR DISCUSSIONS ---
@@ -59,6 +60,11 @@ export interface Discussion {
   title: string;
   content: string; // The single message content
   createdAt: string; // Use string for ISO date from backend
+}
+
+export interface ManuscriptOwner {
+  userId: number;
+  // Add other owner properties if needed, e.g., name: string;
 }
 
 @Component({

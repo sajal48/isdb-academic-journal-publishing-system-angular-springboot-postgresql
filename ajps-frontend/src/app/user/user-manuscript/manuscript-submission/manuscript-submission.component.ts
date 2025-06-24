@@ -28,7 +28,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   selectedDiscussion: Discussion | null = null;
 
-  private currentUserId: number = 0;
+  currentUserId: number = 0;
 
   constructor(
     private route: ActivatedRoute,

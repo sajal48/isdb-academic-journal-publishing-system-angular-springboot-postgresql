@@ -79,7 +79,10 @@ export class UserManuscriptService {
               accessType: 'Open Access',
               url: ''
             },
-            discussions: []
+            discussions: [],
+            owner: {
+              userId: backendData.owner.userId
+            }
           };
           return manuscript;
         } else {

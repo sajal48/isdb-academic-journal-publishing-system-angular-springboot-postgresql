@@ -47,8 +47,8 @@
                     <tbody>
                         <tr *ngFor="let discussion of manuscript.discussions">
                             <td>
-                                <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();" class="text-decoration-none text-dark">
-                                    {{ discussion.title }}
+                                <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();" class="text-decoration-none text-primary">
+                                    <i class="bi bi-chat-dots"></i> {{ discussion.title }}
                                 </a>
                             </td>
                             <td>{{ discussion.creatorName }}</td>
@@ -61,7 +61,7 @@
     </div>
 
     <div class="col-md-3">
-        <div class="card mb-4">
+        <div class="card mb-4" *ngIf="manuscript && currentUserId !== manuscript.owner.userId">
             <div class="card-body d-flex flex-column gap-2">
                 <button class="btn btn-primary" style="font-size: 14px;" (click)="openConfirmationModal('sendToReview')">Send to Review</button>
                 <button class="btn btn-secondary" style="font-size: 14px;" (click)="openConfirmationModal('acceptAndSkipReview')">Accept and Skip Review</button>

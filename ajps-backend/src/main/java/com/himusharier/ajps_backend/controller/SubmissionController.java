@@ -72,6 +72,12 @@ public class SubmissionController {
             responseData.put("journal", journalData); // Return the journal object
             // --- END IMPORTANT CHANGE ---
 
+            Map<String, Object> ownerData = new HashMap<>();
+            if (submissionDetails.getJournal() != null) {
+                ownerData.put("userId", submissionDetails.getProfile().getAuth().getUserId());
+            }
+            responseData.put("owner", ownerData);
+
             responseData.put("manuscriptTitle", submissionDetails.getManuscriptTitle());
             responseData.put("manuscriptCategory", submissionDetails.getManuscriptCategory());
             responseData.put("abstractContent", submissionDetails.getAbstractContent());
