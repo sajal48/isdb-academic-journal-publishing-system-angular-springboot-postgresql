@@ -34,6 +34,7 @@ export class UserManuscriptService {
             title: backendData.manuscriptTitle,
             journalName: backendData.journal ? backendData.journal.journalName : 'N/A',
             submissionDate: new Date(backendData.submittedAt || backendData.createdAt),
+            submissionStatus: backendData.submissionStatus,
             author: backendData.authors && backendData.authors.length > 0 ? backendData.authors[0].name : 'N/A',
             abstract: backendData.abstractContent,
             files: backendData.files ? backendData.files.map((file: any) => ({

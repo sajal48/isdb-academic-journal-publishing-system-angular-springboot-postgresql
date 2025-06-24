@@ -321,7 +321,8 @@ export class ManuscriptSubmissionComponent implements OnInit {
             this.manuscript.status.submission = 'Accepted';
             this.manuscript.status.review = 'Skipped';
             this.manuscript.status.copyEditing = 'In Progress'; // Transition to copy editing
-          }
+          }          
+            document.location.reload();
         },
         error: (err) => {
           console.error('Error accepting and skipping review:', err);
@@ -346,6 +347,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
             this.manuscript.status.production = 'N/A';
             this.manuscript.status.publication = 'N/A';
           }
+            document.location.reload();
         },
         error: (err) => {
           console.error('Error declining submission:', err);
