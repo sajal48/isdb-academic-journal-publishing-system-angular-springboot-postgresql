@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
-import { Manuscript } from '../../user/user-manuscript/user-manuscript.component';
+import { Discussion, Manuscript } from '../../user/user-manuscript/user-manuscript.component';
 import { of } from 'rxjs/internal/observable/of';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/internal/operators/map';
@@ -14,6 +14,7 @@ export class UserManuscriptService {
 
   // Base URL for your Spring Boot backend
   private baseUrl = 'http://localhost:8090/api/user/submission'; // Adjust if your backend runs on a different port or path
+  private discussionUrl = 'http://localhost:8090/api/user/discussion'; // Base URL for discussions
 
   constructor(private http: HttpClient) { } // Inject HttpClient
 
@@ -117,6 +118,48 @@ deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
     })
   );
 }
+
+// --- NEW: Get Discussions for a Submission ---
+  getDiscussionsForSubmission(submissionId: number): Observable<Discussion[]> {
+    return this.http.get<any>(`${this.discussionUrl}/submission/${submissionId}`).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success' && response.data) {
+          return response.data.map((d: any) => ({
+            ...d,
+            createdAt: new Date(d.createdAt) // Convert to Date object
+          }));
+        }
+        console.error('Backend response structure is not as expected for discussions:', response);
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error fetching discussions:', error);
+        return of([]); // Return empty array on error
+      })
+    );
+  }
+
+  // --- NEW: Create New Discussion (Simplified) ---
+  createDiscussion(submissionId: number, userId: number, title: string, content: string): Observable<Discussion> {
+    const body = { title, content }; // Use 'content' for the message
+    // Pass userId as query param, as defined in backend controller
+    return this.http.post<any>(`${this.discussionUrl}/${submissionId}?userId=${userId}`, body).pipe(
+      map(response => {
+        if (response && response.code === 201 && response.status === 'success' && response.data) {
+          const d = response.data;
+          return {
+            ...d,
+            createdAt: new Date(d.createdAt)
+          };
+        }
+        throw new Error('Failed to create discussion: Unexpected response');
+      }),
+      catchError(error => {
+        console.error('Error creating discussion:', error);
+        return throwError(() => new Error(error.error?.message || 'Server error during discussion creation.'));
+      })
+    );
+  }
 
 
 }

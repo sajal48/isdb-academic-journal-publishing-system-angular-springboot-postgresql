@@ -47,14 +47,18 @@ export interface Manuscript {
     accessType: string;
     url: string;
   };
-  discussions?: {
-    name: string;
-    from: string;
-    lastReply: Date;
-    replies: number;
-    closed: boolean;
-    messages?: { sender: string; text: string; date: Date }[];
-  }[];
+  discussions?: Discussion[];
+}
+
+// --- SIMPLIFIED INTERFACE FOR DISCUSSIONS ---
+export interface Discussion {
+  id: number;
+  submissionId: number;
+  creatorId: number;
+  creatorName: string;
+  title: string;
+  content: string; // The single message content
+  createdAt: string; // Use string for ISO date from backend
 }
 
 @Component({

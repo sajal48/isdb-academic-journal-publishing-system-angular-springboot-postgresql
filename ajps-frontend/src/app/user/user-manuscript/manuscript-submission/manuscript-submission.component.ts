@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { Manuscript } from '../user-manuscript.component'; // Adjust path to where Manuscript interface is defined
+import { Discussion, Manuscript } from '../user-manuscript.component';
 import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { HttpClient } from '@angular/common/http';
@@ -26,28 +26,26 @@ export class ManuscriptSubmissionComponent implements OnInit {
   selectedFile: File | null = null;
   assignedParticipantName: string = '';
 
-  selectedDiscussion: any = null; // Can be a more specific interface if needed
+  selectedDiscussion: Discussion | null = null;
 
-  // IMPORTANT: Replace with a dynamic userId from authentication or user session
-  private currentUserId: number = 0; // <<--- SET A VALID USER ID HERE (e.g., from logged-in user)
-
+  private currentUserId: number = 0;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private manuscriptService: UserManuscriptService,
-        private authLoginRegisterService: AuthLoginRegisterService,
-        private http: HttpClient,
-        private userToastNotificationService: UserToastNotificationService
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private http: HttpClient,
+    private userToastNotificationService: UserToastNotificationService
   ) {}
 
   ngOnInit(): void {
     this.currentUserId = this.authLoginRegisterService.getUserID();
-    
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');
         if (manuscriptId && this.currentUserId) {
-          // Pass both userId and manuscriptId to the service
+          // Fetch manuscript details
           return this.manuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
         }
         return of(undefined);
@@ -56,13 +54,28 @@ export class ManuscriptSubmissionComponent implements OnInit {
       if (manuscript) {
         this.manuscript = manuscript;
         console.log('Manuscript loaded for submission:', this.manuscript);
+        // Load discussions immediately after manuscript is loaded
+        this.loadDiscussions(Number(this.manuscript.id));
       } else {
         console.error('Manuscript not found for submission component or ID/User ID missing.');
       }
     });
   }
 
-  // --- File Upload Logic ---
+  // New method to load discussions
+  loadDiscussions(submissionId: number): void {
+    this.manuscriptService.getDiscussionsForSubmission(submissionId).subscribe({
+      next: (discussions) => {
+        this.manuscript.discussions = discussions;
+        console.log('Discussions loaded:', this.manuscript.discussions);
+      },
+      error: (err) => {
+        console.error('Error loading discussions:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load discussions.', 'danger');
+      }
+    });
+  }
+
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -70,46 +83,43 @@ export class ManuscriptSubmissionComponent implements OnInit {
     }
   }
 
-  // --- UPDATED uploadFile method ---
   uploadFile(): void {
     if (this.selectedFile && this.manuscript && this.manuscript.id) {
       this.manuscriptService.uploadManuscriptFile(Number(this.manuscript.id), this.selectedFile).subscribe(
         response => {
           if (response && response.code === 200 && response.data) {
             console.log('File uploaded successfully:', response.data);
-            alert('File uploaded successfully!');
-            // Add the new file to the manuscript's file list
+            this.userToastNotificationService.showToast('Success', 'File uploaded successfully!', 'success'); // Use toast notification
             if (!this.manuscript.files) {
               this.manuscript.files = [];
             }
             this.manuscript.files.push({
-              id: response.data.id, // Backend returns the ID
+              id: response.data.id,
               name: response.data.originalName,
               url: response.data.fileUrl,
               size: (response.data.size / 1024).toFixed(2),
               storedName: response.data.storedName
             });
-            this.selectedFile = null; // Clear selected file
+            this.selectedFile = null;
             const uploadModal = bootstrap.Modal.getInstance(document.getElementById('uploadFileModal'));
             if (uploadModal) {
               uploadModal.hide();
             }
           } else {
             console.error('Upload response not as expected:', response);
-            alert('File upload failed: Unexpected response from server.');
+            this.userToastNotificationService.showToast('Error', 'File upload failed: Unexpected response from server.', 'danger');
           }
         },
         error => {
           console.error('File upload error:', error);
-          alert('File upload failed: ' + (error.error?.message || 'Server error.'));
+          this.userToastNotificationService.showToast('Error', 'File upload failed: ' + (error.error?.message || 'Server error.'), 'danger');
         }
       );
     } else {
-      alert('No file selected or manuscript ID is missing.');
+      this.userToastNotificationService.showToast('Warning', 'No file selected or manuscript ID is missing.', 'warning');
     }
   }
 
-  // --- NEW deleteFile method ---
   deleteFile(fileId: number, fileName: string): void {
     if (confirm(`Are you sure you want to delete the file "${fileName}"?`)) {
       if (this.manuscript && this.manuscript.id) {
@@ -117,65 +127,48 @@ export class ManuscriptSubmissionComponent implements OnInit {
           response => {
             if (response && response.code === 200) {
               console.log('File deleted successfully:', response.message);
-              alert('File deleted successfully!');
-              // Remove the file from the local list
+              this.userToastNotificationService.showToast('Success', 'File deleted successfully!', 'success');
               if (this.manuscript.files) {
                 this.manuscript.files = this.manuscript.files.filter(f => f.id !== fileId);
               }
             } else {
               console.error('Delete response not as expected:', response);
-              alert('File deletion failed: Unexpected response from server.');
+              this.userToastNotificationService.showToast('Error', 'File deletion failed: Unexpected response from server.', 'danger');
             }
           },
           error => {
             console.error('File deletion error:', error);
-            alert('File deletion failed: ' + (error.error?.message || 'Server error.'));
+            this.userToastNotificationService.showToast('Error', 'File deletion failed: ' + (error.error?.message || 'Server error.'), 'danger');
           }
         );
       } else {
-        alert('Manuscript ID is missing. Cannot delete file.');
+        this.userToastNotificationService.showToast('Warning', 'Manuscript ID is missing. Cannot delete file.', 'warning');
       }
     }
   }
-  
-  /*downloadFile(fileUrl: string, fileName: string): void {
-    // For real backend files, fileUrl will be the direct URL from the backend
-    const link = document.createElement('a');
-    link.href = fileUrl;
-    link.download = fileName; // Suggests filename for download
-    link.target = '_blank'; // Opens in a new tab
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }*/
- downloadFile(fileUrl: string, originalFileName: string): void {
 
+  downloadFile(fileUrl: string, originalFileName: string): void {
     const downloadUrl = fileUrl;
 
     this.http.get(downloadUrl, { responseType: 'blob' })
       .subscribe({
         next: (response: Blob) => {
-          // Create a blob URL and trigger the download
           const blob = new Blob([response], { type: response.type });
           const url = window.URL.createObjectURL(blob);
 
           const a = document.createElement('a');
           a.href = url;
-          a.download = originalFileName; // Use the original file name
-          document.body.appendChild(a); // Append to body (required for Firefox)
-          a.click(); // Programmatically click the link to trigger download
-          window.URL.revokeObjectURL(url); // Clean up the URL object
-
+          a.download = originalFileName;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
         },
         error: (error: any) => {
-          // console.error('Error downloading file:', error);
-          // alert('Failed to download file. Please try again.');
           this.userToastNotificationService.showToast('Error', 'Failed to download file. Please try again.', 'danger');
         }
       });
   }
 
-  // --- Discussion Logic ---
   addDiscussion(): void {
     this.newDiscussionTitle = '';
     this.newDiscussionMessage = '';
@@ -184,41 +177,43 @@ export class ManuscriptSubmissionComponent implements OnInit {
   }
 
   confirmAddDiscussion(): void {
-    if (this.newDiscussionTitle && this.newDiscussionMessage) {
-      const newDisc = {
-        name: this.newDiscussionTitle,
-        from: 'Current User', // Replace with actual user name
-        lastReply: new Date(),
-        replies: 0,
-        closed: false,
-        // Adding a placeholder for actual messages/replies for the detail view
-        messages: [{ sender: 'Current User', text: this.newDiscussionMessage, date: new Date() }]
-      };
-      if (!this.manuscript.discussions) {
-        this.manuscript.discussions = [];
-      }
-      this.manuscript.discussions.push(newDisc);
-      console.log('New discussion added:', newDisc);
-      alert('Discussion added successfully!');
-      const discussionModal = bootstrap.Modal.getInstance(document.getElementById('addDiscussionModal'));
-      if (discussionModal) {
-        discussionModal.hide();
-      }
-      // In a real app, you'd send this new discussion to your backend API
+    if (this.newDiscussionTitle && this.newDiscussionMessage && this.manuscript && this.manuscript.id) {
+      this.manuscriptService.createDiscussion(
+        Number(this.manuscript.id),
+        this.currentUserId,
+        this.newDiscussionTitle,
+        this.newDiscussionMessage
+      ).subscribe({
+        next: (newDisc) => {
+          console.log('New discussion added:', newDisc);
+          this.userToastNotificationService.showToast('Success', 'Discussion added successfully!', 'success'); // Use toast notification
+
+          // Reload discussions to get the latest list, including the new one
+          this.loadDiscussions(Number(this.manuscript.id));
+
+          const discussionModal = bootstrap.Modal.getInstance(document.getElementById('addDiscussionModal'));
+          if (discussionModal) {
+            discussionModal.hide();
+          }
+          this.newDiscussionTitle = ''; // Clear input fields
+          this.newDiscussionMessage = '';
+        },
+        error: (err) => {
+          console.error('Error adding discussion:', err);
+          this.userToastNotificationService.showToast('Error', 'Failed to add discussion: ' + err.message, 'danger');
+        }
+      });
     } else {
-      alert('Please provide both a title and a message for the discussion.');
+      this.userToastNotificationService.showToast('Warning', 'Please provide a title, message, and ensure manuscript ID is available.', 'warning');
     }
   }
 
-  // New method to open discussion details modal
-  viewDiscussionDetails(discussion: any): void {
-    this.selectedDiscussion = discussion;
-    const detailModal = new bootstrap.Modal(document.getElementById('discussionDetailModal'));
+  viewDiscussionContent(discussion: Discussion): void {
+    this.selectedDiscussion = discussion; // Now store the whole discussion object
+    const detailModal = new bootstrap.Modal(document.getElementById('discussionContentModal'));
     detailModal.show();
   }
 
-
-  // --- Action Buttons Logic (with Modals) ---
   openConfirmationModal(action: string): void {
     const modalElement = document.getElementById('confirmationModal');
     if (modalElement) {
@@ -268,31 +263,27 @@ export class ManuscriptSubmissionComponent implements OnInit {
   }
 
   private _sendToReview(): void {
-    alert('Manuscript sent to review!');
+    this.userToastNotificationService.showToast('Info', 'Manuscript sent to review!', 'info');
     if (this.manuscript) {
       this.manuscript.status!.submission = 'Sent to Review';
-      // In a real app, send a request to backend to update status
     }
   }
 
   private _acceptAndSkipReview(): void {
-    alert('Manuscript accepted and review skipped!');
+    this.userToastNotificationService.showToast('Info', 'Manuscript accepted and review skipped!', 'info');
     if (this.manuscript) {
       this.manuscript.status!.submission = 'Accepted';
       this.manuscript.status!.review = 'Skipped';
-      // In a real app, send a request to backend to update status
     }
   }
 
   private _declineSubmission(): void {
-    alert('Manuscript submission declined!');
+    this.userToastNotificationService.showToast('Info', 'Manuscript submission declined!', 'info');
     if (this.manuscript) {
       this.manuscript.status!.submission = 'Declined';
-      // In a real app, send a request to backend to update status
     }
   }
 
-  // --- Assign Participant Logic ---
   assignParticipant(): void {
     this.assignedParticipantName = '';
     const assignModal = new bootstrap.Modal(document.getElementById('assignParticipantModal'));
@@ -301,15 +292,14 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   confirmAssignParticipant(): void {
     if (this.assignedParticipantName) {
-      alert(`Participant '${this.assignedParticipantName}' assigned!`);
+      this.userToastNotificationService.showToast('Success', `Participant '${this.assignedParticipantName}' assigned!`, 'success');
       console.log('Assigning participant:', this.assignedParticipantName);
-      // In a real app, send a request to backend to assign participant
       const assignModal = bootstrap.Modal.getInstance(document.getElementById('assignParticipantModal'));
       if (assignModal) {
         assignModal.hide();
       }
     } else {
-      alert('Please enter a participant name.');
+      this.userToastNotificationService.showToast('Warning', 'Please enter a participant name.', 'warning');
     }
   }
 }
