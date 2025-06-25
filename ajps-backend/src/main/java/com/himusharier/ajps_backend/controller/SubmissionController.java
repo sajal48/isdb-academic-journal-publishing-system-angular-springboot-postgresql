@@ -428,4 +428,18 @@ public class SubmissionController {
         }
     }
 
+    // NEW ENDPOINT: Get All Submissions
+    @GetMapping("/all-submissions")
+    public ResponseEntity<ApiResponse<List<SubmissionListResponse>>> getAllSubmissions() {
+        try {
+            List<SubmissionListResponse> allSubmissions = submissionService.getAllSubmissions().stream()
+                    .map(UserSubmissionListMapperUtil::submissionListResponseFromSubmission)
+                    .toList();
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "All submissions retrieved successfully.", allSubmissions));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to retrieve all submissions: " + e.getMessage(), null));
+        }
+    }
+
 }

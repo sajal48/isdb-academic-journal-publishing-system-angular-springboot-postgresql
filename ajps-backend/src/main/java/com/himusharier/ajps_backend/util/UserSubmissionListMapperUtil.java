@@ -16,6 +16,8 @@ public class UserSubmissionListMapperUtil {
                 submission.getSubmittedAt(),
                 submission.getUpdatedAt(),
                 submission.isPaymentDue(),
-                submission.isEditable());
+                submission.isEditable(),
+                submission.getUserId()
+        );
     }
 }

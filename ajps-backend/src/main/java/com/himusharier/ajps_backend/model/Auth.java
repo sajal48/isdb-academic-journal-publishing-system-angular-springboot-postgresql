@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.himusharier.ajps_backend.constants.UserStatus;
 import com.himusharier.ajps_backend.constants.UserRole;
@@ -48,6 +49,7 @@ public class Auth {
     private UserStatus userStatus;
 
     @OneToOne(mappedBy = "auth", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonBackReference
     private Profile profile;
 
 

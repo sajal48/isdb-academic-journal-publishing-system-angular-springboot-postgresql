@@ -18,6 +18,8 @@ interface Issue {
   publicationDate: string;
   status: 'Published' | 'Future';
   papers: Paper[];
+  volumeNote?: string;
+  issueNote?: string;
 }
 
 interface Paper {
@@ -202,7 +204,9 @@ export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
       number: undefined,
       publicationDate: '',
       status: undefined,
-      papers: []
+      papers: [],
+      volumeNote: '',
+      issueNote: ''
     };
   }
 }

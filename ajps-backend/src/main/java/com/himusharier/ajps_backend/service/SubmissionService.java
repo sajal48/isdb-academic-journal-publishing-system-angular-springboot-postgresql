@@ -631,4 +631,10 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
+    // NEW METHOD: Get All Submissions
+    @Transactional(readOnly = true)
+    public List<Submission> getAllSubmissions() {
+        return submissionRepository.findAll();
+    }
+
 }

@@ -30,9 +30,6 @@ public class Submission implements Serializable {
     @Column(updatable = false, nullable = false, unique = true)
     private Long submissionNumber;
 
-//    @Column(nullable = false)
-//    private String journalName;
-
     @ManyToOne
     @JoinColumn(name = "journal_id", nullable = false) // Foreign key column
     private Journal journal; // Link to the Journal entity
@@ -67,32 +64,39 @@ public class Submission implements Serializable {
     private String completedSteps;
     private boolean isEditable;
 
-    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
-    private List<Author> authors;
+    private List<Author> authors = new ArrayList<>(); // Initialize to prevent NullPointerException
 
-    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
-    private List<FileUpload> files;
+    private List<FileUpload> files = new ArrayList<>(); // Initialize to prevent NullPointerException
 
-    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
-    private List<SubmissionReviewer> submissionReviewers;
+    private List<SubmissionReviewer> submissionReviewers = new ArrayList<>(); // Initialize to prevent NullPointerException
 
     @ManyToOne
     @JoinColumn(name = "profile_id")
     @JsonBackReference
     private Profile profile;
 
-    // Add Issues relation
-//    @OneToMany(mappedBy = "submission")
-//    private List<Issue> issues;
+    // --- New Fields for File Tracking within Submission (optional, but aligns with service logic) ---
+    // These could also be managed purely through the FileUpload entity,
+    // but having flags here can make queries/logic on Submission itself easier.
+    // However, your FileUpload model already has these, so usually,
+    // you'd rely on the FileUpload entity's flags.
+    // If you add them here, ensure they are kept in sync with FileUpload entities.
+    // For now, I'm NOT adding them directly to Submission, as FileUpload already has them.
+
 
     @PrePersist
     protected void onCreate() {
         createdAt = BdtZoneTimeUtil.timeInBDT();
-//        updatedAt = TimeUtil.timeInBDT();
-        submissionNumber = generateRandomSubmissionNumber();
+        // Generate submission number only if not already set (e.g., if set manually in test)
+        if (submissionNumber == null || submissionNumber == 0L) {
+            submissionNumber = generateRandomSubmissionNumber();
+        }
     }
 
     @PreUpdate
@@ -105,6 +109,20 @@ public class Submission implements Serializable {
     }
 
     private Long generateRandomSubmissionNumber() {
-        return 100000L + new Random().nextInt(900000); // 6-digit number
+        // Generates a 6-digit number, ensuring it's unique if necessary in a larger system
+        // For simplicity, a random number is generated. In production, you might need a more robust sequence generator.
+        return 100000L + new Random().nextInt(900000);
+    }
+
+    // --- Transient Getter for userId ---
+    // This method will NOT be persisted to the database.
+    // It provides convenient access to the userId associated with the submission's owner.
+    @Transient
+    @JsonIgnore // Prevents this from being serialized if you use Lombok's @Data or @ToString which might include it
+    public Long getUserId() {
+        if (this.profile != null && this.profile.getAuth() != null) {
+            return this.profile.getAuth().getUserId();
+        }
+        return null;
     }
 }

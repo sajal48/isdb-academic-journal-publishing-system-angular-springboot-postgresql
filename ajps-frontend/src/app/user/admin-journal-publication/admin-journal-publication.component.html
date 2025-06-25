@@ -129,6 +129,19 @@
                             </div>
                         </div>
 
+                        <!-- <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="volumeNoteInput">Volume Note</label>
+                                <input id="volumeNoteInput" type="text" class="form-control" [(ngModel)]="newIssue.number"
+                                    name="volumeNote" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="issueNoteInput">Issue Note</label>
+                                <input id="issueNoteInput" type="text" class="form-control" [(ngModel)]="newIssue.number"
+                                    name="issueNote" required />
+                            </div>
+                        </div> -->
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label" for="pubDateInput">Publication Date</label>
@@ -142,7 +155,6 @@
                                     <option [ngValue]="'Published'">Published</option>
                                     <option [ngValue]="'Future'">Future</option>
                                 </select>
-
                             </div>
                         </div>
                     </form>
@@ -157,5 +169,4 @@
             </div>
         </div>
     </div>
-
 </div>

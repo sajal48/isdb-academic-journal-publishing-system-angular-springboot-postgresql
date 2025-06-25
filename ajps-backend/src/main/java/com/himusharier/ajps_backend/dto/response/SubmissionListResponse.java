@@ -13,5 +13,6 @@ public record SubmissionListResponse(
         LocalDateTime submittedAt,
         LocalDateTime updatedAt,
         boolean paymentDue,
-        boolean editable
+        boolean editable,
+        Long userId
 ) {}

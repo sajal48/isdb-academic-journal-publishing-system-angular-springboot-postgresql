@@ -19,6 +19,10 @@
         role="tab" aria-controls="in-review" aria-selected="false">In Review</button>
     </li>
     <li class="nav-item" role="presentation">
+      <button class="nav-link" id="copy-edit-tab" data-bs-toggle="tab" data-bs-target="#copy-edit" type="button"
+        role="tab" aria-controls="copy-edit" aria-selected="false">In Copy Edit</button>
+    </li>
+    <li class="nav-item" role="presentation">
       <button class="nav-link" id="production-tab" data-bs-toggle="tab" data-bs-target="#production" type="button"
         role="tab" aria-controls="production" aria-selected="false">Production</button>
     </li>
@@ -49,14 +53,13 @@
                   <td>{{ sub.title }}</td>
                   <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td style="white-space: nowrap;">
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)" title="View">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
                       <i class="bi bi-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-success" (click)="assignSubmission(sub.id)" title="Assign">
+                    <button class="btn btn-sm btn-outline-success" (click)="assignSubmission(sub.id)">
                       <i class="bi bi-person-check"></i> Assign Editor
                     </button>
                   </td>
-
                 </tr>
                 <tr *ngIf="getSubmissionsByStatus('New').length === 0">
                   <td colspan="5" class="text-center text-muted">No new submissions.</td>
@@ -87,7 +90,7 @@
                   <td>{{ sub.title }}</td>
                   <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)" title="View">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
                       <i class="bi bi-eye"></i>
                     </button>
                   </td>
@@ -121,13 +124,47 @@
                   <td>{{ sub.title }}</td>
                   <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)" title="View">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
                       <i class="bi bi-eye"></i>
                     </button>
                   </td>
                 </tr>
                 <tr *ngIf="getSubmissionsByStatus('In Review').length === 0">
                   <td colspan="6" class="text-center text-muted">No submissions in review.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Copy Edit Tab -->
+    <div class="tab-pane fade" id="copy-edit" role="tabpanel" aria-labelledby="copy-edit-tab">
+      <div class="card shadow-sm">
+        <div class="card-header">In Copy Edit Submissions</div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Journal</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let sub of getSubmissionsByStatus('In Copy Edit')">
+                  <td>{{ sub.title }}</td>
+                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="getSubmissionsByStatus('In Copy Edit').length === 0">
+                  <td colspan="6" class="text-center text-muted">No submissions in copy edit.</td>
                 </tr>
               </tbody>
             </table>
@@ -155,7 +192,7 @@
                   <td>{{ sub.title }}</td>
                   <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)" title="View">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
                       <i class="bi bi-eye"></i>
                     </button>
                   </td>
@@ -189,10 +226,10 @@
                   <td>{{ sub.title }}</td>
                   <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td style="white-space: nowrap;">
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)" title="View">
+                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
                       <i class="bi bi-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-outline-success" (click)="assignSubmission(sub.id)" title="Assign">
+                    <button class="btn btn-sm btn-outline-success">
                       <i class="bi bi-box-arrow-up-right"></i> Read Article
                     </button>
                   </td>

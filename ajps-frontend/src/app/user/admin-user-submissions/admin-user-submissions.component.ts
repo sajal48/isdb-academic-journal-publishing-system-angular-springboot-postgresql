@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-admin-user-submissions',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './admin-user-submissions.component.html',
   styleUrl: './admin-user-submissions.component.css'
@@ -19,50 +20,44 @@ export class AdminUserSubmissionsComponent {
     {
       id: 'S001',
       journalId: '1',
-      // title: 'Advances in Machine Learning',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
+      title: 'Quantitative Ethnobotanical Study...',
       status: 'New',
       submittedDate: new Date('2025-06-17')
     },
     {
       id: 'S002',
       journalId: '2',
-      // title: 'Quantum Computing Applications',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
+      title: 'Quantitative Ethnobotanical Study...',
       status: 'Assigned',
       submittedDate: new Date('2025-06-15')
     },
     {
       id: 'S003',
       journalId: '1',
-      // title: 'Data Science Trends',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
+      title: 'Quantitative Ethnobotanical Study...',
       status: 'In Review',
       submittedDate: new Date('2025-05-20')
     },
     {
       id: 'S004',
       journalId: '2',
-      // title: 'AI Ethics',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
+      title: 'Quantitative Ethnobotanical Study...',
+      status: 'In Copy Edit',
+      submittedDate: new Date('2025-06-14')
+    },
+    {
+      id: 'S005',
+      journalId: '2',
+      title: 'Quantitative Ethnobotanical Study...',
       status: 'Production',
       submittedDate: new Date('2025-04-10')
     },
     {
-      id: 'S005',
+      id: 'S006',
       journalId: '1',
-      // title: 'Neural Network Innovations',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
+      title: 'Quantitative Ethnobotanical Study...',
       status: 'Publication',
       submittedDate: new Date('2025-03-01')
-    },
-    {
-      id: 'S006',
-      journalId: '2',
-      // title: 'Blockchain in Healthcare',
-      title: 'Quantitative Ethnobotanical Study of Medicinal Plants Used by the People of Bandhakhola Village, Gazipur, Bangladesh',
-      status: 'New',
-      submittedDate: new Date('2025-06-16')
     }
   ];
 
@@ -76,7 +71,6 @@ export class AdminUserSubmissionsComponent {
 
   viewSubmission(id: string) {
     alert(`Viewing submission ${id}`);
-    // Placeholder for view functionality
   }
 
   assignSubmission(id: string) {
