@@ -1,23 +1,43 @@
-// service ts:
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { Discussion, DiscussionOrigin, Manuscript } from '../../user/user-manuscript/user-manuscript.component';
-import { of } from 'rxjs';
+import { Discussion, DiscussionOrigin, Manuscript, ManuscriptAuthor, SubmissionFile } from '../../user/user-manuscript/user-manuscript.component';
+
+// Define the Journal and JournalIssue interfaces as they will be received from the backend
+export interface Journal {
+  id: number;
+  journalName: string;
+  issn: string;
+  frequency: string;
+  journalType: string;
+  journalCode: string;
+  contactEmail: string;
+  journalUrl: string;
+  aimsScopes: string;
+  aboutJournal: string;
+  coverImageUrl: string;
+  issues: JournalIssue[];
+}
+
+export interface JournalIssue {
+  id: number;
+  number: number;
+  volume: number;
+  status: string; // e.g., "Future", "Published"
+  publicationDate: string; // Assuming string format like "YYYY-MM-DD"
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserManuscriptService {
+  private baseUrl = 'http://localhost:8090/api/user/submission';
+  private discussionUrl = 'http://localhost:8090/api/user/discussion';
+  private journalUrl = 'http://localhost:8090/api/journal'; // Base URL for journal API
 
-  // Base URL for your Spring Boot backend
-  private baseUrl = 'http://localhost:8090/api/user/submission'; // Adjust if your backend runs on a different port or path
-  private discussionUrl = 'http://localhost:8090/api/user/discussion'; // Base URL for discussions
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { } // Inject HttpClient
-
-  // This method now fetches data from the backend
   getManuscriptById(userId: number, submissionId: string): Observable<Manuscript | undefined> {
     const url = `${this.baseUrl}/details/${userId}/${submissionId}`;
     console.log(`Fetching manuscript from: ${url}`);
@@ -28,27 +48,41 @@ export class UserManuscriptService {
           const backendData = response.data;
           console.log('Backend response data:', backendData);
 
-          // Map backend data to your frontend Manuscript interface
+          // Map authors data
+          const authors: ManuscriptAuthor[] = backendData.authors?.map((author: any) => ({
+            id: author.id,
+            name: author.name,
+            email: author.email,
+            institution: author.institution,
+            corresponding: author.corresponding,
+            orcid: author.orcid
+          })) || [];
+
+          // Map files data
+          const files: SubmissionFile[] = backendData.files?.map((file: any) => ({
+            id: file.id,
+            name: file.originalName,
+            url: file.fileUrl,
+            size: file.size,
+            storedName: file.storedName,
+            fileOrigin: file.fileOrigin,
+            isReviewFile: file.reviewFile,
+            isCopyEditingFile: file.copyEditingFile,
+            isProductionFile: file.productionFile,
+            isPublicationFile: file.publicationFile
+          })) || [];
+
           const manuscript: Manuscript = {
-            id: backendData.id,
+            id: backendData.id.toString(),
             submissionNumber: backendData.submissionNumber,
             title: backendData.manuscriptTitle,
-            journalName: backendData.journal ? backendData.journal.journalName : 'N/A',
+            journalName: backendData.journal?.journalName || 'N/A',
             submissionDate: new Date(backendData.submittedAt || backendData.createdAt),
-            lastUpdate: new Date(backendData.updateAt || backendData.submittedAt),
+            lastUpdate: new Date(backendData.updatedAt || backendData.submittedAt),
             submissionStatus: backendData.submissionStatus,
-            author: backendData.authors && backendData.authors.length > 0 ? backendData.authors[0].name : 'N/A',
+            manuscriptKeywords: backendData.manuscriptKeywords,
             abstract: backendData.abstractContent,
-            files: backendData.files ? backendData.files.map((file: any) => ({
-              id: file.id, // Include file ID
-              name: file.originalName,
-              url: file.fileUrl,
-              size: (file.size / 1024).toFixed(2), // Convert bytes to KB
-              storedName: file.storedName, // Might be useful for debugging or specific backend calls
-              fileOrigin: file.fileOrigin,
-              isReviewFile: file.reviewFile,
-              isCopyEditingFile: file.copyEditingFile
-            })) : [],
+            files: files,
             status: {
               submission: backendData.submissionStatus,
               review: 'Not Started',
@@ -58,11 +92,11 @@ export class UserManuscriptService {
             },
             review: {
               startDate: new Date(),
-              reviewers: backendData.submissionReviewers ? backendData.submissionReviewers.map((reviewer: any) => ({
+              reviewers: backendData.submissionReviewers?.map((reviewer: any) => ({
                 name: reviewer.name,
                 status: 'Pending',
                 comments: ''
-              })) : [],
+              })) || [],
               decision: ''
             },
             copyEditing: {
@@ -84,19 +118,39 @@ export class UserManuscriptService {
               url: ''
             },
             discussions: [],
+            authors: authors,
             owner: {
               userId: backendData.owner.userId
-            }
+            },
+            journal: backendData.journal
           };
           return manuscript;
         } else {
-          console.error('Backend response structure is not as expected:', response);
+          console.error('Backend response structure is not as expected for manuscript details:', response);
           return undefined;
         }
       }),
       catchError(error => {
         console.error('Error fetching manuscript:', error);
-        return of(undefined); // Return Observable of undefined on error
+        return of(undefined);
+      })
+    );
+  }
+
+  // --- MODIFIED: Method to get all journals and their issues ---
+  getAllJournals(): Observable<Journal[]> {
+    // The backend response is a direct array of Journal objects, not wrapped in a success model.
+    return this.http.get<Journal[]>(`${this.journalUrl}/get-all-journals`).pipe( // Directly cast to Journal[]
+      map(response => {
+        if (Array.isArray(response)) { // Check if it's an array
+          return response; // Return the array directly
+        }
+        console.error('Backend response for journals is not an array as expected:', response);
+        return [];
+      }),
+      catchError(error => {
+        console.error('Error fetching journals:', error);
+        return of([]);
       })
     );
   }
@@ -106,12 +160,12 @@ export class UserManuscriptService {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileOrigin', 'PRE_REVIEW');
-    formData.append('submissionId', submissionId.toString()); // Backend expects Long
+    formData.append('submissionId', submissionId.toString());
 
     return this.http.post<any>(`${this.baseUrl}/manuscript-files/upload`, formData).pipe(
       catchError(error => {
         console.error('Error uploading file:', error);
-        return throwError(() => error); // Corrected
+        return throwError(() => error);
       })
     );
   }
@@ -121,7 +175,7 @@ export class UserManuscriptService {
     return this.http.delete<any>(`${this.baseUrl}/manuscript-files/remove/${submissionId}/${fileId}`).pipe(
       catchError(error => {
         console.error('Error deleting file:', error);
-        return throwError(() => error); // Corrected
+        return throwError(() => error);
       })
     );
   }
@@ -133,7 +187,7 @@ export class UserManuscriptService {
         if (response && response.code === 200 && response.status === 'success' && response.data) {
           return response.data.map((d: any) => ({
             ...d,
-            createdAt: new Date(d.createdAt) // Convert to Date object
+            createdAt: new Date(d.createdAt)
           }));
         }
         console.error('Backend response structure is not as expected for discussions:', response);
@@ -141,7 +195,7 @@ export class UserManuscriptService {
       }),
       catchError(error => {
         console.error('Error fetching discussions:', error);
-        return of([]); // Return empty array on error
+        return of([]);
       })
     );
   }
@@ -190,7 +244,6 @@ export class UserManuscriptService {
 
   updateSubmissionStatus(submissionId: number, newStatus: string): Observable<any> {
     const url = `${this.baseUrl}/update-status/${submissionId}`;
-    // The backend endpoint might expect a specific body, e.g., { status: newStatus }
     const body = { status: newStatus };
     console.log(`Updating submission status for ${submissionId} to ${newStatus} via ${url}`);
 
@@ -205,7 +258,6 @@ export class UserManuscriptService {
       }),
       catchError(error => {
         console.error('Error updating submission status:', error);
-        // Extract a more specific error message if available
         const errorMessage = error.error?.message || error.statusText || 'Server error during status update.';
         return throwError(() => new Error(errorMessage));
       })
@@ -213,19 +265,15 @@ export class UserManuscriptService {
   }
 
   addReviewFileReference(manuscriptId: number, fileId: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId }); // This works directly with the DTO
+    return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId });
   }
 
   acceptAndSkipReview(submissionId: number): Observable<any> {
-    // The endpoint is PUT /api/user/submission/{submissionId}/accept-skip-review
-    // No request body is needed for this operation.
     return this.http.put(`${this.baseUrl}/${submissionId}/accept-skip-review`, {});
   }
 
   // --- NEW METHOD: SELECT FILE FOR COPY EDITING ---
   selectFileForCopyEditing(submissionId: number, fileId: number): Observable<any> {
-    // The endpoint is PUT /api/user/submission/{submissionId}/select-copy-editing-file
-    // The backend expects a request body like { fileId: fileId }
     return this.http.put(`${this.baseUrl}/${submissionId}/select-copy-editing-file`, { fileId }).pipe(
       map((response: any) => {
         if (response && response.code === 200 && response.status === 'success') {
@@ -243,9 +291,7 @@ export class UserManuscriptService {
 
   uploadRevisionFile(submissionId: number, file: File): Observable<any> {
     const formData = new FormData();
-    formData.append('file', file); // Append the actual File object
-    // No need for 'fileOrigin' here as the backend endpoint specifically handles 'REVISION'
-    // formData.append('fileOrigin', 'REVISION'); // This is handled by backend logic for this specific endpoint
+    formData.append('file', file);
 
     return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-revision-file`, formData).pipe(
       map(response => {
@@ -266,7 +312,6 @@ export class UserManuscriptService {
   uploadCopyeditedFile(submissionId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    // The backend endpoint specifically marks this as 'COPY_EDIT' origin
 
     return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-copyedited-file`, formData).pipe(
       map(response => {
@@ -283,61 +328,56 @@ export class UserManuscriptService {
       })
     );
   }
-  
-  // Add this method to UserManuscriptService
-selectFileForProduction(submissionId: number, fileId: number): Observable<any> {
+
+  selectFileForProduction(submissionId: number, fileId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/${submissionId}/select-production-file`, { fileId }).pipe(
-        map((response: any) => {
-            if (response && response.code === 200 && response.status === 'success') {
-                return response;
-            } else {
-                throw new Error(response?.message || 'Failed to select file for production: Unexpected response');
-            }
-        }),
-        catchError(error => {
-            console.error('Error selecting file for production:', error);
-            return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
-        })
+      map((response: any) => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to select file for production: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error selecting file for production:', error);
+        return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
+      })
     );
-}
+  }
 
-// Add this to UserManuscriptService
-uploadProductionFile(submissionId: number, file: File): Observable<any> {
-  const formData = new FormData();
-  formData.append('file', file);
-  // The backend endpoint specifically marks this as 'PRODUCTION' origin
+  uploadProductionFile(submissionId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
 
-  return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-production-file`, formData).pipe(
-    map(response => {
-      if (response && response.code === 200 && response.status === 'success') {
-        return response;
-      } else {
-        throw new Error(response?.message || 'Failed to upload production file: Unexpected response');
-      }
-    }),
-    catchError(error => {
-      console.error('Error uploading production file:', error);
-      const errorMessage = error.error?.message || error.statusText || 'Server error during production file upload.';
-      return throwError(() => new Error(errorMessage));
-    })
-  );
-}
+    return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-production-file`, formData).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to upload production file: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error uploading production file:', error);
+        const errorMessage = error.error?.message || error.statusText || 'Server error during production file upload.';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
 
-// Add this to UserManuscriptService
-selectFileForPublication(submissionId: number, fileId: number): Observable<any> {
+  selectFileForPublication(submissionId: number, fileId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/${submissionId}/select-publication-file`, { fileId }).pipe(
-        map((response: any) => {
-            if (response && response.code === 200 && response.status === 'success') {
-                return response;
-            } else {
-                throw new Error(response?.message || 'Failed to select file for publication: Unexpected response');
-            }
-        }),
-        catchError(error => {
-            console.error('Error selecting file for publication:', error);
-            return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
-        })
+      map((response: any) => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to select file for publication: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error selecting file for publication:', error);
+        return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
+      })
     );
-}
-
+  }
 }

@@ -6,21 +6,26 @@ import { switchMap } from 'rxjs/operators';
 import { UserManuscriptService } from '../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../site-settings/auth/auth-login-register.service';
 
-// Define an interface for Manuscript data for better type safety
-// Keep this here or move it to a shared 'models' file if you prefer
+export interface ManuscriptAuthor {
+  id: number;
+  name: string;
+  email: string;
+  institution: string;
+  corresponding: boolean;
+  orcid?: string;
+}
+
 export interface Manuscript {
-  id: string; // Keep internal ID
-  submissionNumber?: number; // <-- Add submission number to interface
+  id: string;
+  submissionNumber?: number;
   title: string;
   journalName: string;
   submissionDate: Date;
   lastUpdate: Date;
   submissionStatus: string;
-  author?: string;
+  manuscriptKeywords?: string;
   abstract?: string;
-  // files?: { id: number; name: string; url: string; size: string; storedName: string }[]; // <--- UPDATED
-  // files?: { id: number; name: string; url: string; size: string; storedName: string, fileOrigin: string; isReviewFile: boolean; isCopyEditingFile: boolean; }[]; // <--- UPDATED
-  files?: SubmissionFile[]; // <--- UPDATED
+  files?: SubmissionFile[];
   status?: {
     submission: string;
     review: string;
@@ -52,8 +57,13 @@ export interface Manuscript {
     url: string;
   };
   discussions?: Discussion[];
+  authors?: ManuscriptAuthor[];
   owner: ManuscriptOwner;
   isEditable?: boolean;
+  journal?: {
+    id: number;
+    journalName: string;
+  };
 }
 
 // --- SIMPLIFIED INTERFACE FOR DISCUSSIONS ---

@@ -3,6 +3,7 @@ package com.himusharier.ajps_backend.controller;
 import com.himusharier.ajps_backend.dto.request.AdminJournalDto;
 import com.himusharier.ajps_backend.service.JournalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class JournalController {
 
+    @Autowired
     private final JournalService journalService;
 
     @GetMapping("/get-all-journals")

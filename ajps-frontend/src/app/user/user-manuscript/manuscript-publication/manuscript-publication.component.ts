@@ -2,299 +2,267 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
-// --- Interfaces ---
-interface CustomFile {
-  id?: string;
-  name: string;
-  size: number; // in bytes
-  url: string;
-  isProductionFile?: boolean;
-  fileOrigin?: string;
-}
+import { Discussion, DiscussionOrigin, Manuscript, SubmissionFile } from '../user-manuscript.component';
+import { Journal, JournalIssue, UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service'; // Import Journal and JournalIssue interfaces
+import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
-interface Author {
-  name: string;
-  affiliation: string;
-  email: string;
-  orcid?: string; // ORCID is optional
-}
+declare var bootstrap: any;
 
-interface User {
-  userId: string;
-}
-
-interface Journal {
-  id: string;
-  name: string;
-}
-
-interface Volume {
-  id: string;
-  journalId: string;
-  number: number;
+interface JournalIssueDisplay { // Renamed to avoid conflict with imported JournalIssue
+  id: number;
+  journalName: string;
+  volumeNumber: number;
+  issueNumber: number;
   year: number;
-}
-
-interface Issue {
-  id: string;
-  volumeId: string;
-  number: number;
-  title: string;
-}
-
-interface Manuscript {
-  id: string;
-  title: string;
-  keywords: string[];
-  abstract: string;
-  authors: Author[];
-  doi?: string;
-  articleFile: CustomFile | null;
-  publicationStatus: 'Draft' | 'Scheduled' | 'Published' | 'Unpublished' | 'Publication';
-  journalId?: string;
-  volumeId?: string;
-  issueId?: string;
-  lastUpdated?: Date;
-  files?: CustomFile[];
-  owner: User;
 }
 
 @Component({
   selector: 'app-manuscript-publication',
   imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './manuscript-publication.component.html',
-  styleUrl: './manuscript-publication.component.css'
+  styleUrls: ['./manuscript-publication.component.css'],
+  standalone: true
 })
 export class ManuscriptPublicationComponent implements OnInit {
+  manuscript!: Manuscript;
+  currentUserId: number = 0;
 
-  manuscript: Manuscript | null = null;
-  currentUserId: string = 'pub_admin123'; // Simulate current user ID
+  publicationFiles: SubmissionFile[] = [];
+  keywordsArray: string[] = [];
 
-  selectedArticleFile: CustomFile | null = null;
-  keywordsString: string = '';
-
-  // For Journal/Volume/Issue Selection
-  journals: Journal[] = [];
-  volumes: Volume[] = [];
-  issues: Issue[] = [];
-
-  filteredVolumes: Volume[] = [];
-  filteredIssues: Issue[] = [];
-
-  selectedJournalId: string | null = null;
-  selectedVolumeId: string | null = null;
-  selectedIssueId: string | null = null;
-
-  // For Publication Files
-  productionReadyFiles: CustomFile[] = [];
+  // For Journal/Issue Selection
+  issues: JournalIssueDisplay[] = []; // Using the renamed interface
+  selectedIssueId: number | null = null;
 
   // For Modals
   confirmationMessage: string = '';
   currentAction: string = '';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private userManuscriptService: UserManuscriptService,
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private userToastNotificationService: UserToastNotificationService
+  ) {}
 
   ngOnInit(): void {
-    this.loadManuscriptDetails('manuscript123');
-    this.loadPublicationData();
-  }
-
-  loadManuscriptDetails(manuscriptId: string): void {
-    setTimeout(() => {
-      this.manuscript = {
-        id: manuscriptId,
-        title: 'The Impact of AI on Modern Education Systems: A Longitudinal Study',
-        keywords: ['Artificial Intelligence', 'Education', 'Technology', 'Learning Outcomes'],
-        abstract: 'This study investigates the profound effects of integrating artificial intelligence (AI) technologies into primary and secondary education systems over a ten-year period...',
-        authors: [
-          { name: 'Dr. Jane Doe', affiliation: 'Department of Educational Technology, University of Global Studies', email: 'jane.doe@example.edu', orcid: '0000-0001-2345-6789' },
-          { name: 'Prof. John Smith', affiliation: 'Faculty of Computer Science, Tech University', email: 'john.smith@example.com' }
-        ],
-        doi: '10.1234/journal.2025.12345',
-        articleFile: { name: 'Final_Article_v1.0.pdf', size: 4500000, url: '/assets/final_article.pdf' },
-        publicationStatus: 'Publication',
-        lastUpdated: new Date(),
-        files: [
-          { id: 'file2', name: 'Production_Final.pdf', size: 4800000, url: '/assets/production_final.pdf', isProductionFile: true, fileOrigin: 'PRODUCTION' }
-        ],
-        owner: { userId: 'author456' }
-      };
-
-      this.keywordsString = this.manuscript.keywords ? this.manuscript.keywords.join(', ') : '';
-      if (this.manuscript.journalId) this.selectedJournalId = this.manuscript.journalId;
-      if (this.manuscript.volumeId) this.selectedVolumeId = this.manuscript.volumeId;
-      if (this.manuscript.issueId) this.selectedIssueId = this.manuscript.issueId;
-
-      this.filterFiles();
-      this.onJournalChange();
-      this.onVolumeChange();
-
-      console.log('Manuscript loaded for publication:', this.manuscript);
-    }, 500);
-  }
-
-  loadPublicationData(): void {
-    setTimeout(() => {
-      this.journals = [
-        { id: 'journalA', name: 'Journal of Academic Research' },
-        { id: 'journalB', name: 'International Tech Review' },
-        { id: 'journalC', name: 'Educational Studies Quarterly' }
-      ];
-
-      this.volumes = [
-        { id: 'volA1', journalId: 'journalA', number: 1, year: 2024 },
-        { id: 'volA2', journalId: 'journalA', number: 2, year: 2025 },
-        { id: 'volB1', journalId: 'journalB', number: 1, year: 2024 },
-        { id: 'volC1', journalId: 'journalC', number: 1, year: 2025 }
-      ];
-
-      this.issues = [
-        { id: 'issueA1_1', volumeId: 'volA1', number: 1, title: 'Spring Issue' },
-        { id: 'issueA1_2', volumeId: 'volA1', number: 2, title: 'Summer Issue' },
-        { id: 'issueA2_1', volumeId: 'volA2', number: 1, title: 'Special Issue on AI' },
-        { id: 'issueB1_1', volumeId: 'volB1', number: 1, title: 'Emerging Technologies' },
-        { id: 'issueC1_1', volumeId: 'volC1', number: 1, title: 'Education Policy' }
-      ];
-
-      if (this.manuscript?.journalId) {
-        this.onJournalChange();
-        if (this.manuscript?.volumeId) {
-          this.onVolumeChange();
+    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.route.parent?.paramMap.pipe(
+      switchMap(params => {
+        const manuscriptId = params.get('manuscriptId');
+        if (manuscriptId && this.currentUserId) {
+          return this.userManuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
         }
+        return of(undefined);
+      })
+    ).subscribe(manuscript => {
+      if (manuscript) {
+        this.manuscript = manuscript;
+        console.log('Manuscript loaded for publication:', this.manuscript);
+        this.filterFiles();
+        this.processKeywords();
+        this.loadIssues(); // Call loadIssues after manuscript is loaded
+      } else {
+        console.error('Manuscript not found.');
+        this.userToastNotificationService.showToast('Error', 'Manuscript not found.', 'danger');
+        this.router.navigate(['/user/dashboard']);
       }
-    }, 700);
+    });
+  }
+
+  processKeywords(): void {
+    if (this.manuscript.manuscriptKeywords) {
+      this.keywordsArray = this.manuscript.manuscriptKeywords
+        .split(',')
+        .map(keyword => keyword.trim())
+        .filter(keyword => keyword.length > 0);
+    }
   }
 
   filterFiles(): void {
-    if (this.manuscript) {
-      this.productionReadyFiles = this.manuscript.files?.filter(file => file.isProductionFile || file.fileOrigin === 'PRODUCTION') || [];
+    if (this.manuscript && this.manuscript.files) {
+      this.publicationFiles = this.manuscript.files.filter(file =>
+        file.isPublicationFile || file.fileOrigin === 'PUBLICATION');
     }
   }
 
-  onJournalChange(): void {
-    this.filteredVolumes = this.selectedJournalId
-      ? this.volumes.filter(v => v.journalId === this.selectedJournalId)
-      : [];
-    this.selectedVolumeId = null;
-    this.selectedIssueId = null;
-    this.filteredIssues = [];
-  }
-
-  onVolumeChange(): void {
-    this.filteredIssues = this.selectedVolumeId
-      ? this.issues.filter(i => i.volumeId === this.selectedVolumeId)
-      : [];
-    this.selectedIssueId = null;
-  }
-
-  assignIssue(): void {
-    if (this.manuscript && this.selectedJournalId && this.selectedVolumeId && this.selectedIssueId) {
-      this.manuscript.journalId = this.selectedJournalId;
-      this.manuscript.volumeId = this.selectedVolumeId;
-      this.manuscript.issueId = this.selectedIssueId;
-      console.log('Manuscript assigned to issue:', {
-        journalId: this.selectedJournalId,
-        volumeId: this.selectedVolumeId,
-        issueId: this.selectedIssueId
-      });
-      alert('Manuscript successfully assigned to the selected issue!');
-      this.saveAllChanges();
-    } else {
-      alert('Please select a Journal, Volume, and Issue.');
+  loadIssues(): void {
+    if (!this.manuscript || !this.manuscript.journal?.id) {
+      console.warn('Cannot load issues: Manuscript or Journal ID is missing.');
+      return;
     }
+
+    this.userManuscriptService.getAllJournals().subscribe({
+      next: (journals: Journal[]) => {
+        const currentJournal = journals.find(j => j.id === this.manuscript.journal?.id);
+        if (currentJournal && currentJournal.issues) {
+          // Filter for issues that are 'Future' or 'Published' (if you want to allow changing published status)
+          // For publication, typically you'd select a future or current unassigned issue.
+          this.issues = currentJournal.issues
+            .filter(issue => issue.status === 'Future' || issue.status === 'Published') // Adjust filtering as needed
+            .map(issue => ({
+              id: issue.id,
+              journalName: currentJournal.journalName,
+              volumeNumber: issue.volume,
+              issueNumber: issue.number,
+              year: new Date(issue.publicationDate).getFullYear() // Extract year from publicationDate
+            }));
+          console.log('Loaded issues:', this.issues);
+          // Pre-select an issue if the manuscript already has one assigned (if your manuscript model supports this)
+          // this.selectedIssueId = this.manuscript.publication?.issueId || null; // Example if your manuscript had an issueId
+        } else {
+          console.log('No issues found for this journal or journal not found in the list.');
+          this.issues = [];
+        }
+      },
+      error: (err) => {
+        console.error('Error loading journal issues:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load journal issues.', 'danger');
+        this.issues = [];
+      }
+    });
+  }
+
+  hasPublicationFiles(): boolean {
+    return this.publicationFiles.length > 0;
   }
 
   downloadFile(url: string, fileName: string): void {
-    console.log(`Downloading: ${fileName} from ${url}`);
-    alert(`Initiating download for: ${fileName}`);
-    window.open(url, '_blank');
-  }
-
-  onArticleFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.selectedArticleFile = {
-        name: file.name,
-        size: file.size,
-        url: URL.createObjectURL(file as Blob)
-      };
-      console.log('Final article file selected:', this.selectedArticleFile);
-    } else {
-      this.selectedArticleFile = null;
-    }
-  }
-
-  uploadArticleFile(): void {
-    if (this.selectedArticleFile && this.manuscript) {
-      console.log('Uploading final article file:', this.selectedArticleFile.name);
-      this.manuscript.articleFile = { ...this.selectedArticleFile };
-      this.manuscript.files = this.manuscript.files || [];
-      this.manuscript.files.push({ ...this.selectedArticleFile, isProductionFile: true, fileOrigin: 'PRODUCTION' });
-      this.filterFiles();
-      this.selectedArticleFile = null;
-      this.closeModal('uploadArticleFileModal');
-      alert('Final article file uploaded successfully!');
-      this.saveAllChanges();
-    } else {
-      alert('No file selected to upload.');
-    }
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.href = downloadUrl;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        a.remove();
+        this.userToastNotificationService.showToast('Success', `${fileName} downloaded successfully!`, 'success');
+      },
+      error: (error) => {
+        console.error('Download error:', error);
+        this.userToastNotificationService.showToast('Error', `Failed to download ${fileName}.`, 'danger');
+      }
+    });
   }
 
   openPublicationActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
       case 'publishArticle':
-        this.confirmationMessage = 'Are you sure you want to publish this article?';
+        this.confirmationMessage = 'Are you sure you want to publish this article? This will make it publicly available.';
         break;
       case 'unpublishArticle':
-        this.confirmationMessage = 'WARNING: Are you sure you want to unpublish this article?';
+        this.confirmationMessage = 'WARNING: Are you sure you want to unpublish this article? This will remove it from public view.';
         break;
       default:
         this.confirmationMessage = 'Are you sure you want to proceed with this action?';
-        break;
     }
     this.openModal('publicationConfirmationModal');
   }
 
   confirmPublicationAction(): void {
-    console.log(`Confirmed publication action: ${this.currentAction}`);
-    if (this.manuscript) {
-      switch (this.currentAction) {
-        case 'publishArticle':
-          this.manuscript.publicationStatus = 'Published';
-          this.manuscript.lastUpdated = new Date();
-          alert('Article published successfully!');
-          break;
-        case 'unpublishArticle':
-          this.manuscript.publicationStatus = 'Unpublished';
-          this.manuscript.lastUpdated = new Date();
-          alert('Article unpublished successfully!');
-          break;
-      }
-      this.saveAllChanges();
+    if (!this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID missing.', 'danger');
+      return;
     }
-    this.closeModal('publicationConfirmationModal');
+
+    const manuscriptId = Number(this.manuscript.id);
+    let statusToUpdate = '';
+    let successMessage = '';
+
+    switch (this.currentAction) {
+      case 'publishArticle':
+        if (!this.selectedIssueId) {
+          this.userToastNotificationService.showToast('Error', 'Please select an issue for publication.', 'danger');
+          return;
+        }
+        statusToUpdate = 'PUBLISHED'; // Changed from 'PUBLICATION' to 'PUBLISHED' as per common status names
+        successMessage = 'Article published successfully!';
+        break;
+      case 'unpublishArticle':
+        statusToUpdate = 'UNPUBLISHED';
+        successMessage = 'Article unpublished successfully!';
+        break;
+      default:
+        this.userToastNotificationService.showToast('Error', 'Invalid action.', 'danger');
+        return;
+    }
+
+    // For publishing, we need to assign the issue first
+    if (this.currentAction === 'publishArticle' && this.selectedIssueId) {
+      // First, select the publication file (assuming there's one, or select the latest if multiple)
+      // For simplicity, let's assume the first publication file found is the one to be used.
+      const publicationFile = this.publicationFiles[0];
+      if (!publicationFile) {
+        this.userToastNotificationService.showToast('Error', 'No publication file found to assign.', 'danger');
+        return;
+      }
+      this.userManuscriptService.selectFileForPublication(manuscriptId, publicationFile.id).pipe(
+        switchMap(() => {
+          console.log(`File ${publicationFile.id} selected for publication.`);
+          // After selecting the file, update the submission status to PUBLISHED
+          return this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate);
+        })
+      ).subscribe({
+        next: (response) => {
+          this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+          this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+          this.closeModal('publicationConfirmationModal');
+          // Optionally, update the manuscript's publication details in the component
+          if (this.manuscript.publication) {
+            this.manuscript.publication.status = statusToUpdate;
+            this.manuscript.publication.date = new Date(); // Set current date
+            const selectedIssue = this.issues.find(issue => issue.id === this.selectedIssueId);
+            if (selectedIssue) {
+              this.manuscript.publication.volumeIssue = `Vol ${selectedIssue.volumeNumber}, No ${selectedIssue.issueNumber}`;
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Publication action error:', err);
+          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to complete action.', 'danger');
+        }
+      });
+    } else {
+      this.updatePublicationStatus(manuscriptId, statusToUpdate, successMessage);
+    }
   }
 
-  saveAllChanges(): void {
-    if (this.manuscript) {
-      this.manuscript.keywords = this.keywordsString
-        .split(',')
-        .map(keyword => keyword.trim())
-        .filter(keyword => keyword.length > 0);
-
-      console.log('Saving all changes to manuscript:', this.manuscript);
-      alert('All changes saved successfully!');
-    } else {
-      alert('No manuscript data to save.');
-    }
+  updatePublicationStatus(manuscriptId: number, status: string, successMessage: string): void {
+    this.userManuscriptService.updateSubmissionStatus(manuscriptId, status).subscribe({
+      next: (response) => {
+        this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+        this.manuscript.submissionStatus = response.data?.submissionStatus || status;
+        this.closeModal('publicationConfirmationModal');
+        // Update the publication status in the local manuscript object
+        if (this.manuscript.publication) {
+          this.manuscript.publication.status = status;
+          if (status === 'UNPUBLISHED') {
+            this.manuscript.publication.date = null; // Clear publication date if unpublished
+            this.manuscript.publication.volumeIssue = ''; // Clear volume/issue
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Publication action error:', err);
+        this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to complete action.', 'danger');
+      }
+    });
   }
 
   openModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = new (window as any).bootstrap.Modal(modalElement);
+      const bootstrapModal = new bootstrap.Modal(modalElement);
       bootstrapModal.show();
     }
   }
@@ -302,7 +270,7 @@ export class ManuscriptPublicationComponent implements OnInit {
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
       if (bootstrapModal) {
         bootstrapModal.hide();
       }

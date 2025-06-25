@@ -75,8 +75,7 @@ export class ManuscriptProductionComponent implements OnInit {
   filterFilesAndDiscussions(): void {
     if (this.manuscript) {
       // Copy edited files are those marked as isCopyEditingFile or with COPY_EDIT origin
-      this.copyEditedFiles = this.manuscript.files?.filter(file => 
-        file.isCopyEditingFile) || [];
+      this.copyEditedFiles = this.manuscript.files?.filter(file => file.isCopyEditingFile) || [];
       
       // Production ready files are those marked as isProductionFile or with PRODUCTION origin
       this.productionReadyFiles = this.manuscript.files?.filter(file => 
@@ -258,7 +257,7 @@ openProductionActionModal(action: string): void {
 
     switch (this.currentAction) {
       case 'scheduleForPublication':
-        statusToUpdate = 'PUBLISHED';
+        statusToUpdate = 'PUBLICATION';
         successMessage = 'Manuscript scheduled for publication!';
         navigateToRoute = `/user/manuscript/${manuscriptId}/publication`;
         break;

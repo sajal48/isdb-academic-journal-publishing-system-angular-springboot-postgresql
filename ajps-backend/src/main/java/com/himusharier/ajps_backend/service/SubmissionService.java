@@ -388,7 +388,7 @@ public class SubmissionService {
         // For simplicity, I'm using a direct string comparison, but an enum or
         // a more complex state machine pattern would be better for real-world.
 
-        String currentStatus = submission.getSubmissionStatus().toString(); // Assuming your entity has this field
+//        String currentStatus = submission.getSubmissionStatus().toString(); // Assuming your entity has this field
 
         // Example business rules:
         /*switch (newStatusString) {
@@ -479,13 +479,13 @@ public class SubmissionService {
         submission.setSubmissionStatus(SubmissionStatus.COPY_EDITING); // Then immediately set to copy editing
 
         submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
-        submission.setEditable(false); // Lock submission for editing after this stage
+//        submission.setEditable(false); // Lock submission for editing after this stage
 
         // Unmark any review files and copy-editing files if they were marked before skipping review
         if (submission.getFiles() != null) {
             for (FileUpload file : submission.getFiles()) {
                 file.setReviewFile(false);
-                file.setCopyEditingFile(false); // <--- ADDED THIS LINE FOR CONSISTENCY
+//                file.setCopyEditingFile(false); // <--- ADDED THIS LINE FOR CONSISTENCY
             }
         }
 
@@ -590,9 +590,9 @@ public class SubmissionService {
                 .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
 
         // Business logic: Ensure the submission is in production phase
-        if (existingSubmission.getSubmissionStatus() != SubmissionStatus.PRODUCTION) {
-            throw new SubmissionRequestException("Cannot upload production file as the submission is not in 'PRODUCTION' status");
-        }
+//        if (existingSubmission.getSubmissionStatus() != SubmissionStatus.PRODUCTION) {
+//            throw new SubmissionRequestException("Cannot upload production file as the submission is not in 'PRODUCTION' status");
+//        }
 
         return saveFile(submissionId, FileUploadOrigin.PRODUCTION.name(), file);
     }
@@ -625,7 +625,7 @@ public class SubmissionService {
         }
 
         // Update status to PUBLISHED
-        submission.setSubmissionStatus(SubmissionStatus.PUBLISHED);
+        submission.setSubmissionStatus(SubmissionStatus.PUBLICATION);
         submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
 
         return submissionRepository.save(submission);

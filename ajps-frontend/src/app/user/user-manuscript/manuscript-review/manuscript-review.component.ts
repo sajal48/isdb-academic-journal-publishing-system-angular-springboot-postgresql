@@ -230,7 +230,7 @@ export class ManuscriptReviewComponent implements OnInit {
       this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'COPY_EDITING'),
       this.userManuscriptService.selectFileForCopyEditing(manuscriptId, fileIdToCopyEdit)
     ]).subscribe({
-      next: ([statusResponse, fileSelectionResponse]) => {
+      next: ([statusResponse]) => {
         // Update local manuscript status
         this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'COPY_EDITING';
         this.manuscript.isEditable = statusResponse.data?.isEditable ?? false; // Assuming false after acceptance
@@ -286,11 +286,11 @@ export class ManuscriptReviewComponent implements OnInit {
     let errorMessage = '';
 
     switch (this.currentAction) {
-      // case 'acceptReview': // This case is now handled by confirmAcceptRevisionWithFile
-      //   statusToUpdate = 'ACCEPTED';
-      //   successMessage = 'Manuscript accepted!';
-      //   errorMessage = 'Failed to accept manuscript.';
-      //   break;
+      case 'acceptReview': // This case is now handled by confirmAcceptRevisionWithFile
+        statusToUpdate = 'COPY_EDITING';
+        successMessage = 'Manuscript accepted!';
+        errorMessage = 'Failed to accept manuscript.';
+        break;
       case 'requestRevision':
         statusToUpdate = 'REVISION_REQUIRED';
         successMessage = 'Revision requested!';
