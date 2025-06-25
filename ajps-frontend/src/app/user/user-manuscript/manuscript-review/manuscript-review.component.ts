@@ -1,3 +1,4 @@
+// review ts:
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, DatePipe, KeyValuePipe, TitleCasePipe } from '@angular/common';
@@ -5,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs'; // Import forkJoin for parallel calls
 
 import { Discussion, Manuscript, SubmissionFile } from '../user-manuscript.component';
 import { DiscussionOrigin } from '../manuscript-submission/manuscript-submission.component';
@@ -37,6 +39,9 @@ export class ManuscriptReviewComponent implements OnInit {
   submissionFiles: SubmissionFile[] = [];
   revisionFiles: SubmissionFile[] = [];
   reviewDiscussions: Discussion[] = [];
+
+  // NEW: Property to hold the ID of the selected file for copy-editing
+  selectedCopyEditingFileId: number | null = null;
 
   DiscussionOrigin = DiscussionOrigin;
 
@@ -89,7 +94,7 @@ export class ManuscriptReviewComponent implements OnInit {
   filterFilesAndDiscussions(): void {
     if (this.manuscript) {
       this.submissionFiles = this.manuscript.files?.filter(file =>
-        file.fileOrigin === 'PRE_REVIEW' && file.isReviewFile) || [];
+        (file.fileOrigin === 'PRE_REVIEW' || file.fileOrigin === 'SUBMISSION') && file.isReviewFile) || [];
       this.revisionFiles = this.manuscript.files?.filter(file =>
         file.fileOrigin === 'REVISION') || [];
       this.reviewDiscussions = this.manuscript.discussions?.filter(discussion =>
@@ -129,7 +134,6 @@ export class ManuscriptReviewComponent implements OnInit {
 
   uploadRevisionFile(): void {
     if (this.selectedRevisionFile && this.manuscript?.id) {
-      // this.userToastNotificationService.showToast('Info', 'Uploading revision file...', 'info');
       this.userManuscriptService.uploadRevisionFile(Number(this.manuscript.id), this.selectedRevisionFile).subscribe({
         next: (response) => {
           if (response?.code === 200 && response.data) {
@@ -172,7 +176,6 @@ export class ManuscriptReviewComponent implements OnInit {
 
   confirmAddReviewDiscussion(): void {
     if (this.newReviewDiscussionTitle && this.newReviewDiscussionMessage && this.manuscript?.id && this.newReviewDiscussionOrigin) {
-      // this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
       this.userManuscriptService.createDiscussion(
         Number(this.manuscript.id),
         this.currentUserId,
@@ -205,10 +208,57 @@ export class ManuscriptReviewComponent implements OnInit {
     this.openModal('discussionContentModal');
   }
 
+  // NEW: Function to open the file selection modal
+  openSelectCopyEditingFileModal(): void {
+    this.selectedCopyEditingFileId = null; // Reset selection
+    this.openModal('selectCopyEditingFileModal');
+  }
+
+  // NEW: Function to confirm acceptance and select file for copy-editing
+  confirmAcceptRevisionWithFile(): void {
+    if (!this.manuscript?.id || this.selectedCopyEditingFileId === null) {
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
+      return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    const fileIdToCopyEdit = this.selectedCopyEditingFileId;
+
+    this.userToastNotificationService.showToast('Info', 'Accepting manuscript and preparing for copy-editing...', 'info');
+
+    // Make two API calls: one to update status and another to select the copy-editing file
+    forkJoin([
+      this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'ACCEPTED'),
+      this.userManuscriptService.selectFileForCopyEditing(manuscriptId, fileIdToCopyEdit)
+    ]).subscribe({
+      next: ([statusResponse, fileSelectionResponse]) => {
+        // Update local manuscript status
+        this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'ACCEPTED';
+        this.manuscript.isEditable = statusResponse.data?.isEditable ?? false; // Assuming false after acceptance
+
+        // Update local file data to reflect the copy-editing file status
+        if (this.manuscript.files) {
+          this.manuscript.files.forEach(file => {
+            file.isCopyEditingFile = (file.id === fileIdToCopyEdit); // Set true for the selected file, false for others
+          });
+        }
+
+        this.userToastNotificationService.showToast('Success', 'Manuscript accepted and file sent for copy-editing!', 'success');
+        this.closeModal('selectCopyEditingFileModal'); // Close the file selection modal
+        this.selectedCopyEditingFileId = null; // Clear selected file
+      },
+      error: (error) => {
+        console.error('Error during accept and file selection:', error);
+        this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to accept manuscript or select file for copy-editing.', 'danger');
+      }
+    });
+  }
+
+
   openReviewActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
-      case 'acceptReview':
+      case 'acceptReview': // This case will now be handled by openSelectCopyEditingFileModal
         this.confirmationMessage = 'Are you sure you want to accept this manuscript and send it for copy-editing?';
         break;
       case 'requestRevision':
@@ -223,6 +273,7 @@ export class ManuscriptReviewComponent implements OnInit {
     this.openModal('reviewConfirmationModal');
   }
 
+  // Refactor confirmReviewAction to only handle decline and potentially request revision if re-enabled
   confirmReviewAction(): void {
     if (!this.manuscript?.id) {
       this.userToastNotificationService.showToast('Error', 'Manuscript ID missing.', 'danger');
@@ -235,11 +286,11 @@ export class ManuscriptReviewComponent implements OnInit {
     let errorMessage = '';
 
     switch (this.currentAction) {
-      case 'acceptReview':
-        statusToUpdate = 'ACCEPTED';
-        successMessage = 'Manuscript accepted!';
-        errorMessage = 'Failed to accept manuscript.';
-        break;
+      // case 'acceptReview': // This case is now handled by confirmAcceptRevisionWithFile
+      //   statusToUpdate = 'ACCEPTED';
+      //   successMessage = 'Manuscript accepted!';
+      //   errorMessage = 'Failed to accept manuscript.';
+      //   break;
       case 'requestRevision':
         statusToUpdate = 'REVISION_REQUIRED';
         successMessage = 'Revision requested!';
@@ -255,7 +306,6 @@ export class ManuscriptReviewComponent implements OnInit {
         return;
     }
 
-    // this.userToastNotificationService.showToast('Info', `Performing action: ${this.currentAction}...`, 'info');
     this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate).subscribe({
       next: (response) => {
         this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');

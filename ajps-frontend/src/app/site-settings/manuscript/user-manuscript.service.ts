@@ -1,3 +1,4 @@
+// service ts:
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -210,11 +211,11 @@ export class UserManuscriptService {
     );
   }
 
- addReviewFileReference(manuscriptId: number, fileId: number): Observable<any> {
-  return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId }); // This works directly with the DTO
-}
+  addReviewFileReference(manuscriptId: number, fileId: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${manuscriptId}/send-to-review`, { fileId }); // This works directly with the DTO
+  }
 
-acceptAndSkipReview(submissionId: number): Observable<any> {
+  acceptAndSkipReview(submissionId: number): Observable<any> {
     // The endpoint is PUT /api/user/submission/{submissionId}/accept-skip-review
     // No request body is needed for this operation.
     return this.http.put(`${this.baseUrl}/${submissionId}/accept-skip-review`, {});
@@ -225,9 +226,16 @@ acceptAndSkipReview(submissionId: number): Observable<any> {
     // The endpoint is PUT /api/user/submission/{submissionId}/select-copy-editing-file
     // The backend expects a request body like { fileId: fileId }
     return this.http.put(`${this.baseUrl}/${submissionId}/select-copy-editing-file`, { fileId }).pipe(
+      map((response: any) => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to select file for copy-editing: Unexpected response');
+        }
+      }),
       catchError(error => {
         console.error('Error selecting file for copy-editing:', error);
-        return throwError(() => error);
+        return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
       })
     );
   }

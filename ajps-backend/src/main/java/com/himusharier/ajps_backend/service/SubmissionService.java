@@ -512,7 +512,7 @@ public class SubmissionService {
                     file.setCopyEditingFile(false); // Unmark any other files
                 }
                 // Ensure review file flag is false for all files here, as we are in copy-editing phase
-                file.setReviewFile(false);
+//                file.setReviewFile(false);
             }
         }
 

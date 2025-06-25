@@ -11,8 +11,7 @@
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
                             <small class="text-muted">{{ (file.size / 1024).toFixed(2) }} KB</small>
-                            <!-- <span *ngIf="file.isReviewFile" class="badge bg-primary ms-2">Current Review File</span> -->
-                        </div>
+                            </div>
                         <button type="button" class="btn btn-sm btn-outline-primary"
                             (click)="downloadFile(file.url, file.name)">
                             <i class="bi bi-download"></i> Download
@@ -29,9 +28,8 @@
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Revision Files</h5>
                 <div>
-                    <!-- <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#uploadRevisionFileModal"
-                            [disabled]="manuscript.submissionStatus !== 'REVISION_REQUIRED'">Upload Revision</button> -->
-                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#uploadRevisionFileModal">Upload Revision</button>
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                        data-bs-target="#uploadRevisionFileModal">Upload Revision</button>
                 </div>
             </div>
             <div class="card-body">
@@ -57,7 +55,8 @@
         <div class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Review Discussions</h5>
-                <button class="btn btn-sm btn-outline-secondary" (click)="addReviewDiscussion()">Add discussion</button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="addReviewDiscussion()">Add
+                    discussion</button>
             </div>
             <div class="card-body">
                 <div *ngIf="!reviewDiscussions || reviewDiscussions.length === 0" class="text-muted mb-3">
@@ -74,15 +73,14 @@
                     <tbody>
                         <tr *ngFor="let discussion of reviewDiscussions">
                             <td>
-                                <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();" class="text-decoration-none text-primary">
+                                <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();"
+                                    class="text-decoration-none text-primary">
                                     <i class="bi bi-chat-dots"></i> {{ discussion.title }}
                                 </a>
                             </td>
                             <td>{{ discussion.creatorName }}</td>
                             <td style="white-space: nowrap;">{{ discussion.createdAt | date:'longDate' }}</td>
-                            <!-- <td><span class="badge bg-info text-dark">{{ discussion.origin | titlecase | replaceUnderscore }}</span></td> -->
-                            <!-- <td><span class="badge bg-info text-dark">{{ discussion.origin | titlecase }}</span></td> -->
-                        </tr>
+                            </tr>
                     </tbody>
                 </table>
             </div>
@@ -90,47 +88,43 @@
     </div>
 
     <div class="col-md-3">
-        <!-- Review Status / Decision Display (Optional: Add more detailed status here) -->
         <div class="card mb-4 p-2 bg-info-subtle text-success-emphasis"
-             *ngIf="manuscript.submissionStatus === 'UNDER_REVIEW'">
+            *ngIf="manuscript.submissionStatus === 'UNDER_REVIEW'">
             <a><i class="bi bi-person-lines-fill"></i> Manuscript is Under Review</a>
         </div>
-         <div class="card mb-4 p-2 bg-info-subtle text-warning-emphasis"
-             *ngIf="manuscript.submissionStatus === 'REVISION_REQUIRED'">
+        <div class="card mb-4 p-2 bg-info-subtle text-warning-emphasis"
+            *ngIf="manuscript.submissionStatus === 'REVISION_REQUIRED'">
             <a><i class="bi bi-exclamation-triangle-fill"></i> Revision Required</a>
         </div>
         <div class="card mb-4 p-2 bg-info-subtle text-danger-emphasis"
-             *ngIf="manuscript.submissionStatus === 'REJECTED'">
+            *ngIf="manuscript.submissionStatus === 'REJECTED'">
             <a><i class="bi bi-x-circle-fill"></i> Submission Rejected</a>
         </div>
-         <div class="card mb-4 p-2 bg-info-subtle text-primary-emphasis"
-             *ngIf="manuscript.submissionStatus === 'ACCEPTED'">
+        <div class="card mb-4 p-2 bg-info-subtle text-primary-emphasis"
+            *ngIf="manuscript.submissionStatus === 'ACCEPTED'">
             <a><i class="bi bi-check-circle-fill"></i> Submission Accepted</a>
         </div>
 
 
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-primary" style="font-size: 14px;" (click)="openReviewActionModal('acceptReview')"
-                        [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW' && manuscript.submissionStatus !== 'REVISION_REQUIRED'">
-                    Accept Manuscript
+                <button class="btn btn-primary" style="font-size: 14px;"
+                    (click)="openSelectCopyEditingFileModal()"
+                    [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW' && manuscript.submissionStatus !== 'REVISION_REQUIRED'">
+                    Accept Revision
                 </button>
-                <!-- <button class="btn btn-warning" style="font-size: 14px;" (click)="openReviewActionModal('requestRevision')"
-                        [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW'">
-                    Request Revision
-                </button> -->
-                <button class="btn btn-danger" style="font-size: 14px;" (click)="openReviewActionModal('declineSubmission')"
-                        [disabled]="manuscript.submissionStatus === 'REJECTED'">
+                <button class="btn btn-danger" style="font-size: 14px;"
+                    (click)="openReviewActionModal('declineSubmission')"
+                    [disabled]="manuscript.submissionStatus === 'REJECTED'">
                     Decline Submission
                 </button>
-                <!-- Add other review actions like "Assign New Reviewer" here if needed -->
-            </div>
+                </div>
         </div>
     </div>
 </div>
 
-<!-- Upload Revision File Modal -->
-<div class="modal fade" id="uploadRevisionFileModal" tabindex="-1" aria-labelledby="uploadRevisionFileModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadRevisionFileModal" tabindex="-1" aria-labelledby="uploadRevisionFileModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -143,19 +137,21 @@
                     <input class="form-control" type="file" id="revisionFile" (change)="onRevisionFileSelected($event)">
                 </div>
                 <div *ngIf="selectedRevisionFile">
-                    Selected file: {{ selectedRevisionFile.name }} ({{ (selectedRevisionFile.size / 1024).toFixed(2) }} KB)
+                    Selected file: {{ selectedRevisionFile.name }} ({{ (selectedRevisionFile.size / 1024).toFixed(2) }}
+                    KB)
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" (click)="uploadRevisionFile()" [disabled]="!selectedRevisionFile">Upload Revision</button>
+                <button type="button" class="btn btn-primary" (click)="uploadRevisionFile()"
+                    [disabled]="!selectedRevisionFile">Upload Revision</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add Review Discussion Modal -->
-<div class="modal fade" id="addReviewDiscussionModal" tabindex="-1" aria-labelledby="addReviewDiscussionModalLabel" aria-hidden="true">
+<div class="modal fade" id="addReviewDiscussionModal" tabindex="-1" aria-labelledby="addReviewDiscussionModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -165,31 +161,26 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="reviewDiscussionTitle" class="form-label">Discussion Title</label>
-                    <input type="text" class="form-control" id="reviewDiscussionTitle" [(ngModel)]="newReviewDiscussionTitle" required>
+                    <input type="text" class="form-control" id="reviewDiscussionTitle"
+                        [(ngModel)]="newReviewDiscussionTitle" required>
                 </div>
                 <div class="mb-3">
                     <label for="reviewDiscussionMessage" class="form-label">Message</label>
-                    <textarea class="form-control" id="reviewDiscussionMessage" rows="3" [(ngModel)]="newReviewDiscussionMessage" required></textarea>
+                    <textarea class="form-control" id="reviewDiscussionMessage" rows="3"
+                        [(ngModel)]="newReviewDiscussionMessage" required></textarea>
                 </div>
-                <!-- Origin is automatically set to IN_REVIEW by addReviewDiscussion() for this modal -->
-                 <!-- <div class="mb-3" *ngIf="newReviewDiscussionOrigin">
-                    <label for="reviewDiscussionOriginDisplay" class="form-label">Origin</label> -->
-                    <!-- <input type="text" class="form-control" id="reviewDiscussionOriginDisplay"
-                           [ngModel]="newReviewDiscussionOrigin | titlecase | replaceUnderscore" readonly> -->
-                    <!-- <input type="text" class="form-control" id="reviewDiscussionOriginDisplay"
-                           [ngModel]="newReviewDiscussionOrigin | titlecase" readonly> -->
-                <!-- </div> -->
-            </div>
+                </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" (click)="confirmAddReviewDiscussion()" [disabled]="!newReviewDiscussionTitle || !newReviewDiscussionMessage">Add Discussion</button>
+                <button type="button" class="btn btn-primary" (click)="confirmAddReviewDiscussion()"
+                    [disabled]="!newReviewDiscussionTitle || !newReviewDiscussionMessage">Add Discussion</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Generic Confirmation Modal -->
-<div class="modal fade" id="reviewConfirmationModal" tabindex="-1" aria-labelledby="reviewConfirmationModalLabel" aria-hidden="true">
+<div class="modal fade" id="reviewConfirmationModal" tabindex="-1" aria-labelledby="reviewConfirmationModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -207,12 +198,13 @@
     </div>
 </div>
 
-<!-- Discussion Content Modal -->
-<div class="modal fade" id="discussionContentModal" tabindex="-1" aria-labelledby="discussionContentModalLabel" aria-hidden="true">
+<div class="modal fade" id="discussionContentModal" tabindex="-1" aria-labelledby="discussionContentModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}</h5>
+                <h5 class="modal-title" id="discussionContentModalLabel">Discussion: {{ selectedDiscussion?.title }}
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -225,7 +217,8 @@
                         </div>
                         <div class="col-md-6 text-md-end">
                             <p class="mb-0 text-muted">
-                                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at {{ selectedDiscussion.createdAt | date:'shortTime' }}
+                                <strong>Date:</strong> {{ selectedDiscussion.createdAt | date:'longDate' }} at
+                                {{ selectedDiscussion.createdAt | date:'shortTime' }}
                             </p>
                         </div>
                     </div>
@@ -241,6 +234,57 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="selectCopyEditingFileModal" tabindex="-1"
+    aria-labelledby="selectCopyEditingFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectCopyEditingFileModalLabel">Select File for Copy-Editing</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Please select the file you wish to send for copy-editing:</p>
+                <ul class="list-group">
+                    <ng-container *ngIf="submissionFiles.length > 0">
+                        <li class="list-group-item bg-light fw-semibold">Original Submission Files</li>
+                        <li *ngFor="let file of submissionFiles"
+                            class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <input type="radio" name="copyEditingFile" [value]="file.id"
+                                    [(ngModel)]="selectedCopyEditingFileId" class="form-check-input me-2">
+                                <label>{{ file.name }}</label>
+                            </div>
+                            <small class="text-muted">{{ (file.size / 1024).toFixed(2) }} KB</small>
+                        </li>
+                    </ng-container>
+
+                    <ng-container *ngIf="revisionFiles.length > 0">
+                        <li class="list-group-item bg-light fw-semibold mt-3">Revision Files</li>
+                        <li *ngFor="let file of revisionFiles"
+                            class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <input type="radio" name="copyEditingFile" [value]="file.id"
+                                    [(ngModel)]="selectedCopyEditingFileId" class="form-check-input me-2">
+                                <label>{{ file.name }}</label>
+                            </div>
+                            <small class="text-muted">{{ (file.size / 1024).toFixed(2) }} KB</small>
+                        </li>
+                    </ng-container>
+
+                    <div *ngIf="!submissionFiles.length && !revisionFiles.length" class="text-muted mt-3">
+                        No files available to select for copy-editing.
+                    </div>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="confirmAcceptRevisionWithFile()"
+                    [disabled]="!selectedCopyEditingFileId">Accept & Send to Copy-Editing</button>
             </div>
         </div>
     </div>
