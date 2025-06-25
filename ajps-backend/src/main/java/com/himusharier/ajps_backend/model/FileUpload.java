@@ -45,6 +45,9 @@ public class FileUpload {
     @Column(nullable = false)
     private boolean isProductionFile = false;
 
+    @Column(nullable = false)
+    private boolean isPublicationFile = false;
+
     @ManyToOne
     @JoinColumn(name = "submission_id", nullable = false)
     @JsonBackReference

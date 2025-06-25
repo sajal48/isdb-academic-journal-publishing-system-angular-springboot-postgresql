@@ -77,6 +77,7 @@ export interface SubmissionFile {
   isCopyEditingFile?: boolean;
   fileOrigin?: string;
   isProductionFile?: boolean; // Add this new property
+  isPublicationFile?: boolean;
 }
 
 export interface Reviewer {

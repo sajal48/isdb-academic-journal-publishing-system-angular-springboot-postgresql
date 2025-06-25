@@ -37,6 +37,7 @@ export class ManuscriptProductionComponent implements OnInit {
   currentAction: string = '';
 
   private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT;
+  selectedPublicationFileId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -228,20 +229,21 @@ export class ManuscriptProductionComponent implements OnInit {
     this.openModal('discussionContentModal');
   }
 
-  openProductionActionModal(action: string): void {
+  // Modify the existing openProductionActionModal method
+openProductionActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
-      case 'scheduleForPublication':
-        this.confirmationMessage = 'Are you sure you want to schedule this manuscript for publication?';
-        break;
-      case 'declineSubmission':
-        this.confirmationMessage = 'Are you sure you want to decline this submission?';
-        break;
-      default:
-        this.confirmationMessage = 'Are you sure you want to proceed?';
+        case 'scheduleForPublication':
+            this.openSelectPublicationFileModal();
+            return;
+        case 'declineSubmission':
+            this.confirmationMessage = 'Are you sure you want to decline this submission?';
+            break;
+        default:
+            this.confirmationMessage = 'Are you sure you want to proceed?';
     }
     this.openModal('productionConfirmationModal');
-  }
+}
 
   confirmProductionAction(): void {
     if (!this.manuscript?.id) {
@@ -252,15 +254,18 @@ export class ManuscriptProductionComponent implements OnInit {
     const manuscriptId = Number(this.manuscript.id);
     let statusToUpdate = '';
     let successMessage = '';
+    let navigateToRoute: string | null = null;
 
     switch (this.currentAction) {
       case 'scheduleForPublication':
         statusToUpdate = 'PUBLISHED';
         successMessage = 'Manuscript scheduled for publication!';
+        navigateToRoute = `/user/manuscript/${manuscriptId}/publication`;
         break;
       case 'declineSubmission':
         statusToUpdate = 'REJECTED';
         successMessage = 'Submission declined.';
+        navigateToRoute = `/user/manuscript/${manuscriptId}/submission`;
         break;
       default:
         this.userToastNotificationService.showToast('Error', 'Invalid action.', 'danger');
@@ -272,6 +277,10 @@ export class ManuscriptProductionComponent implements OnInit {
         this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
         this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
         this.closeModal('productionConfirmationModal');
+        // this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
+        if (navigateToRoute) {
+            this.router.navigate([navigateToRoute]);
+          }
       },
       error: (err) => {
         console.error('Production action error:', err);
@@ -297,4 +306,52 @@ export class ManuscriptProductionComponent implements OnInit {
       }
     }
   }
+
+  // Add this method to open the file selection modal
+openSelectPublicationFileModal(): void {
+    this.selectedPublicationFileId = null; // Reset selection
+    this.openModal('selectPublicationFileModal');
+}
+
+// Add this method to handle the confirmation with file selection
+confirmScheduleForPublication(): void {
+    if (!this.manuscript?.id || this.selectedPublicationFileId === null) {
+        this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
+        return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    const fileIdForPublication = this.selectedPublicationFileId;
+
+    this.userToastNotificationService.showToast('Info', 'Scheduling manuscript for publication...', 'info');
+
+    // Make two API calls: one to update status and another to select the publication file
+    forkJoin([
+        this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PUBLICATION'),
+        this.userManuscriptService.selectFileForPublication(manuscriptId, fileIdForPublication)
+    ]).subscribe({
+        next: ([statusResponse, fileSelectionResponse]) => {
+            // Update local manuscript status
+            this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PUBLICATION';
+            
+            // Update local file data to reflect the publication file status
+            if (this.manuscript.files) {
+                this.manuscript.files.forEach(file => {
+                    file.isPublicationFile = (file.id === fileIdForPublication);
+                });
+            }
+
+            this.userToastNotificationService.showToast('Success', 'Manuscript scheduled for publication!', 'success');
+            this.closeModal('selectPublicationFileModal');
+            this.selectedPublicationFileId = null;
+            this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
+        },
+        error: (error) => {
+            console.error('Error during publication scheduling:', error);
+            this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to schedule for publication.', 'danger');
+        }
+    });
+}
+
+
 }

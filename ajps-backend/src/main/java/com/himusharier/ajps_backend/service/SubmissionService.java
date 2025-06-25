@@ -597,4 +597,38 @@ public class SubmissionService {
         return saveFile(submissionId, FileUploadOrigin.PRODUCTION.name(), file);
     }
 
+    // Add this to SubmissionService.java
+    @Transactional
+    public Submission selectFileForPublication(Long submissionId, Long fileIdForPublication) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Business logic: Ensure the submission is in production phase
+//        if (submission.getSubmissionStatus() != SubmissionStatus.PRODUCTION) {
+//            throw new SubmissionRequestException("Cannot select file for publication as the submission is not in 'PRODUCTION' status");
+//        }
+
+        boolean fileFoundAndMarked = false;
+        if (submission.getFiles() != null) {
+            for (FileUpload file : submission.getFiles()) {
+                if (file.getId().equals(fileIdForPublication)) {
+                    file.setPublicationFile(true); // Mark this file for publication
+                    fileFoundAndMarked = true;
+                } else {
+                    file.setPublicationFile(false); // Unmark any other files
+                }
+            }
+        }
+
+        if (!fileFoundAndMarked) {
+            throw new SubmissionRequestException("File with ID: " + fileIdForPublication + " not found within submission ID: " + submissionId);
+        }
+
+        // Update status to PUBLISHED
+        submission.setSubmissionStatus(SubmissionStatus.PUBLISHED);
+        submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
+
+        return submissionRepository.save(submission);
+    }
+
 }

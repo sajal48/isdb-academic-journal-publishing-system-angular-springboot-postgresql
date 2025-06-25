@@ -413,4 +413,19 @@ public class SubmissionController {
         }
     }
 
+    // Add this to SubmissionController.java
+    @PutMapping("/{submissionId}/select-publication-file")
+    public ResponseEntity<ApiResponse<?>> selectFileForPublication(
+            @PathVariable Long submissionId,
+            @RequestBody SendToReviewRequest request) {
+        try {
+            Submission updatedSubmission = submissionService.selectFileForPublication(submissionId, request.getFileId());
+            return ResponseEntity.ok(new ApiResponse(200, "File selected for publication successfully.", updatedSubmission));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Failed to select file for publication.", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to select file for publication."));
+        }
+    }
+
 }

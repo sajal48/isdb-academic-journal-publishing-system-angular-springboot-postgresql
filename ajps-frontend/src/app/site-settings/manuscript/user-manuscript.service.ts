@@ -322,4 +322,21 @@ uploadProductionFile(submissionId: number, file: File): Observable<any> {
   );
 }
 
+// Add this to UserManuscriptService
+selectFileForPublication(submissionId: number, fileId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/${submissionId}/select-publication-file`, { fileId }).pipe(
+        map((response: any) => {
+            if (response && response.code === 200 && response.status === 'success') {
+                return response;
+            } else {
+                throw new Error(response?.message || 'Failed to select file for publication: Unexpected response');
+            }
+        }),
+        catchError(error => {
+            console.error('Error selecting file for publication:', error);
+            return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
+        })
+    );
+}
+
 }
