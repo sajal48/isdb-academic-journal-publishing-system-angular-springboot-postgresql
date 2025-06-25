@@ -1,234 +1,289 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
-// --- Reused Interfaces ---
-interface CustomFile {
-  name: string;
-  size: number; // in bytes
-  url: string;
-}
+import { Discussion, DiscussionOrigin, Manuscript, SubmissionFile } from '../user-manuscript.component';
+import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
+import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
-interface Discussion {
-  id: string;
-  title: string;
-  content: string;
-  creatorName: string;
-  createdAt: Date;
-}
+declare var bootstrap: any;
 
-interface User {
-  userId: string;
-  // ... other user properties
-}
-
-// --- Manuscript Interface (updated for Production) ---
-interface Manuscript {
-  id: string;
-  productionReadyFiles: CustomFile[];
-  productionDiscussions: Discussion[];
-  owner: User;
-  // ... other manuscript properties
-}
 @Component({
   selector: 'app-manuscript-production',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe],
   templateUrl: './manuscript-production.component.html',
-  styleUrl: './manuscript-production.component.css'
+  styleUrls: ['./manuscript-production.component.css'],
+  standalone: true
 })
 export class ManuscriptProductionComponent implements OnInit {
+  manuscript!: Manuscript;
+  currentUserId: number = 0;
 
-  manuscript: Manuscript | null = null;
-  currentUserId: string = 'production_manager456'; // Simulate current user ID
+  copyEditedFiles: SubmissionFile[] = [];
+  productionReadyFiles: SubmissionFile[] = [];
+  productionDiscussions: Discussion[] = [];
 
-  selectedProductionFile: CustomFile | null = null;
+  selectedProductionFile: File | null = null;
   newProductionDiscussionTitle: string = '';
   newProductionDiscussionMessage: string = '';
-  selectedDiscussion: Discussion | null = null; // Reused for viewing any discussion
+  selectedDiscussion: Discussion | null = null;
 
   confirmationMessage: string = '';
-  currentAction: string = ''; // Stores the action type for the confirmation modal
+  currentAction: string = '';
 
-  constructor(private http: HttpClient) { }
+  private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT;
+
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private userManuscriptService: UserManuscriptService,
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private userToastNotificationService: UserToastNotificationService
+  ) {}
 
   ngOnInit(): void {
-    this.loadManuscriptDetails('manuscript123'); // Load a dummy manuscript
+    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.route.parent?.paramMap.pipe(
+      switchMap(params => {
+        const manuscriptId = params.get('manuscriptId');
+        if (manuscriptId && this.currentUserId) {
+          return this.userManuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
+        }
+        return of(undefined);
+      })
+    ).subscribe(manuscript => {
+      if (manuscript) {
+        this.manuscript = manuscript;
+        console.log('Manuscript loaded for production:', this.manuscript);
+        this.filterFilesAndDiscussions();
+        this.loadDiscussions(Number(this.manuscript.id));
+      } else {
+        console.error('Manuscript not found.');
+        this.userToastNotificationService.showToast('Error', 'Manuscript not found.', 'danger');
+        this.router.navigate(['/user/dashboard']);
+      }
+    });
   }
 
-  /**
-   * Loads manuscript details for production from a (mock) API.
-   */
-  loadManuscriptDetails(manuscriptId: string): void {
-    // Simulate API call
-    setTimeout(() => {
-      this.manuscript = {
-        id: manuscriptId,
-        productionReadyFiles: [
-          { name: 'Final_Manuscript_Layout.pdf', size: 3500000, url: '/assets/final_layout.pdf' },
-          { name: 'Web_Optimized_Images.zip', size: 800000, url: '/assets/web_images.zip' }
-        ],
-        productionDiscussions: [
-          {
-            id: 'prodDisc1',
-            title: 'Proof for Final Review',
-            content: 'The final PDF proof is ready. Please review and provide approval for publication.',
-            creatorName: 'Production Mgr David',
-            createdAt: new Date('2025-06-24T10:00:00Z')
-          },
-          {
-            id: 'prodDisc2',
-            title: 'DOI Assignment Status',
-            content: 'Waiting on DOI assignment from CrossRef. Will update once received.',
-            creatorName: 'Production Assistant Eve',
-            createdAt: new Date('2025-06-24T14:15:00Z')
-          }
-        ],
-        owner: { userId: 'author456' } // Example owner
-      };
-      console.log('Manuscript loaded for production:', this.manuscript);
-    }, 500);
+  filterFilesAndDiscussions(): void {
+    if (this.manuscript) {
+      // Copy edited files are those marked as isCopyEditingFile or with COPY_EDIT origin
+      this.copyEditedFiles = this.manuscript.files?.filter(file => 
+        file.isCopyEditingFile) || [];
+      
+      // Production ready files are those marked as isProductionFile or with PRODUCTION origin
+      this.productionReadyFiles = this.manuscript.files?.filter(file => 
+        file.isProductionFile || file.fileOrigin === 'PRODUCTION') || [];
+      
+      this.productionDiscussions = this.manuscript.discussions?.filter(discussion => 
+        discussion.origin === DiscussionOrigin.PRODUCTION) || [];
+    }
   }
 
-  /**
-   * Downloads a file.
-   */
+  loadDiscussions(submissionId: number): void {
+    this.userManuscriptService.getDiscussionsForSubmission(submissionId).subscribe({
+      next: (discussions) => {
+        this.manuscript.discussions = discussions;
+        this.productionDiscussions = discussions.filter(d => d.origin === DiscussionOrigin.PRODUCTION);
+        console.log('Production discussions loaded:', this.productionDiscussions);
+      },
+      error: (err) => {
+        console.error('Error loading discussions:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load discussions.', 'danger');
+      }
+    });
+  }
+
   downloadFile(url: string, fileName: string): void {
-    console.log(`Downloading: ${fileName} from ${url}`);
-    alert(`Initiating download for: ${fileName}`);
-    window.open(url, '_blank');
+    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.href = downloadUrl;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        a.remove();
+        this.userToastNotificationService.showToast('Success', `${fileName} downloaded successfully!`, 'success');
+      },
+      error: (error) => {
+        console.error('Download error:', error);
+        this.userToastNotificationService.showToast('Error', `Failed to download ${fileName}.`, 'danger');
+      }
+    });
   }
 
-  // --- Production File Upload Functions ---
-
-  /**
-   * Handles the selection of a production file.
-   */
   onProductionFileSelected(event: any): void {
     const file: File = event.target.files[0];
-    if (file) {
-      this.selectedProductionFile = {
-        name: file.name,
-        size: file.size,
-        url: URL.createObjectURL(file as Blob) // Explicitly cast to Blob
-      };
-      console.log('Production file selected:', this.selectedProductionFile);
-    } else {
-      this.selectedProductionFile = null;
-    }
+    this.selectedProductionFile = file || null;
   }
 
-  /**
-   * Uploads the selected production file.
-   */
   uploadProductionFile(): void {
-    if (this.selectedProductionFile && this.manuscript) {
-      console.log('Uploading production file:', this.selectedProductionFile.name);
-      // Simulate file upload to a backend
-      // this.http.post('/api/upload-production-file', formData).subscribe(...)
-
-      // Add to manuscript's productionReadyFiles array for immediate UI update
-      this.manuscript.productionReadyFiles.push({ ...this.selectedProductionFile });
-      this.selectedProductionFile = null; // Clear selected file after upload
-      this.closeModal('uploadProductionFileModal'); // Close the modal
-      alert('Production file uploaded successfully!');
+    if (this.selectedProductionFile && this.manuscript?.id) {
+      this.userManuscriptService.uploadProductionFile(Number(this.manuscript.id), this.selectedProductionFile).subscribe({
+        next: (response) => {
+          if (response?.code === 200 && response.data) {
+            const newFile = {
+              id: response.data.id,
+              name: response.data.originalName,
+              url: response.data.fileUrl,
+              size: response.data.size,
+              storedName: response.data.storedName,
+              isReviewFile: response.data.isReviewFile,
+              isCopyEditingFile: response.data.isCopyEditingFile,
+              isProductionFile: response.data.isProductionFile,
+              fileOrigin: response.data.fileOrigin
+            };
+            if (!this.manuscript.files) this.manuscript.files = [];
+            this.manuscript.files.push(newFile);
+            this.filterFilesAndDiscussions();
+            this.selectedProductionFile = null;
+            this.closeModal('uploadProductionFileModal');
+            this.userToastNotificationService.showToast('Success', 'Production file uploaded successfully!', 'success');
+          } else {
+            this.userToastNotificationService.showToast('Error', 'Unexpected server response.', 'danger');
+          }
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          this.userToastNotificationService.showToast('Error', error.error?.message || 'Upload failed.', 'danger');
+        }
+      });
     } else {
-      alert('No production file selected to upload.');
+      this.userToastNotificationService.showToast('Warning', 'No file selected or manuscript ID missing.', 'warning');
     }
   }
 
-  // --- Production Discussion Functions ---
+  markAsFinalVersion(file: SubmissionFile): void {
+    if (!this.manuscript?.id) return;
 
-  /**
-   * Opens the "Add New Production Discussion" modal.
-   */
+    this.userToastNotificationService.showToast('Info', 'Marking file as final version...', 'info');
+    
+    this.userManuscriptService.selectFileForProduction(Number(this.manuscript.id), file.id).subscribe({
+      next: (response) => {
+        if (response?.code === 200) {
+          // Update local file status
+          if (this.manuscript.files) {
+            this.manuscript.files.forEach(f => {
+              f.isProductionFile = (f.id === file.id);
+            });
+          }
+          this.filterFilesAndDiscussions();
+          this.userToastNotificationService.showToast('Success', 'File marked as final version!', 'success');
+        } else {
+          this.userToastNotificationService.showToast('Error', 'Failed to mark file as final version.', 'danger');
+        }
+      },
+      error: (error) => {
+        console.error('Error marking file as final:', error);
+        this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to mark file as final version.', 'danger');
+      }
+    });
+  }
+
   addProductionDiscussion(): void {
     this.newProductionDiscussionTitle = '';
     this.newProductionDiscussionMessage = '';
     this.openModal('addProductionDiscussionModal');
   }
 
-  /**
-   * Confirms and adds a new production discussion.
-   */
   confirmAddProductionDiscussion(): void {
-    if (this.newProductionDiscussionTitle && this.newProductionDiscussionMessage && this.manuscript) {
-      const newDisc: Discussion = {
-        id: `prodDisc${Date.now()}`, // Simple unique ID
-        title: this.newProductionDiscussionTitle,
-        content: this.newProductionDiscussionMessage,
-        creatorName: 'Current User (Production)', // Replace with actual current user
-        createdAt: new Date()
-      };
-      this.manuscript.productionDiscussions.push(newDisc);
-      console.log('New production discussion added:', newDisc);
-      this.closeModal('addProductionDiscussionModal');
-      alert('Discussion added successfully!');
+    if (this.newProductionDiscussionTitle && this.newProductionDiscussionMessage && this.manuscript?.id) {
+      this.userManuscriptService.createDiscussion(
+        Number(this.manuscript.id),
+        this.currentUserId,
+        this.newProductionDiscussionTitle,
+        this.newProductionDiscussionMessage,
+        this.discussionOrigin = DiscussionOrigin.PRODUCTION
+      ).subscribe({
+        next: (newDisc) => {
+          if (!this.manuscript.discussions) this.manuscript.discussions = [];
+          this.manuscript.discussions.push(newDisc);
+          this.filterFilesAndDiscussions();
+          this.closeModal('addProductionDiscussionModal');
+          this.newProductionDiscussionTitle = '';
+          this.newProductionDiscussionMessage = '';
+          this.userToastNotificationService.showToast('Success', 'Discussion added!', 'success');
+        },
+        error: (err) => {
+          console.error('Discussion error:', err);
+          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to add discussion.', 'danger');
+        }
+      });
     } else {
-      alert('Please enter both title and message for the discussion.');
+      this.userToastNotificationService.showToast('Warning', 'Fill all discussion fields.', 'warning');
     }
   }
 
-  /**
-   * Views the content of a selected discussion in a modal.
-   */
   viewDiscussionContent(discussion: Discussion): void {
     this.selectedDiscussion = discussion;
     this.openModal('discussionContentModal');
   }
 
-  // --- Production Action Functions ---
-
-  /**
-   * Opens the confirmation modal for various production actions.
-   */
   openProductionActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
       case 'scheduleForPublication':
         this.confirmationMessage = 'Are you sure you want to schedule this manuscript for publication?';
         break;
-      case 'requestFinalApproval':
-        this.confirmationMessage = 'Are you sure you want to request final approval for this manuscript?';
-        break;
-      case 'haltProduction':
-        this.confirmationMessage = 'WARNING: Are you absolutely sure you want to halt production for this manuscript? This action might require further justification.';
+      case 'declineSubmission':
+        this.confirmationMessage = 'Are you sure you want to decline this submission?';
         break;
       default:
-        this.confirmationMessage = 'Are you sure you want to proceed with this action?';
-        break;
+        this.confirmationMessage = 'Are you sure you want to proceed?';
     }
     this.openModal('productionConfirmationModal');
   }
 
-  /**
-   * Executes the confirmed production action.
-   */
   confirmProductionAction(): void {
-    console.log(`Confirmed action: ${this.currentAction}`);
-    // Implement the actual logic for each action here
+    if (!this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID missing.', 'danger');
+      return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    let statusToUpdate = '';
+    let successMessage = '';
+
     switch (this.currentAction) {
       case 'scheduleForPublication':
-        alert('Manuscript scheduled for publication!');
-        // Call service to update manuscript status and schedule
+        statusToUpdate = 'PUBLISHED';
+        successMessage = 'Manuscript scheduled for publication!';
         break;
-      case 'requestFinalApproval':
-        alert('Final approval requested!');
-        // Call service to notify relevant parties
+      case 'declineSubmission':
+        statusToUpdate = 'REJECTED';
+        successMessage = 'Submission declined.';
         break;
-      case 'haltProduction':
-        alert('Production halted for manuscript!');
-        // Call service to change status and trigger necessary alerts
-        break;
+      default:
+        this.userToastNotificationService.showToast('Error', 'Invalid action.', 'danger');
+        return;
     }
-    this.closeModal('productionConfirmationModal');
+
+    this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate).subscribe({
+      next: (response) => {
+        this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+        this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+        this.closeModal('productionConfirmationModal');
+      },
+      error: (err) => {
+        console.error('Production action error:', err);
+        this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to complete action.', 'danger');
+      }
+    });
   }
 
-  // --- Utility Functions for Modals (using Bootstrap 5's JS API) ---
   openModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = new (window as any).bootstrap.Modal(modalElement);
+      const bootstrapModal = new bootstrap.Modal(modalElement);
       bootstrapModal.show();
     }
   }
@@ -236,7 +291,7 @@ export class ManuscriptProductionComponent implements OnInit {
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
       if (bootstrapModal) {
         bootstrapModal.hide();
       }

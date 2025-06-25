@@ -285,7 +285,6 @@ export class UserManuscriptService {
   
   // Add this method to UserManuscriptService
 selectFileForProduction(submissionId: number, fileId: number): Observable<any> {
-  debugger
     return this.http.put(`${this.baseUrl}/${submissionId}/select-production-file`, { fileId }).pipe(
         map((response: any) => {
             if (response && response.code === 200 && response.status === 'success') {
@@ -299,6 +298,28 @@ selectFileForProduction(submissionId: number, fileId: number): Observable<any> {
             return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
         })
     );
+}
+
+// Add this to UserManuscriptService
+uploadProductionFile(submissionId: number, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('file', file);
+  // The backend endpoint specifically marks this as 'PRODUCTION' origin
+
+  return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-production-file`, formData).pipe(
+    map(response => {
+      if (response && response.code === 200 && response.status === 'success') {
+        return response;
+      } else {
+        throw new Error(response?.message || 'Failed to upload production file: Unexpected response');
+      }
+    }),
+    catchError(error => {
+      console.error('Error uploading production file:', error);
+      const errorMessage = error.error?.message || error.statusText || 'Server error during production file upload.';
+      return throwError(() => new Error(errorMessage));
+    })
+  );
 }
 
 }

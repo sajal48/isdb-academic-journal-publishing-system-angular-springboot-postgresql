@@ -583,4 +583,18 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
+    // Add this to SubmissionService.java
+    @Transactional
+    public FileUpload uploadProductionFile(Long submissionId, MultipartFile file) throws IOException {
+        Submission existingSubmission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Business logic: Ensure the submission is in production phase
+        if (existingSubmission.getSubmissionStatus() != SubmissionStatus.PRODUCTION) {
+            throw new SubmissionRequestException("Cannot upload production file as the submission is not in 'PRODUCTION' status");
+        }
+
+        return saveFile(submissionId, FileUploadOrigin.PRODUCTION.name(), file);
+    }
+
 }

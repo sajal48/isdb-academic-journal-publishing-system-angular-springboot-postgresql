@@ -95,7 +95,8 @@ export enum DiscussionOrigin {
   EDITORIAL = 'EDITORIAL',
   AUTHOR_QUERY = 'AUTHOR_QUERY',
   TECHNICAL_SUPPORT = 'TECHNICAL_SUPPORT',
-  COPY_EDIT = 'COPY_EDIT'
+  COPY_EDIT = 'COPY_EDIT',
+  PRODUCTION = 'PRODUCTION',
   // Ensure this matches your Java enum values exactly
 }
 
