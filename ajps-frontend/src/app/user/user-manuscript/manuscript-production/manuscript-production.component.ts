@@ -75,11 +75,11 @@ export class ManuscriptProductionComponent implements OnInit {
   filterFilesAndDiscussions(): void {
     if (this.manuscript) {
       // Copy edited files are those marked as isCopyEditingFile or with COPY_EDIT origin
-      this.copyEditedFiles = this.manuscript.files?.filter(file => file.isCopyEditingFile) || [];
+      this.copyEditedFiles = this.manuscript.files?.filter(file => file.isProductionFile) || [];
       
       // Production ready files are those marked as isProductionFile or with PRODUCTION origin
       this.productionReadyFiles = this.manuscript.files?.filter(file => 
-        file.isProductionFile || file.fileOrigin === 'PRODUCTION') || [];
+        file.isPublicationFile || file.fileOrigin === 'PRODUCTION') || [];
       
       this.productionDiscussions = this.manuscript.discussions?.filter(discussion => 
         discussion.origin === DiscussionOrigin.PRODUCTION) || [];

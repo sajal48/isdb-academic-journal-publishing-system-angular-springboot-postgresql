@@ -3,17 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, forkJoin } from 'rxjs';
+import { of, forkJoin, throwError } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { Discussion, DiscussionOrigin, Manuscript, SubmissionFile } from '../user-manuscript.component';
-import { Journal, JournalIssue, UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service'; // Import Journal and JournalIssue interfaces
+import { Journal, JournalIssue, UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
+// Declare bootstrap to avoid TypeScript errors if not imported as a module
 declare var bootstrap: any;
 
-interface JournalIssueDisplay { // Renamed to avoid conflict with imported JournalIssue
+interface JournalIssueDisplay {
   id: number;
   journalName: string;
   volumeNumber: number;
@@ -36,7 +37,7 @@ export class ManuscriptPublicationComponent implements OnInit {
   keywordsArray: string[] = [];
 
   // For Journal/Issue Selection
-  issues: JournalIssueDisplay[] = []; // Using the renamed interface
+  issues: JournalIssueDisplay[] = [];
   selectedIssueId: number | null = null;
 
   // For Modals
@@ -68,7 +69,7 @@ export class ManuscriptPublicationComponent implements OnInit {
         console.log('Manuscript loaded for publication:', this.manuscript);
         this.filterFiles();
         this.processKeywords();
-        this.loadIssues(); // Call loadIssues after manuscript is loaded
+        this.loadIssues();
       } else {
         console.error('Manuscript not found.');
         this.userToastNotificationService.showToast('Error', 'Manuscript not found.', 'danger');
@@ -103,20 +104,16 @@ export class ManuscriptPublicationComponent implements OnInit {
       next: (journals: Journal[]) => {
         const currentJournal = journals.find(j => j.id === this.manuscript.journal?.id);
         if (currentJournal && currentJournal.issues) {
-          // Filter for issues that are 'Future' or 'Published' (if you want to allow changing published status)
-          // For publication, typically you'd select a future or current unassigned issue.
           this.issues = currentJournal.issues
-            .filter(issue => issue.status === 'Future' || issue.status === 'Published') // Adjust filtering as needed
+            .filter(issue => issue.status === 'Future' || issue.status === 'Published') // Show future and published issues
             .map(issue => ({
               id: issue.id,
               journalName: currentJournal.journalName,
               volumeNumber: issue.volume,
               issueNumber: issue.number,
-              year: new Date(issue.publicationDate).getFullYear() // Extract year from publicationDate
+              year: new Date(issue.publicationDate).getFullYear()
             }));
           console.log('Loaded issues:', this.issues);
-          // Pre-select an issue if the manuscript already has one assigned (if your manuscript model supports this)
-          // this.selectedIssueId = this.manuscript.publication?.issueId || null; // Example if your manuscript had an issueId
         } else {
           console.log('No issues found for this journal or journal not found in the list.');
           this.issues = [];
@@ -181,80 +178,113 @@ export class ManuscriptPublicationComponent implements OnInit {
 
     switch (this.currentAction) {
       case 'publishArticle':
-        if (!this.selectedIssueId) {
+        if (this.selectedIssueId === null) {
           this.userToastNotificationService.showToast('Error', 'Please select an issue for publication.', 'danger');
           return;
         }
-        statusToUpdate = 'PUBLISHED'; // Changed from 'PUBLICATION' to 'PUBLISHED' as per common status names
+        statusToUpdate = 'PUBLISHED';
         successMessage = 'Article published successfully!';
+
+        const publicationFile = this.publicationFiles[0]; // Assuming the first file in publicationFiles is the primary one
+        if (!publicationFile) {
+          this.userToastNotificationService.showToast('Error', 'No publication file found to assign.', 'danger');
+          return;
+        }
+
+        // Chain the calls: Select file for publication -> Publish article -> Update submission status
+        this.userManuscriptService.selectFileForPublication(manuscriptId, publicationFile.id).pipe(
+          switchMap(() => {
+            console.log(`File ${publicationFile.id} selected for publication.`);
+            if (this.selectedIssueId === null) {
+              // This case should ideally be caught earlier, but good for type safety in pipe
+              return throwError(() => new Error('Issue must be selected for publication.'));
+            }
+            return this.userManuscriptService.publishArticle(manuscriptId, this.selectedIssueId, publicationFile.id);
+          }),
+          switchMap(() => {
+            console.log('Article successfully linked to issue (Paper record created). Now updating submission status.');
+            return this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate);
+          })
+        ).subscribe({
+          next: (response) => {
+            this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+            this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+            this.closeModal('publicationConfirmationModal');
+            // Update the publication status in the local manuscript object for immediate UI reflection
+            if (this.manuscript.publication) {
+              this.manuscript.publication.status = statusToUpdate;
+              this.manuscript.publication.date = new Date(); // Set current date as publication date
+              const selectedIssue = this.issues.find(issue => issue.id === this.selectedIssueId);
+              if (selectedIssue) {
+                this.manuscript.publication.volumeIssue = `Vol ${selectedIssue.volumeNumber}, No ${selectedIssue.issueNumber}`;
+              }
+            }
+          },
+          error: (err) => {
+            console.error('Publication action error:', err);
+            const errorMessage = err.message || err.error?.message || 'Failed to complete action.';
+            this.userToastNotificationService.showToast('Error', errorMessage, 'danger');
+          }
+        });
         break;
+
       case 'unpublishArticle':
-        statusToUpdate = 'UNPUBLISHED';
+        statusToUpdate = 'PUBLICATION';
         successMessage = 'Article unpublished successfully!';
+
+        // Chain the calls: Delete paper record -> Update submission status
+        this.userManuscriptService.unpublishArticle(manuscriptId).pipe(
+          switchMap(() => {
+            console.log('Paper record deleted from apjs_paper. Now updating submission status.');
+            return this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate);
+          })
+        ).subscribe({
+          next: (response) => {
+            this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+            this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+            this.closeModal('publicationConfirmationModal');
+            // Update the publication status in the local manuscript object
+            if (this.manuscript.publication) {
+              this.manuscript.publication.status = statusToUpdate;
+              this.manuscript.publication.date = null; // Clear publication date if unpublished
+              this.manuscript.publication.volumeIssue = ''; // Clear volume/issue
+            }
+          },
+          error: (err) => {
+            console.error('Unpublication action error:', err);
+            const errorMessage = err.message || err.error?.message || 'Failed to complete action.';
+            this.userToastNotificationService.showToast('Error', errorMessage, 'danger');
+          }
+        });
         break;
+
       default:
         this.userToastNotificationService.showToast('Error', 'Invalid action.', 'danger');
         return;
     }
-
-    // For publishing, we need to assign the issue first
-    if (this.currentAction === 'publishArticle' && this.selectedIssueId) {
-      // First, select the publication file (assuming there's one, or select the latest if multiple)
-      // For simplicity, let's assume the first publication file found is the one to be used.
-      const publicationFile = this.publicationFiles[0];
-      if (!publicationFile) {
-        this.userToastNotificationService.showToast('Error', 'No publication file found to assign.', 'danger');
-        return;
-      }
-      this.userManuscriptService.selectFileForPublication(manuscriptId, publicationFile.id).pipe(
-        switchMap(() => {
-          console.log(`File ${publicationFile.id} selected for publication.`);
-          // After selecting the file, update the submission status to PUBLISHED
-          return this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate);
-        })
-      ).subscribe({
-        next: (response) => {
-          this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
-          this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
-          this.closeModal('publicationConfirmationModal');
-          // Optionally, update the manuscript's publication details in the component
-          if (this.manuscript.publication) {
-            this.manuscript.publication.status = statusToUpdate;
-            this.manuscript.publication.date = new Date(); // Set current date
-            const selectedIssue = this.issues.find(issue => issue.id === this.selectedIssueId);
-            if (selectedIssue) {
-              this.manuscript.publication.volumeIssue = `Vol ${selectedIssue.volumeNumber}, No ${selectedIssue.issueNumber}`;
-            }
-          }
-        },
-        error: (err) => {
-          console.error('Publication action error:', err);
-          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to complete action.', 'danger');
-        }
-      });
-    } else {
-      this.updatePublicationStatus(manuscriptId, statusToUpdate, successMessage);
-    }
   }
 
+  // This method is now less critical as actions are handled directly in confirmPublicationAction
+  // Keeping it for generic status updates if needed elsewhere, but unpublish/publish
+  // actions will use the chained observables.
   updatePublicationStatus(manuscriptId: number, status: string, successMessage: string): void {
     this.userManuscriptService.updateSubmissionStatus(manuscriptId, status).subscribe({
       next: (response) => {
         this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
         this.manuscript.submissionStatus = response.data?.submissionStatus || status;
         this.closeModal('publicationConfirmationModal');
-        // Update the publication status in the local manuscript object
         if (this.manuscript.publication) {
           this.manuscript.publication.status = status;
-          if (status === 'UNPUBLISHED') {
-            this.manuscript.publication.date = null; // Clear publication date if unpublished
-            this.manuscript.publication.volumeIssue = ''; // Clear volume/issue
+          if (status === 'PUBLICATION') {
+            this.manuscript.publication.date = null;
+            this.manuscript.publication.volumeIssue = '';
           }
         }
       },
       error: (err) => {
         console.error('Publication action error:', err);
-        this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to complete action.', 'danger');
+        const errorMessage = err.error?.message || err.statusText || 'Server error during status update.';
+        this.userToastNotificationService.showToast('Error', errorMessage, 'danger');
       }
     });
   }

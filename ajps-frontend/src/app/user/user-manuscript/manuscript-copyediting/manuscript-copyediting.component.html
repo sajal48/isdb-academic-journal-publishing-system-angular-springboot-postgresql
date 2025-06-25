@@ -3,7 +3,7 @@
         <!-- Draft Files Section -->
         <div class="card mb-4">
             <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Draft Files</h5>
+                <h5 class="mb-0">Draft File</h5>
                 <!-- No upload button here, as these are the original draft files for copyediting -->
             </div>
             <div class="card-body">
@@ -135,8 +135,9 @@
                 <!-- <button class="btn btn-success" style="font-size: 14px;" (click)="openCopyeditingActionModal('completeCopyediting')"
                  [disabled]="manuscript.submissionStatus !== 'COPY_EDITING' || !hasCopyeditedFiles()">Complete Copyediting</button> -->
                 <!-- Change the Complete Copyediting button to use the new method -->
-                <button class="btn btn-success" style="font-size: 14px;" (click)="completeCopyediting()"
-                    [disabled]="manuscript.submissionStatus !== 'COPY_EDITING'">Complete Copyediting</button>
+                <button class="btn btn-success" style="font-size: 14px;" (click)="completeCopyediting()">
+                    <!-- [disabled]="manuscript.submissionStatus !== 'COPY_EDITING'"> -->
+                    Complete Copyediting</button>
                 <!-- <button class="btn btn-warning" style="font-size: 14px;" (click)="openCopyeditingActionModal('requestAuthorClarification')"
                  [disabled]="manuscript.submissionStatus !== 'COPY_EDITING'">Request Author Clarification</button> -->
                 <!-- <button class="btn btn-info" style="font-size: 14px;" (click)="openCopyeditingActionModal('sendToProofreading')"

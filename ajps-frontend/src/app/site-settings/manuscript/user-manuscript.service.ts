@@ -34,7 +34,8 @@ export interface JournalIssue {
 export class UserManuscriptService {
   private baseUrl = 'http://localhost:8090/api/user/submission';
   private discussionUrl = 'http://localhost:8090/api/user/discussion';
-  private journalUrl = 'http://localhost:8090/api/journal'; // Base URL for journal API
+  private journalUrl = 'http://localhost:8090/api/journal';
+  private publicationUrl = 'http://localhost:8090/api/publication'; // Base URL for publication actions
 
   constructor(private http: HttpClient) {}
 
@@ -110,12 +111,12 @@ export class UserManuscriptService {
               proofs: []
             },
             publication: {
-              status: 'Not Published',
-              date: null,
-              doi: '',
-              volumeIssue: '',
-              accessType: 'Open Access',
-              url: ''
+              status: backendData.submissionStatus === 'PUBLISHED' ? 'Published' : 'Not Published', // Derive from submissionStatus
+              date: backendData.publicationDate ? new Date(backendData.publicationDate) : null, // Assuming backend provides this
+              doi: backendData.doi || '',
+              volumeIssue: backendData.volumeIssue || '',
+              accessType: backendData.accessType || 'Open Access', // Assuming default or provided
+              url: backendData.publishedUrl || '' // Assuming published URL
             },
             discussions: [],
             authors: authors,
@@ -137,13 +138,11 @@ export class UserManuscriptService {
     );
   }
 
-  // --- MODIFIED: Method to get all journals and their issues ---
   getAllJournals(): Observable<Journal[]> {
-    // The backend response is a direct array of Journal objects, not wrapped in a success model.
-    return this.http.get<Journal[]>(`${this.journalUrl}/get-all-journals`).pipe( // Directly cast to Journal[]
+    return this.http.get<Journal[]>(`${this.journalUrl}/get-all-journals`).pipe(
       map(response => {
-        if (Array.isArray(response)) { // Check if it's an array
-          return response; // Return the array directly
+        if (Array.isArray(response)) {
+          return response;
         }
         console.error('Backend response for journals is not an array as expected:', response);
         return [];
@@ -155,7 +154,6 @@ export class UserManuscriptService {
     );
   }
 
-  // --- NEW: Upload File Method ---
   uploadManuscriptFile(submissionId: number, file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
@@ -170,7 +168,6 @@ export class UserManuscriptService {
     );
   }
 
-  // --- NEW: Delete File Method ---
   deleteManuscriptFile(submissionId: number, fileId: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/manuscript-files/remove/${submissionId}/${fileId}`).pipe(
       catchError(error => {
@@ -180,7 +177,6 @@ export class UserManuscriptService {
     );
   }
 
-  // --- NEW: Get Discussions for a Submission ---
   getDiscussionsForSubmission(submissionId: number): Observable<Discussion[]> {
     return this.http.get<any>(`${this.discussionUrl}/submission/${submissionId}`).pipe(
       map(response => {
@@ -200,43 +196,28 @@ export class UserManuscriptService {
     );
   }
 
-  /**
-   * Creates a new discussion for a given submission.
-   * This method is updated to align with the backend controller's endpoint signature.
-   * @param submissionId The ID of the submission to which the discussion belongs.
-   * @param creatorId The ID of the user creating the discussion (now a path variable).
-   * @param title The title of the discussion.
-   * @param content The initial message content of the discussion.
-   * @param origin The origin/category of the discussion (e.g., 'PRE_REVIEW', 'EDITORIAL').
-   * @returns An Observable that emits the newly created Discussion object.
-   */
   createDiscussion(submissionId: number, creatorId: number, title: string, content: string, origin: DiscussionOrigin): Observable<Discussion> {
-    // Construct the request body with title, content, and origin
     const body = { title, content, origin };
 
-    // FIX HERE: Use this.discussionUrl as the base for discussion creation
     return this.http.post<any>(`${this.discussionUrl}/${submissionId}/discussions/create/${creatorId}`, body).pipe(
       map(response => {
-        // Check for successful response structure from the backend's SuccessResponseModel
         if (response && response.code === 201 && response.status === 'success' && response.data) {
           const d = response.data;
-          // Map the backend DiscussionResponse DTO to the frontend Discussion interface
           return {
             id: d.id,
             submissionId: d.submissionId,
             creatorId: d.creatorId,
-            creatorName: d.creatorName, // Assuming the backend returns creatorName
+            creatorName: d.creatorName,
             title: d.title,
             content: d.content,
-            origin: d.origin, // Assuming the backend returns the enum value directly
-            createdAt: new Date(d.createdAt) // Convert to Date object
+            origin: d.origin,
+            createdAt: new Date(d.createdAt)
           };
         }
         throw new Error('Failed to create discussion: Unexpected response from server.');
       }),
       catchError(error => {
         console.error('Error creating discussion:', error);
-        // Extract a more specific error message if available, otherwise use a generic one
         return throwError(() => new Error(error.error?.message || 'Server error during discussion creation.'));
       })
     );
@@ -272,7 +253,6 @@ export class UserManuscriptService {
     return this.http.put(`${this.baseUrl}/${submissionId}/accept-skip-review`, {});
   }
 
-  // --- NEW METHOD: SELECT FILE FOR COPY EDITING ---
   selectFileForCopyEditing(submissionId: number, fileId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/${submissionId}/select-copy-editing-file`, { fileId }).pipe(
       map((response: any) => {
@@ -377,6 +357,50 @@ export class UserManuscriptService {
       catchError(error => {
         console.error('Error selecting file for publication:', error);
         return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
+      })
+    );
+  }
+
+  publishArticle(submissionId: number, issueId: number, fileId: number): Observable<any> {
+    const url = `${this.publicationUrl}/publish-article/${submissionId}/${issueId}/${fileId}`;
+    return this.http.post<any>(url, {}).pipe(
+      map(response => {
+        if (response && response.code === 201 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to publish article: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error publishing article:', error);
+        const errorMessage = error.error?.message || error.statusText || 'Server error during article publication.';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+
+  /**
+   * Sends a DELETE request to unpublish an article by removing its Paper record from the database.
+   *
+   * @param submissionId The ID of the submission corresponding to the article to unpublish.
+   * @returns An Observable that emits the response from the server.
+   */
+  unpublishArticle(submissionId: number): Observable<any> {
+    const url = `${this.publicationUrl}/unpublish-article/${submissionId}`;
+    console.log(`Sending DELETE request to unpublish article: ${url}`);
+    return this.http.delete<any>(url).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success') {
+          console.log(`Unpublish successful: ${response.message}`);
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to unpublish article: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error unpublishing article:', error);
+        const errorMessage = error.error?.message || error.statusText || 'Server error during article unpublication.';
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
