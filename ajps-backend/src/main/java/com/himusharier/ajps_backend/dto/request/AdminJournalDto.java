@@ -2,6 +2,8 @@ package com.himusharier.ajps_backend.dto.request;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,4 +22,5 @@ public class AdminJournalDto {
     private String aimsScopes;
     private String aboutJournal;
     private String coverImageUrl;
+    private List<IssueDto> issues; // Add this line
 }

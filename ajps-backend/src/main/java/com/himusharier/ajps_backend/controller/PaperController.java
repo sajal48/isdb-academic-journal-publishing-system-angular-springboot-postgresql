@@ -22,9 +22,6 @@ public class PaperController {
     @PutMapping("/{pid}") public Paper updatePaper(@PathVariable Long iid, @PathVariable Long pid, @RequestBody Paper p) {
         Issue i = issues.findById(iid).orElseThrow();
         Paper existing = i.getPapers().stream().filter(x -> x.getId().equals(pid)).findFirst().orElseThrow();
-        existing.setTitle(p.getTitle());
-        existing.setAuthors(p.getAuthors());
-        existing.setStatus(p.getStatus());
         issues.save(i);
         return existing;
     }

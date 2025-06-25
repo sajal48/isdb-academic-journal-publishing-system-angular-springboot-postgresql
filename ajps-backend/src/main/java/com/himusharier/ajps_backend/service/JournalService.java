@@ -1,6 +1,8 @@
 package com.himusharier.ajps_backend.service;
 
 import com.himusharier.ajps_backend.dto.request.AdminJournalDto;
+import com.himusharier.ajps_backend.dto.request.IssueDto;
+import com.himusharier.ajps_backend.model.Issue;
 import com.himusharier.ajps_backend.model.Journal;
 import com.himusharier.ajps_backend.repository.JournalRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +34,38 @@ public class JournalService {
 
     public List<AdminJournalDto> getAllJournals() {
         return journalRepository.findAll().stream()
-                .map(this::convertToDtoWithFullImageUrl)
+                .map(this::mapJournalToAdminJournalDto)
                 .collect(Collectors.toList());
+    }
+
+    private AdminJournalDto mapJournalToAdminJournalDto(Journal journal) {
+        return AdminJournalDto.builder()
+                .id(journal.getId())
+                .journalName(journal.getJournalName())
+                .issn(journal.getIssn())
+                .frequency(journal.getFrequency())
+                .journalType(journal.getJournalType())
+                .journalCode(journal.getJournalCode())
+                .contactEmail(journal.getContactEmail())
+                .journalUrl(journal.getJournalUrl())
+                .aimsScopes(journal.getAimsScopes())
+                .aboutJournal(journal.getAboutJournal())
+                .coverImageUrl(journal.getCoverImageUrl())
+                // Map issues to IssueDto
+                .issues(journal.getIssues().stream()
+                        .map(this::mapIssueToIssueDto)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private IssueDto mapIssueToIssueDto(Issue issue) {
+        return IssueDto.builder()
+                .id(issue.getId())
+                .number(issue.getNumber())
+                .volume(issue.getVolume())
+                .status(issue.getStatus().toString())
+                .publicationDate(issue.getPublicationDate())
+                .build();
     }
 
     public AdminJournalDto createJournal(AdminJournalDto dto, MultipartFile coverImage) {

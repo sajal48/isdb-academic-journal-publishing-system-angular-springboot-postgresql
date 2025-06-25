@@ -53,4 +53,8 @@ public class Journal {
     @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<EditorAssignment> editorAssignments = new ArrayList<>();
+
+    // NEW: One-to-Many relationship with Issue
+    @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Issue> issues = new ArrayList<>();
 }

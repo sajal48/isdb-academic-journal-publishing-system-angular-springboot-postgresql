@@ -14,6 +14,7 @@ export interface Manuscript {
   title: string;
   journalName: string;
   submissionDate: Date;
+  lastUpdate: Date;
   submissionStatus: string;
   author?: string;
   abstract?: string;

@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.himusharier.ajps_backend.constants.IssueStatus;
 import jakarta.persistence.*;
@@ -35,9 +36,10 @@ public class Issue {
     @Column(nullable = false)
     private IssueStatus status;
 
+    // Many-to-One relationship with Journal
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference // To prevent infinite recursion in JSON serialization
     private Journal journal;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
