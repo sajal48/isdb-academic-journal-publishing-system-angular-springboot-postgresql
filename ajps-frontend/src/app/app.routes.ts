@@ -80,7 +80,7 @@ export const routes: Routes = [
         ]
     },
     // journal site:
-    {path: 'journal/:journalName', component: JournalViewComponent,    
+    {path: 'journal/:journalCode', component: JournalViewComponent,    
         children: [
             {path: 'homepage', component: JournalHomepageComponent, title: 'Homepage - ScholarPress'},
             {path: 'editorial-board', component: JournalEditorialBoardComponent, title: 'Editorial Board - ScholarPress'},

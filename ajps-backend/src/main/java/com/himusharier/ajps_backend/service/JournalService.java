@@ -268,4 +268,15 @@ public class JournalService {
     // Removed the old methods that are no longer needed:
     // - convertToDtoWithFullImageUrl (functionality moved to mapJournalToAdminJournalDto)
     // - deleteOldImageIfExists (replaced with deleteImageByUrl)
+
+    public AdminJournalDto getJournalByCode(String journalCode) {
+        if (journalCode == null || journalCode.isEmpty() || journalCode.equals("undefined")) {
+            throw new IllegalArgumentException("Journal code is required");
+        }
+
+        return journalRepository.findByJournalCode(journalCode)
+                .map(this::mapJournalToAdminJournalDto)
+                .orElseThrow(() -> new IllegalArgumentException("Journal not found with code: " + journalCode));
+    }
+
 }

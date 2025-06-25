@@ -1,8 +1,8 @@
 <article class="container">
-    <div>
+    <div *ngIf="!isLoading; else loading">
         <section>
             <h2>About the Journal</h2>
-            <p><em>Plants and Ecosystem</em> is a prestigious, open-access, peer-reviewed journal dedicated to advancing research in plant sciences and ecosystem studies. We welcome contributions from all branches of these fields, fostering rapid dissemination of cutting-edge scientific knowledge to researchers, academics, and enthusiasts worldwide. Published annually, our journal prioritizes innovative and impactful findings while also considering fundamental research with significant scientific merit. Each submission undergoes rigorous peer review to ensure the highest standards of quality and integrity.</p>
+            <p [innerHTML]="journal?.aboutJournal || 'No description available'"></p>
         </section>
         <section>
             <h2>Publication Frequency</h2>
@@ -21,7 +21,7 @@
         </section>
         <section>
             <h2>Aims and Scope</h2>
-            <p>Our journal encompasses a broad spectrum of plant sciences and ecosystem research, including studies involving photosynthetic organisms as model species. Key areas of focus include:</p>
+            <p [innerHTML]="journal?.aimsScopes || 'No aims and scope information available'"></p>
             <ul class="list-unstyled">
                 <li>Plant Taxonomy</li>
                 <li>Plant Tissue Culture</li>
@@ -46,4 +46,12 @@
             <p>Published by <a href="../../home" target="_blank">ScholarPress</a>, the journal sustains its operations through an <a href="article-processing-charges">Article Processing Charge (APC)</a> applied to accepted manuscripts. This ensures the journal remains freely accessible to readers worldwide while covering essential maintenance costs.</p>
         </section>
     </div>
+
+    <ng-template #loading>
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </ng-template>
 </article>

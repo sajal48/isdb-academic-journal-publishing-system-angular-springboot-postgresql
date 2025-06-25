@@ -44,12 +44,17 @@ public class SecurityConfig {
                     .cors(Customizer.withDefaults())
                     .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for REST APIs, (Method Reference)
                     .authorizeHttpRequests(auth -> auth
+                            // This path is configured to permit all requests,
+                            // allowing unauthenticated users to access authentication endpoints (e.g., /api/auth/login, /api/auth/register).
+                            // The actual authentication logic (e.g., validating credentials, generating JWT)
+                            // will be implemented in your controller for these paths.
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/ajps-uploads/**").permitAll()
+                            .requestMatchers("/api/journal/**").permitAll()
                             .requestMatchers("/api/user/**").hasAnyRole("USER", "EDITOR", "REVIEWER", "ADMIN")
                             .requestMatchers("/api/submission/**").hasAnyRole("USER", "EDITOR", "REVIEWER", "ADMIN")
-    //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                            .anyRequest().authenticated()
+                            //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .anyRequest().authenticated() // All other requests require authentication
                     )
                     .addFilterBefore(jwtAuthenticationFilter,
                             UsernamePasswordAuthenticationFilter.class)

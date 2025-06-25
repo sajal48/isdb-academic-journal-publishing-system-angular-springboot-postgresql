@@ -22,4 +22,6 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
     // OPTIONAL: If you also want to fetch a single journal with issues
     @Query("SELECT j FROM Journal j LEFT JOIN FETCH j.issues WHERE j.id = :id")
     Optional<Journal> findByIdWithIssues(Long id);
+
+    Optional<Journal> findByJournalCode(String journalCode);
 }
