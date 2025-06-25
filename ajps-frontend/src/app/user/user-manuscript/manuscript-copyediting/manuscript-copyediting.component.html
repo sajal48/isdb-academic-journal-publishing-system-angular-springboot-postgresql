@@ -8,7 +8,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li *ngFor="let file of manuscript.draftFiles"
+                    <li *ngFor="let file of draftFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
@@ -20,7 +20,7 @@
                         </button>
                     </li>
                 </ul>
-                <div *ngIf="!manuscript.draftFiles || manuscript.draftFiles.length === 0" class="text-muted mt-3">
+                <div *ngIf="!draftFiles || draftFiles.length === 0" class="text-muted mt-3">
                     No draft files available for copyediting.
                 </div>
             </div>
@@ -36,7 +36,7 @@
             </div>
             <div class="card-body">
                 <ul class="list-group">
-                    <li *ngFor="let file of manuscript.copyeditedFiles"
+                    <li *ngFor="let file of copyeditedFiles"
                         class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
@@ -48,7 +48,7 @@
                         </button>
                     </li>
                 </ul>
-                <div *ngIf="!manuscript.copyeditedFiles || manuscript.copyeditedFiles.length === 0" class="text-muted mt-3">
+                <div *ngIf="!copyeditedFiles || copyeditedFiles.length === 0" class="text-muted mt-3">
                     No copyedited files uploaded yet.
                 </div>
             </div>
@@ -61,10 +61,10 @@
                 <button class="btn btn-sm btn-outline-secondary" (click)="addCopyeditingDiscussion()">Add discussion</button>
             </div>
             <div class="card-body">
-                <div *ngIf="!manuscript.copyeditingDiscussions || manuscript.copyeditingDiscussions.length === 0" class="text-muted mb-3">
+                <div *ngIf="!copyeditingDiscussions || copyeditingDiscussions.length === 0" class="text-muted mb-3">
                     No discussions yet.
                 </div>
-                <table class="table" *ngIf="manuscript.copyeditingDiscussions && manuscript.copyeditingDiscussions.length > 0">
+                <table class="table" *ngIf="copyeditingDiscussions && copyeditingDiscussions.length > 0">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -73,7 +73,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let discussion of manuscript.copyeditingDiscussions">
+                        <tr *ngFor="let discussion of copyeditingDiscussions">
                             <td>
                                 <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();" class="text-decoration-none text-primary">
                                     <i class="bi bi-chat-dots"></i> {{ discussion.title }}
@@ -92,9 +92,17 @@
         <!-- Copyediting Actions -->
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-success" style="font-size: 14px;" (click)="openCopyeditingActionModal('completeCopyediting')">Complete Copyediting</button>
-                <button class="btn btn-warning" style="font-size: 14px;" (click)="openCopyeditingActionModal('requestAuthorClarification')">Request Author Clarification</button>
-                <button class="btn btn-info" style="font-size: 14px;" (click)="openCopyeditingActionModal('sendToProofreading')">Send to Proofreading</button>
+                <button class="btn btn-success" style="font-size: 14px;" (click)="openCopyeditingActionModal('completeCopyediting')"
+                 [disabled]="manuscript.submissionStatus !== 'COPY_EDITING' || !hasCopyeditedFiles()">Complete Copyediting</button>
+                <!-- <button class="btn btn-warning" style="font-size: 14px;" (click)="openCopyeditingActionModal('requestAuthorClarification')"
+                 [disabled]="manuscript.submissionStatus !== 'COPY_EDITING'">Request Author Clarification</button> -->
+                <!-- <button class="btn btn-info" style="font-size: 14px;" (click)="openCopyeditingActionModal('sendToProofreading')"
+                 [disabled]="manuscript.submissionStatus !== 'COPY_EDITING' || !hasCopyeditedFiles()">Send to Proofreading</button> -->
+                 <button class="btn btn-danger" style="font-size: 14px;"
+                    (click)="openCopyeditingActionModal('declineSubmission')"
+                    [disabled]="manuscript.submissionStatus === 'REJECTED'">
+                    Decline Submission
+                </button>
             </div>
         </div>
     </div>

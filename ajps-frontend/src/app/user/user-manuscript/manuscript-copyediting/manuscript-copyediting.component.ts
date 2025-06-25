@@ -1,49 +1,37 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common'; // Include DatePipe for template
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of, forkJoin } from 'rxjs'; // Import forkJoin for parallel calls
+import { switchMap } from 'rxjs/operators';
 
-// --- Interfaces for data structure ---
-interface CustomFile {
-  name: string;
-  size: number; // in bytes
-  url: string;
-}
+// --- Interfaces from your shared user-manuscript.component ---
+import { Manuscript, Discussion, SubmissionFile, DiscussionOrigin } from '../user-manuscript.component';
+import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
+import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
+import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
-interface Discussion {
-  id: string;
-  title: string;
-  content: string;
-  creatorName: string;
-  createdAt: Date;
-}
-
-interface User {
-  userId: string;
-  // ... other user properties
-}
-
-interface Manuscript {
-  id: string;
-  draftFiles: CustomFile[];
-  copyeditedFiles: CustomFile[];
-  copyeditingDiscussions: Discussion[];
-  owner: User;
-  // ... other manuscript properties
-}
+declare var bootstrap: any; // Declare bootstrap global
 
 @Component({
   selector: 'app-manuscript-copyediting',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DatePipe], // Add DatePipe to imports
   templateUrl: './manuscript-copyediting.component.html',
-  styleUrl: './manuscript-copyediting.component.css'
+  styleUrl: './manuscript-copyediting.component.css',
+  standalone: true
 })
 export class ManuscriptCopyeditingComponent implements OnInit {
 
-  manuscript: Manuscript | null = null;
-  currentUserId: string = 'copyeditor123'; // Simulate current user ID
+  manuscript!: Manuscript; // Use definite assignment assertion
+  currentUserId: number = 0; // Will be populated from AuthLoginRegisterService
 
-  selectedCopyeditedFile: CustomFile | null = null;
+  // File lists for display
+  draftFiles: SubmissionFile[] = [];
+  copyeditedFiles: SubmissionFile[] = [];
+  copyeditingDiscussions: Discussion[] = [];
+
+  selectedCopyeditedFile: File | null = null; // Holds the actual File object to be uploaded
   newCopyeditingDiscussionTitle: string = '';
   newCopyeditingDiscussionMessage: string = '';
   selectedDiscussion: Discussion | null = null; // Reused for viewing any discussion
@@ -51,94 +39,157 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   confirmationMessage: string = '';
   currentAction: string = ''; // Stores the action type for the confirmation modal
 
-  constructor(private http: HttpClient) { }
+  // Discussion origin specifically for copy-editing discussions
+  private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT; // Or a more specific COPY_EDIT if you create one
+
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private router: Router,
+    private userManuscriptService: UserManuscriptService,
+    private authLoginRegisterService: AuthLoginRegisterService,
+    private userToastNotificationService: UserToastNotificationService
+  ) { }
 
   ngOnInit(): void {
-    this.loadManuscriptDetails('manuscript123'); // Load a dummy manuscript
+    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.route.parent?.paramMap.pipe(
+      switchMap(params => {
+        const manuscriptId = params.get('manuscriptId');
+        if (manuscriptId && this.currentUserId) {
+          return this.userManuscriptService.getManuscriptById(this.currentUserId, manuscriptId);
+        }
+        return of(undefined); // Return an observable of undefined if no ID
+      })
+    ).subscribe(manuscript => {
+      if (manuscript) {
+        this.manuscript = manuscript;
+        console.log('Manuscript loaded for copyediting:', this.manuscript);
+        this.filterFilesAndDiscussions(); // Filter files and discussions after manuscript loads
+        this.loadDiscussions(Number(this.manuscript.id));
+      } else {
+        console.error('Manuscript not found for copyediting component or ID/User ID missing.');
+        this.userToastNotificationService.showToast('Error', 'Manuscript not found or access denied.', 'danger');
+        this.router.navigate(['/user/dashboard']); // Redirect if manuscript not found
+      }
+    });
   }
 
   /**
-   * Loads manuscript details for copyediting from a (mock) API.
-   * In a real application, you'd fetch this dynamically.
+   * Filters files and discussions based on their origin/flags for display in this component.
    */
-  loadManuscriptDetails(manuscriptId: string): void {
-    // Simulate API call
-    setTimeout(() => {
-      this.manuscript = {
-        id: manuscriptId,
-        draftFiles: [
-          { name: 'Manuscript Draft V1.docx', size: 1800000, url: '/assets/draft_v1.docx' },
-          { name: 'Supplementary Data.xlsx', size: 500000, url: '/assets/supplementary_data.xlsx' }
-        ],
-        copyeditedFiles: [
-          { name: 'Manuscript Copyedited V1.docx', size: 1900000, url: '/assets/copyedited_v1.docx' }
-        ],
-        copyeditingDiscussions: [
-          {
-            id: 'copyDisc1',
-            title: 'Query about References Formatting',
-            content: 'Could the author clarify the formatting style used for references? It seems inconsistent.',
-            creatorName: 'Copyeditor Charlie',
-            createdAt: new Date('2025-06-22T09:00:00Z')
-          },
-          {
-            id: 'copyDisc2',
-            title: 'Caption for Figure 2',
-            content: 'The caption for Figure 2 is missing key details. Please expand.',
-            creatorName: 'Copyeditor Charlie',
-            createdAt: new Date('2025-06-23T11:45:00Z')
-          }
-        ],
-        owner: { userId: 'author456' } // Example owner
-      };
-      console.log('Manuscript loaded for copyediting:', this.manuscript);
-    }, 500);
+  filterFilesAndDiscussions(): void {
+    if (this.manuscript && this.manuscript.files) {
+      // Draft files for copyediting are those marked as isCopyEditingFile
+      this.draftFiles = this.manuscript.files.filter(file => file.isCopyEditingFile);
+      // Copyedited files are those with fileOrigin === 'COPY_EDIT'
+      this.copyeditedFiles = this.manuscript.files.filter(file => file.fileOrigin === 'COPY_EDIT');
+    } else {
+      this.draftFiles = [];
+      this.copyeditedFiles = [];
+    }
   }
 
   /**
-   * Downloads a file.
+   * Loads discussions relevant to copy-editing from the backend.
+   */
+  loadDiscussions(submissionId: number): void {
+    this.userManuscriptService.getDiscussionsForSubmission(submissionId).subscribe({
+      next: (discussions) => {
+        // Filter discussions specifically for COPY_EDIT origin
+        this.copyeditingDiscussions = discussions.filter(d => d.origin === DiscussionOrigin.EDITORIAL || d.origin === DiscussionOrigin.COPY_EDIT); // Assuming EDITORIAL for general editor discussions or add COPY_EDIT specific
+        console.log('Copyediting Discussions loaded:', this.copyeditingDiscussions);
+      },
+      error: (err) => {
+        console.error('Error loading copyediting discussions:', err);
+        this.userToastNotificationService.showToast('Error', 'Failed to load copyediting discussions.', 'danger');
+      }
+    });
+  }
+
+  /**
+   * Checks if there are any copyedited files uploaded.
+   * Used to disable/enable certain buttons.
+   */
+  hasCopyeditedFiles(): boolean {
+    return this.copyeditedFiles && this.copyeditedFiles.length > 0;
+  }
+
+  /**
+   * Downloads a file from a given URL.
    */
   downloadFile(url: string, fileName: string): void {
-    console.log(`Downloading: ${fileName} from ${url}`);
-    alert(`Initiating download for: ${fileName}`);
-    window.open(url, '_blank');
+    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    this.http.get(url, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        document.body.appendChild(a);
+        a.href = downloadUrl;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        a.remove();
+        this.userToastNotificationService.showToast('Success', `${fileName} downloaded successfully!`, 'success');
+      },
+      error: (error) => {
+        console.error('Download error:', error);
+        this.userToastNotificationService.showToast('Error', `Failed to download ${fileName}.`, 'danger');
+      }
+    });
   }
 
   // --- Copyedited File Upload Functions ---
 
   /**
-   * Handles the selection of a copyedited file.
+   * Handles the selection of a copyedited file from the input.
    */
   onCopyeditedFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
-      this.selectedCopyeditedFile = {
-        name: file.name,
-        size: file.size,
-        url: URL.createObjectURL(file as Blob) // Explicitly cast to Blob
-      };
-      console.log('Copyedited file selected:', this.selectedCopyeditedFile);
+      this.selectedCopyeditedFile = file;
+      console.log('Copyedited file selected:', this.selectedCopyeditedFile.name);
     } else {
       this.selectedCopyeditedFile = null;
     }
   }
 
   /**
-   * Uploads the selected copyedited file.
+   * Uploads the selected copyedited file to the backend.
    */
   uploadCopyeditedFile(): void {
-    if (this.selectedCopyeditedFile && this.manuscript) {
-      console.log('Uploading copyedited file:', this.selectedCopyeditedFile.name);
-      // Simulate file upload to a backend
-      // this.http.post('/api/upload-copyedited-file', formData).subscribe(...)
-
-      // Add to manuscript's copyeditedFiles array for immediate UI update
-      this.manuscript.copyeditedFiles.push({ ...this.selectedCopyeditedFile });
-      this.selectedCopyeditedFile = null; // Clear selected file after upload
-      this.closeModal('uploadCopyeditedFileModal'); // Close the modal
-      alert('Copyedited file uploaded successfully!');
+    if (this.selectedCopyeditedFile && this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Info', 'Uploading copyedited file...', 'info');
+      this.userManuscriptService.uploadCopyeditedFile(Number(this.manuscript.id), this.selectedCopyeditedFile).subscribe({
+        next: (response) => {
+          if (response?.code === 200 && response.data) {
+            const newFile: SubmissionFile = {
+              id: response.data.id,
+              name: response.data.originalName,
+              url: response.data.fileUrl,
+              size: response.data.size, // Already in KB from service, assuming backend provides it this way or handle here
+              storedName: response.data.storedName,
+              isReviewFile: response.data.isReviewFile,
+              isCopyEditingFile: response.data.isCopyEditingFile,
+              fileOrigin: response.data.fileOrigin
+            };
+            if (!this.manuscript.files) this.manuscript.files = [];
+            this.manuscript.files.push(newFile);
+            this.filterFilesAndDiscussions(); // Re-filter to update lists
+            this.selectedCopyeditedFile = null; // Clear selected file after upload
+            this.closeModal('uploadCopyeditedFileModal'); // Close the modal
+            this.userToastNotificationService.showToast('Success', 'Copyedited file uploaded successfully!', 'success');
+          } else {
+            this.userToastNotificationService.showToast('Error', 'Unexpected upload response.', 'danger');
+          }
+        },
+        error: (error) => {
+          console.error('Upload error:', error);
+          this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to upload copyedited file.', 'danger');
+        }
+      });
     } else {
-      alert('No copyedited file selected to upload.');
+      this.userToastNotificationService.showToast('Warning', 'No copyedited file selected or manuscript ID missing.', 'warning');
     }
   }
 
@@ -157,20 +208,31 @@ export class ManuscriptCopyeditingComponent implements OnInit {
    * Confirms and adds a new copyediting discussion.
    */
   confirmAddCopyeditingDiscussion(): void {
-    if (this.newCopyeditingDiscussionTitle && this.newCopyeditingDiscussionMessage && this.manuscript) {
-      const newDisc: Discussion = {
-        id: `copyDisc${Date.now()}`, // Simple unique ID
-        title: this.newCopyeditingDiscussionTitle,
-        content: this.newCopyeditingDiscussionMessage,
-        creatorName: 'Current User (Copyeditor)', // Replace with actual current user
-        createdAt: new Date()
-      };
-      this.manuscript.copyeditingDiscussions.push(newDisc);
-      console.log('New copyediting discussion added:', newDisc);
-      this.closeModal('addCopyeditingDiscussionModal');
-      alert('Discussion added successfully!');
+    if (this.newCopyeditingDiscussionTitle && this.newCopyeditingDiscussionMessage && this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
+      this.userManuscriptService.createDiscussion(
+        Number(this.manuscript.id),
+        this.currentUserId,
+        this.newCopyeditingDiscussionTitle,
+        this.newCopyeditingDiscussionMessage,
+        this.discussionOrigin = DiscussionOrigin.COPY_EDIT // Use the pre-defined origin for copy-editing discussions
+      ).subscribe({
+        next: (newDisc) => {
+          if (!this.manuscript.discussions) this.manuscript.discussions = [];
+          this.manuscript.discussions.push(newDisc); // Add to main manuscript discussions
+          this.loadDiscussions(Number(this.manuscript.id)); // Re-load and filter discussions
+          this.closeModal('addCopyeditingDiscussionModal');
+          this.newCopyeditingDiscussionTitle = '';
+          this.newCopyeditingDiscussionMessage = '';
+          this.userToastNotificationService.showToast('Success', 'Discussion added successfully!', 'success');
+        },
+        error: (err) => {
+          console.error('Discussion error:', err);
+          this.userToastNotificationService.showToast('Error', err.error?.message || 'Failed to add discussion.', 'danger');
+        }
+      });
     } else {
-      alert('Please enter both title and message for the discussion.');
+      this.userToastNotificationService.showToast('Warning', 'Please enter both title and message for the discussion.', 'warning');
     }
   }
 
@@ -191,13 +253,16 @@ export class ManuscriptCopyeditingComponent implements OnInit {
     this.currentAction = action;
     switch (action) {
       case 'completeCopyediting':
-        this.confirmationMessage = 'Are you sure you want to mark copyediting as complete? This will move the manuscript to the next stage.';
+        this.confirmationMessage = 'Are you sure you want to mark copyediting as complete? This will move the manuscript to the Production stage.';
         break;
       case 'requestAuthorClarification':
-        this.confirmationMessage = 'Are you sure you want to request clarification from the author? They will be notified.';
+        this.confirmationMessage = 'Are you sure you want to request clarification from the author? They will be notified and the manuscript will return to Revision Required status.';
         break;
       case 'sendToProofreading':
-        this.confirmationMessage = 'Are you sure you want to send this manuscript to proofreading?';
+        this.confirmationMessage = 'Are you sure you want to send this manuscript to Proofreading? This will move it to the Production stage.';
+        break;
+      case 'declineSubmission':
+        this.confirmationMessage = 'Are you sure you want to decline this submission?';
         break;
       default:
         this.confirmationMessage = 'Are you sure you want to proceed with this action?';
@@ -207,33 +272,70 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   }
 
   /**
-   * Executes the confirmed copyediting action.
+   * Executes the confirmed copyediting action by updating manuscript status.
    */
   confirmCopyeditingAction(): void {
-    console.log(`Confirmed action: ${this.currentAction}`);
-    // Implement the actual logic for each action here
+    if (!this.manuscript?.id) {
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID missing.', 'danger');
+      return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    let statusToUpdate = '';
+    let successMessage = '';
+    let errorMessage = '';
+    let navigateToRoute: string | null = null;
+
     switch (this.currentAction) {
       case 'completeCopyediting':
-        alert('Copyediting marked as complete!');
-        // Call service to update manuscript status
+        statusToUpdate = 'PRODUCTION'; // Assuming 'PRODUCTION' or similar for the next stage
+        successMessage = 'Copyediting marked as complete! Manuscript moved to Production.';
+        errorMessage = 'Failed to mark copyediting as complete.';
+        navigateToRoute = `/user/manuscript/${manuscriptId}/production`;
         break;
       case 'requestAuthorClarification':
-        alert('Clarification request sent to author!');
-        // Call service to notify author and potentially change manuscript status
+        statusToUpdate = 'REVISION_REQUIRED'; // Set status to trigger author revision
+        successMessage = 'Clarification request sent to author! Manuscript status updated.';
+        errorMessage = 'Failed to request author clarification.';
+        navigateToRoute = `/user/manuscript/${manuscriptId}/submission`; // Send back to submission for author
         break;
       case 'sendToProofreading':
-        alert('Manuscript sent to proofreading!');
-        // Call service to transition manuscript to proofreading stage
+        statusToUpdate = 'PRODUCTION'; // Moves to production stage, often includes proofreading
+        successMessage = 'Manuscript sent to Proofreading! Moving to Production.';
+        errorMessage = 'Failed to send to proofreading.';
+        navigateToRoute = `/user/manuscript/${manuscriptId}/production`;
+        break;
+      case 'declineSubmission':
+        statusToUpdate = 'REJECTED';
+        successMessage = 'Submission declined.';
+        errorMessage = 'Failed to decline submission.';
         break;
     }
-    this.closeModal('copyeditingConfirmationModal');
+
+    if (statusToUpdate) {
+      this.userToastNotificationService.showToast('Info', `Performing action: ${this.currentAction}...`, 'info');
+      this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate).subscribe({
+        next: (response) => {
+          this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
+          this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
+          this.closeModal('copyeditingConfirmationModal');
+          if (navigateToRoute) {
+            this.router.navigate([navigateToRoute]);
+          }
+        },
+        error: (err) => {
+          console.error('Copyediting action error:', err);
+          this.userToastNotificationService.showToast('Error', err.error?.message || errorMessage, 'danger');
+        }
+      });
+    }
   }
 
   // --- Utility Functions for Modals (using Bootstrap 5's JS API) ---
   openModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = new (window as any).bootstrap.Modal(modalElement);
+      const bootstrapModal = new bootstrap.Modal(modalElement); // Use direct import
       bootstrapModal.show();
     }
   }
@@ -241,7 +343,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const bootstrapModal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      const bootstrapModal = bootstrap.Modal.getInstance(modalElement); // Use direct import
       if (bootstrapModal) {
         bootstrapModal.hide();
       }

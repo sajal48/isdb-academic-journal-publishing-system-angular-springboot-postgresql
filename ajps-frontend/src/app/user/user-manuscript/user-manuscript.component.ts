@@ -76,6 +76,7 @@ export interface SubmissionFile {
   isReviewFile?: boolean; // Existing
   isCopyEditingFile?: boolean; 
   fileOrigin?: string;
+  isProductionFile?: boolean;
 }
 
 export interface Reviewer {
@@ -94,6 +95,7 @@ export enum DiscussionOrigin {
   EDITORIAL = 'EDITORIAL',
   AUTHOR_QUERY = 'AUTHOR_QUERY',
   TECHNICAL_SUPPORT = 'TECHNICAL_SUPPORT',
+  COPY_EDIT = 'COPY_EDIT'
   // Ensure this matches your Java enum values exactly
 }
 

@@ -344,4 +344,30 @@ public class SubmissionController {
         }
     }
 
+    // --- NEW ENDPOINT: Upload Copyedited File ---
+    @PostMapping("/{submissionId}/upload-copyedited-file")
+    public ResponseEntity<ApiResponse<FileUploadResponse>> uploadCopyeditedFile(
+            @PathVariable Long submissionId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            FileUpload uploadedFile = submissionService.uploadCopyeditedFile(submissionId, file);
+            FileUploadResponse response = FileUploadResponse.builder()
+                    .id(uploadedFile.getId())
+                    .fileOrigin(uploadedFile.getFileOrigin().name())
+                    .originalName(uploadedFile.getOriginalName())
+                    .storedName(uploadedFile.getStoredName())
+                    .size(uploadedFile.getSize())
+                    .type(uploadedFile.getType())
+                    .fileUrl(uploadedFile.getFileUrl())
+                    .isReviewFile(uploadedFile.isReviewFile())
+                    .isCopyEditingFile(uploadedFile.isCopyEditingFile())
+                    .build();
+            return ResponseEntity.ok(new ApiResponse<>(200, "Copyedited file uploaded successfully.", response));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(400, e.getMessage(), null));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(500, "Failed to upload copyedited file: " + e.getMessage(), null));
+        }
+    }
+
 }

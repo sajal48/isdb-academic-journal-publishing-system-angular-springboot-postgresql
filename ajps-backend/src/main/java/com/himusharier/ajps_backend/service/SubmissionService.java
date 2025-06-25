@@ -536,4 +536,14 @@ public class SubmissionService {
         return saveFile(submissionId, FileUploadOrigin.REVISION.name(), file);
     }
 
+    // --- NEW METHOD: Upload Copyedited File ---
+    @Transactional
+    public FileUpload uploadCopyeditedFile(Long submissionId, MultipartFile file) throws IOException {
+        Submission existingSubmission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Call the general saveFile method, specifying the origin as COPY_EDIT
+        return saveFile(submissionId, FileUploadOrigin.COPY_EDIT.name(), file);
+    }
+
 }

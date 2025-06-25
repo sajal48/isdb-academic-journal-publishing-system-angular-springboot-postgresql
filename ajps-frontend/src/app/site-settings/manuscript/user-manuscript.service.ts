@@ -262,4 +262,26 @@ export class UserManuscriptService {
     );
   }
 
+  uploadCopyeditedFile(submissionId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    // The backend endpoint specifically marks this as 'COPY_EDIT' origin
+
+    return this.http.post<any>(`${this.baseUrl}/${submissionId}/upload-copyedited-file`, formData).pipe(
+      map(response => {
+        if (response && response.code === 200 && response.status === 'success') {
+          return response;
+        } else {
+          throw new Error(response?.message || 'Failed to upload copyedited file: Unexpected response');
+        }
+      }),
+      catchError(error => {
+        console.error('Error uploading copyedited file:', error);
+        const errorMessage = error.error?.message || error.statusText || 'Server error during copyedited file upload.';
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+  
+
 }

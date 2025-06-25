@@ -5,22 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { Discussion, Manuscript, SubmissionFile } from '../user-manuscript.component';
+import { Discussion, DiscussionOrigin, Manuscript, SubmissionFile } from '../user-manuscript.component';
 import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { HttpClient } from '@angular/common/http';
 import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
 
 declare var bootstrap: any;
-
-export enum DiscussionOrigin {
-  PRE_REVIEW = 'PRE_REVIEW',
-  IN_REVIEW = 'IN_REVIEW',
-  POST_REVIEW = 'POST_REVIEW',
-  EDITORIAL = 'EDITORIAL',
-  AUTHOR_QUERY = 'AUTHOR_QUERY',
-  TECHNICAL_SUPPORT = 'TECHNICAL_SUPPORT',
-}
 
 @Component({
   selector: 'app-manuscript-submission',

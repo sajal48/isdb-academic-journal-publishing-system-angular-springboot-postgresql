@@ -7,5 +7,6 @@ public enum DiscussionOrigin {
     EDITORIAL,
     AUTHOR_QUERY,
     TECHNICAL_SUPPORT,
+    COPY_EDIT
     // Add any other origins you might need
 }

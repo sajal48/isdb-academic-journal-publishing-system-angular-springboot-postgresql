@@ -8,8 +8,7 @@ import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs'; // Import forkJoin for parallel calls
 
-import { Discussion, Manuscript, SubmissionFile } from '../user-manuscript.component';
-import { DiscussionOrigin } from '../manuscript-submission/manuscript-submission.component';
+import { Discussion, DiscussionOrigin, Manuscript, SubmissionFile } from '../user-manuscript.component';
 import { UserManuscriptService } from '../../../site-settings/manuscript/user-manuscript.service';
 import { AuthLoginRegisterService } from '../../../site-settings/auth/auth-login-register.service';
 import { UserToastNotificationService } from '../../../site-settings/toast-popup/user-toast-notification.service';
