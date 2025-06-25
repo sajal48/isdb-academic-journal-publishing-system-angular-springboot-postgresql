@@ -212,7 +212,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   openSendToReviewModal(): void {
     if (!this.manuscript?.files?.length) {
-      this.userToastNotificationService.showToast('Info', 'No files available.', 'info');
+      // this.userToastNotificationService.showToast('Info', 'No files available.', 'info');
       return;
     }
     this.selectedFileForReviewId = null;
@@ -305,7 +305,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   openSelectCopyEditingFileModal(): void {
     if (!this.manuscript?.files?.length) {
-      this.userToastNotificationService.showToast('Info', 'No files available.', 'info');
+      // this.userToastNotificationService.showToast('Info', 'No files available.', 'info');
       return;
     }
     this.selectedFileForCopyEditingId = null;

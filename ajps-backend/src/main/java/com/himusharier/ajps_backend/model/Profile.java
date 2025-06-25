@@ -64,7 +64,7 @@ public class Profile {
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinTable(
-            name = "profile_journals",
+            name = "ajps_profile_journals",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "journal_id")
     )

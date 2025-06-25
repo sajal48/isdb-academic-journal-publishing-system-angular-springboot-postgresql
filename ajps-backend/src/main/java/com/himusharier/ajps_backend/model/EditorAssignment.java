@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "editor_assignments")
+@Table(name = "ajps_editor_assignments")
 @Getter
 @Setter
 @NoArgsConstructor

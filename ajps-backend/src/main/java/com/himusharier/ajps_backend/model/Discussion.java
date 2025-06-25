@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "AJPS_DISCUSSION")
 public class Discussion implements Serializable {
 
     @Id

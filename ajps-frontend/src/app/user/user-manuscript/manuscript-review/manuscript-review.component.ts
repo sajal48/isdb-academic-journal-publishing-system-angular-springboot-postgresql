@@ -106,7 +106,7 @@ export class ManuscriptReviewComponent implements OnInit {
   }
 
   downloadFile(url: string, fileName: string): void {
-    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    // this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
         const downloadUrl = window.URL.createObjectURL(blob);
@@ -223,7 +223,7 @@ export class ManuscriptReviewComponent implements OnInit {
     const manuscriptId = Number(this.manuscript.id);
     const fileIdToCopyEdit = this.selectedCopyEditingFileId;
 
-    this.userToastNotificationService.showToast('Info', 'Accepting manuscript and preparing for copy-editing...', 'info');
+    // this.userToastNotificationService.showToast('Info', 'Accepting manuscript and preparing for copy-editing...', 'info');
 
     // Make two API calls: one to update status and another to select the copy-editing file
     forkJoin([

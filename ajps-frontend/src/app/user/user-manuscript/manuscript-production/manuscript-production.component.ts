@@ -102,7 +102,7 @@ export class ManuscriptProductionComponent implements OnInit {
   }
 
   downloadFile(url: string, fileName: string): void {
-    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    // this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
         const downloadUrl = window.URL.createObjectURL(blob);
@@ -166,7 +166,7 @@ export class ManuscriptProductionComponent implements OnInit {
   markAsFinalVersion(file: SubmissionFile): void {
     if (!this.manuscript?.id) return;
 
-    this.userToastNotificationService.showToast('Info', 'Marking file as final version...', 'info');
+    // this.userToastNotificationService.showToast('Info', 'Marking file as final version...', 'info');
     
     this.userManuscriptService.selectFileForProduction(Number(this.manuscript.id), file.id).subscribe({
       next: (response) => {
@@ -323,7 +323,7 @@ confirmScheduleForPublication(): void {
     const manuscriptId = Number(this.manuscript.id);
     const fileIdForPublication = this.selectedPublicationFileId;
 
-    this.userToastNotificationService.showToast('Info', 'Scheduling manuscript for publication...', 'info');
+    // this.userToastNotificationService.showToast('Info', 'Scheduling manuscript for publication...', 'info');
 
     // Make two API calls: one to update status and another to select the publication file
     forkJoin([

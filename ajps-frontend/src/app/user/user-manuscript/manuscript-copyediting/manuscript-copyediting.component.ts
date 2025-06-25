@@ -121,7 +121,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
    * Downloads a file from a given URL.
    */
   downloadFile(url: string, fileName: string): void {
-    this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
+    // this.userToastNotificationService.showToast('Info', `Downloading: ${fileName}...`, 'info');
     this.http.get(url, { responseType: 'blob' }).subscribe({
       next: (blob) => {
         const downloadUrl = window.URL.createObjectURL(blob);
@@ -161,7 +161,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
    */
   uploadCopyeditedFile(): void {
     if (this.selectedCopyeditedFile && this.manuscript?.id) {
-      this.userToastNotificationService.showToast('Info', 'Uploading copyedited file...', 'info');
+      // this.userToastNotificationService.showToast('Info', 'Uploading copyedited file...', 'info');
       this.userManuscriptService.uploadCopyeditedFile(Number(this.manuscript.id), this.selectedCopyeditedFile).subscribe({
         next: (response) => {
           if (response?.code === 200 && response.data) {
@@ -211,7 +211,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
    */
   confirmAddCopyeditingDiscussion(): void {
     if (this.newCopyeditingDiscussionTitle && this.newCopyeditingDiscussionMessage && this.manuscript?.id) {
-      this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
+      // this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
       this.userManuscriptService.createDiscussion(
         Number(this.manuscript.id),
         this.currentUserId,
@@ -315,7 +315,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
     }
 
     if (statusToUpdate) {
-      this.userToastNotificationService.showToast('Info', `Performing action: ${this.currentAction}...`, 'info');
+      // this.userToastNotificationService.showToast('Info', `Performing action: ${this.currentAction}...`, 'info');
       this.userManuscriptService.updateSubmissionStatus(manuscriptId, statusToUpdate).subscribe({
         next: (response) => {
           this.userToastNotificationService.showToast('Success', response.message || successMessage, 'success');
@@ -368,7 +368,7 @@ confirmCompleteCopyeditingWithFile(): void {
     const manuscriptId = Number(this.manuscript.id);
     const fileIdForProduction = this.selectedProductionFileId;
 
-    this.userToastNotificationService.showToast('Info', 'Completing copyediting and preparing for production...', 'info');
+    // this.userToastNotificationService.showToast('Info', 'Completing copyediting and preparing for production...', 'info');
 
     // Make two API calls: one to update status and another to select the production file
     forkJoin([

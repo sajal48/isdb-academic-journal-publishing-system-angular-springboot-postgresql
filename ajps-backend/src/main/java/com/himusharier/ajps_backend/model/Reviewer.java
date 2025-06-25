@@ -25,7 +25,7 @@ public class Reviewer {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "reviewer_journals",
+        name = "ajps_reviewer_journals",
         joinColumns = @JoinColumn(name = "reviewer_id"),
         inverseJoinColumns = @JoinColumn(name = "journal_id")
     )

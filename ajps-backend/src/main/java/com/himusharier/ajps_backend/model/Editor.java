@@ -25,7 +25,7 @@ public class Editor {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "editor_journals",
+        name = "ajps_editor_journals",
         joinColumns = @JoinColumn(name = "editor_id"),
         inverseJoinColumns = @JoinColumn(name = "journal_id")
     )
