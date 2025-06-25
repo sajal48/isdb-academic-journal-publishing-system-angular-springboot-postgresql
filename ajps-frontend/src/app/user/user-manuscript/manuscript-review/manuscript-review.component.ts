@@ -227,12 +227,12 @@ export class ManuscriptReviewComponent implements OnInit {
 
     // Make two API calls: one to update status and another to select the copy-editing file
     forkJoin([
-      this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'ACCEPTED'),
+      this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'COPY_EDITING'),
       this.userManuscriptService.selectFileForCopyEditing(manuscriptId, fileIdToCopyEdit)
     ]).subscribe({
       next: ([statusResponse, fileSelectionResponse]) => {
         // Update local manuscript status
-        this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'ACCEPTED';
+        this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'COPY_EDITING';
         this.manuscript.isEditable = statusResponse.data?.isEditable ?? false; // Assuming false after acceptance
 
         // Update local file data to reflect the copy-editing file status
@@ -245,6 +245,7 @@ export class ManuscriptReviewComponent implements OnInit {
         this.userToastNotificationService.showToast('Success', 'Manuscript accepted and file sent for copy-editing!', 'success');
         this.closeModal('selectCopyEditingFileModal'); // Close the file selection modal
         this.selectedCopyEditingFileId = null; // Clear selected file
+        this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
       },
       error: (error) => {
         console.error('Error during accept and file selection:', error);
@@ -311,6 +312,7 @@ export class ManuscriptReviewComponent implements OnInit {
         this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
         this.manuscript.isEditable = response.data?.isEditable ?? (statusToUpdate === 'REVISION_REQUIRED');
         this.closeModal('reviewConfirmationModal');
+        // this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
       },
       error: (err) => {
         console.error('Review action error:', err);

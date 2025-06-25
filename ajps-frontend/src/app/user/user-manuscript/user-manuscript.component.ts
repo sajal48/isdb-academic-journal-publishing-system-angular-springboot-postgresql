@@ -71,12 +71,12 @@ export interface SubmissionFile {
   id: number;
   name: string;
   url: string;
-  size: any; // Or number, depending on how you receive it from the backend
-  storedName?: string; // Optional, if your backend provides it
-  isReviewFile?: boolean; // Existing
-  isCopyEditingFile?: boolean; 
+  size: any;
+  storedName?: string;
+  isReviewFile?: boolean;
+  isCopyEditingFile?: boolean;
   fileOrigin?: string;
-  isProductionFile?: boolean;
+  isProductionFile?: boolean; // Add this new property
 }
 
 export interface Reviewer {

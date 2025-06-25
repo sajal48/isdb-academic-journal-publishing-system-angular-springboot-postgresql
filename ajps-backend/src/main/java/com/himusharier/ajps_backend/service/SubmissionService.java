@@ -120,6 +120,7 @@ public class SubmissionService {
                                 .fileUrl(file.getFileUrl())
                                 .isReviewFile(file.isReviewFile()) // --- INCLUDE NEW FIELD ---
                                 .isCopyEditingFile(file.isCopyEditingFile())
+                                .isProductionFile(file.isProductionFile()) //
                                 .build())
                         .collect(Collectors.toList()) : List.of())
                 .submissionReviewers(submission.getSubmissionReviewers() != null ? submission.getSubmissionReviewers().stream()
@@ -544,6 +545,42 @@ public class SubmissionService {
 
         // Call the general saveFile method, specifying the origin as COPY_EDIT
         return saveFile(submissionId, FileUploadOrigin.COPY_EDIT.name(), file);
+    }
+
+    // Add this to SubmissionService.java
+    @Transactional
+    public Submission selectFileForProduction(Long submissionId, Long fileIdForProduction) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionRequestException("Submission not found with ID: " + submissionId));
+
+        // Business logic: Ensure the submission is in a production phase or equivalent
+        /*if (submission.getSubmissionStatus() != SubmissionStatus.COPY_EDITING) {
+            throw new SubmissionRequestException("Cannot select file for production as the submission is not in 'COPY_EDITING' status. Current status: " + submission.getSubmissionStatus());
+        }*/
+
+        boolean fileFoundAndMarked = false;
+        if (submission.getFiles() != null) {
+            for (FileUpload file : submission.getFiles()) {
+                if (file.getId().equals(fileIdForProduction)) {
+                    file.setProductionFile(true); // Mark this file for production
+                    fileFoundAndMarked = true;
+                } else {
+                    file.setProductionFile(false); // Unmark any other files
+                }
+                // Ensure copy-editing file flag is false for all files here, as we are moving to production
+//                file.setCopyEditingFile(false);
+            }
+        }
+
+        if (!fileFoundAndMarked) {
+            throw new SubmissionRequestException("File with ID: " + fileIdForProduction + " not found within submission ID: " + submissionId);
+        }
+
+        // Update status to PRODUCTION
+        submission.setSubmissionStatus(SubmissionStatus.PRODUCTION);
+        submission.setUpdatedAt(BdtZoneTimeUtil.timeInBDT());
+
+        return submissionRepository.save(submission);
     }
 
 }

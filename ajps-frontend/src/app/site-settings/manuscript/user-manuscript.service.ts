@@ -283,5 +283,22 @@ export class UserManuscriptService {
     );
   }
   
+  // Add this method to UserManuscriptService
+selectFileForProduction(submissionId: number, fileId: number): Observable<any> {
+  debugger
+    return this.http.put(`${this.baseUrl}/${submissionId}/select-production-file`, { fileId }).pipe(
+        map((response: any) => {
+            if (response && response.code === 200 && response.status === 'success') {
+                return response;
+            } else {
+                throw new Error(response?.message || 'Failed to select file for production: Unexpected response');
+            }
+        }),
+        catchError(error => {
+            console.error('Error selecting file for production:', error);
+            return throwError(() => new Error(error.error?.message || error.statusText || 'Server error during file selection.'));
+        })
+    );
+}
 
 }

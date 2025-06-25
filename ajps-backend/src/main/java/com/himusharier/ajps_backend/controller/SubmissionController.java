@@ -370,4 +370,19 @@ public class SubmissionController {
         }
     }
 
+    // Add this to SubmissionController.java
+    @PutMapping("/{submissionId}/select-production-file")
+    public ResponseEntity<ApiResponse<?>> selectFileForProduction(
+            @PathVariable Long submissionId,
+            @RequestBody SendToReviewRequest request) { // Reusing SendToReviewRequest as it just needs fileId
+        try {
+            Submission updatedSubmission = submissionService.selectFileForProduction(submissionId, request.getFileId());
+            return ResponseEntity.ok(new ApiResponse(200, "File selected for production successfully.", updatedSubmission));
+        } catch (SubmissionRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(HttpStatus.BAD_REQUEST.value(), "Failed to select file for production.", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to select file for production."));
+        }
+    }
+
 }

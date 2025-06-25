@@ -8,6 +8,7 @@ public enum SubmissionStatus {
     ACCEPTED,
     DUE_PAYMENT,
     COPY_EDITING,
+    PRODUCTION,
     PUBLICATION,
     PUBLISHED,
     REJECTED

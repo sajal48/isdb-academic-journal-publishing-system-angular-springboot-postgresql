@@ -16,4 +16,5 @@ public class FileUploadResponse {
     private String fileUrl;
     private boolean isReviewFile;
     private boolean isCopyEditingFile;
+    private boolean isProductionFile;
 }

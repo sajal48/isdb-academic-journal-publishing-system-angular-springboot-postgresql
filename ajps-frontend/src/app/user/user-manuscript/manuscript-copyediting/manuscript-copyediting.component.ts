@@ -42,6 +42,8 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   // Discussion origin specifically for copy-editing discussions
   private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT; // Or a more specific COPY_EDIT if you create one
 
+  selectedProductionFileId: number | null = null;
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
@@ -349,4 +351,62 @@ export class ManuscriptCopyeditingComponent implements OnInit {
       }
     }
   }
+
+  // Add this method to open the file selection modal
+openSelectProductionFileModal(): void {
+    this.selectedProductionFileId = null; // Reset selection
+    this.openModal('selectProductionFileModal');
+}
+
+// Add this method to handle the confirmation with file selection
+confirmCompleteCopyeditingWithFile(): void {
+    if (!this.manuscript?.id || this.selectedProductionFileId === null) {
+        this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
+        return;
+    }
+
+    const manuscriptId = Number(this.manuscript.id);
+    const fileIdForProduction = this.selectedProductionFileId;
+
+    this.userToastNotificationService.showToast('Info', 'Completing copyediting and preparing for production...', 'info');
+
+    // Make two API calls: one to update status and another to select the production file
+    forkJoin([
+        this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PRODUCTION'),
+        this.userManuscriptService.selectFileForProduction(manuscriptId, fileIdForProduction)
+    ]).subscribe({
+        next: ([statusResponse, fileSelectionResponse]) => {
+            // Update local manuscript status
+            this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PRODUCTION';
+            
+            // Update local file data to reflect the production file status
+            if (this.manuscript.files) {
+                this.manuscript.files.forEach(file => {
+                    file.isProductionFile = (file.id === fileIdForProduction);
+                });
+            }
+
+            this.userToastNotificationService.showToast('Success', 'Copyediting completed and file sent for production!', 'success');
+            this.closeModal('selectProductionFileModal');
+            this.selectedProductionFileId = null;
+            
+            // Navigate to production page
+            this.router.navigate([`/user/manuscript/${manuscriptId}/production`]);
+        },
+        error: (error) => {
+            console.error('Error during complete copyediting and file selection:', error);
+            this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to complete copyediting or select file for production.', 'danger');
+        }
+    });
+}
+
+// Modify the existing completeCopyediting method to use the new file selection
+completeCopyediting(): void {
+    if (this.hasCopyeditedFiles()) {
+        this.openSelectProductionFileModal();
+    } else {
+        this.openCopyeditingActionModal('completeCopyediting');
+    }
+}
+
 }
