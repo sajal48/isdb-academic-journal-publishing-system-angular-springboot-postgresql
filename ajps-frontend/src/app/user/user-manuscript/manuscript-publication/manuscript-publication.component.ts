@@ -105,7 +105,7 @@ export class ManuscriptPublicationComponent implements OnInit {
         const currentJournal = journals.find(j => j.id === this.manuscript.journal?.id);
         if (currentJournal && currentJournal.issues) {
           this.issues = currentJournal.issues
-            .filter(issue => issue.status === 'Future' || issue.status === 'Published') // Show future and published issues
+            .filter(issue => issue.status === 'FUTURE' || issue.status === 'PUBLISHED') // Show future and published issues
             .map(issue => ({
               id: issue.id,
               journalName: currentJournal.journalName,

@@ -2,6 +2,7 @@ package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.himusharier.ajps_backend.constants.IssueStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,6 +44,7 @@ public class Issue {
     private Journal journal;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Paper> papers = new ArrayList<>();
 
 //    @ManyToOne

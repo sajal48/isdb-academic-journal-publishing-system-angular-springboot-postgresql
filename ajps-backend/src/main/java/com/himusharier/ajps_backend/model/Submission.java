@@ -2,6 +2,7 @@ package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.util.BdtZoneTimeUtil;
@@ -21,6 +22,7 @@ import java.util.Random;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "AJPS_SUBMISSION")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Submission implements Serializable {
 
     @Id
@@ -32,6 +34,7 @@ public class Submission implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "journal_id", nullable = false) // Foreign key column
+    @JsonBackReference
     private Journal journal; // Link to the Journal entity
 
     @Column(nullable = false)
@@ -75,6 +78,10 @@ public class Submission implements Serializable {
     @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonManagedReference
     private List<SubmissionReviewer> submissionReviewers = new ArrayList<>(); // Initialize to prevent NullPointerException
+
+    @OneToMany(mappedBy = "submission", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore // We're ignoring this to prevent circular references
+    private List<Paper> papers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "profile_id")

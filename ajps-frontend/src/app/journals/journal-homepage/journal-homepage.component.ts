@@ -32,7 +32,7 @@ export class JournalHomepageComponent implements OnInit {
   }
 
   loadJournalDetails(journalCode: string): void {
-    this.journalService.getJournalByCode(journalCode).subscribe({
+    this.journalService.getJournalByJournalUrl(journalCode).subscribe({
       next: (data) => {
         this.journal = data;
         this.isLoading = false;

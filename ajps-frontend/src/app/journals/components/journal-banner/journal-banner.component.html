@@ -1,13 +1,25 @@
-<div class="journal-cover-div">
+<div class="journal-cover-div" *ngIf="journal && !isLoading">
     <div class="container-xxl">
         <div class="journal-cover-wrap journal-alpha-container">
-            <img class="journal-main-pic" src="/journal-covers/cover-1.jpg" alt="journal cover">
+            <img class="journal-main-pic" [src]="journal.coverImageUrl || '/assets/images/default-journal-cover.jpg'" [alt]="journal.journalName + ' cover'">
             <div class="journal-cover-text">
-                <p>Plants and Ecosystem</p>
-                <a>Frequency: Annual</a>
+                <p>{{ journal.journalName }}</p>
+                <a>Frequency: {{ journal.frequency }}</a>
                 <a>Open Access</a>
-                <a>ISSN: 2789-7370 (Online)</a>
+                <a>ISSN: {{ journal.issn }} (Online)</a>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Loading state -->
+<div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<!-- Error state -->
+<div *ngIf="!journal && !isLoading" class="alert alert-warning">
+    Journal information could not be loaded.
 </div>

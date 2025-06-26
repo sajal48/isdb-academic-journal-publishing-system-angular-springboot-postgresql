@@ -13,7 +13,7 @@ export interface Issue {
   volume: number;
   number: number;
   publicationDate: string;
-  status: 'Published' | 'Future';
+  status: 'PUBLISHED' | 'FUTURE';
   papers: Paper[];
 }
 

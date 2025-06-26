@@ -16,23 +16,25 @@ export class JournalAllIssuesComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private journalService: JournalDetailsService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    const journalCode = this.route.snapshot.paramMap.get('journalUrl');
-    if (journalCode) {
-      this.journalService.getJournalByCode(journalCode).subscribe({
-        next: (data) => {
-          this.journal = data;
-          this.issues = data.issues.sort((a, b) => {
-            // Sort by volume DESC, then number DESC
-            return b.volume !== a.volume
-              ? b.volume - a.volume
-              : b.number - a.number;
-          });
-        },
-        error: (err) => console.error('Failed to load journal:', err)
-      });
-    }
+    this.route.parent?.paramMap.subscribe(params => {
+      const journalUrl = params.get('journalUrl');
+      if (journalUrl) {
+        this.journalService.getJournalByJournalUrl(journalUrl).subscribe({
+          next: (data) => {
+            this.journal = data;
+            this.issues = data.issues.sort((a, b) => {
+              // Sort by volume DESC, then number DESC
+              return b.volume !== a.volume
+                ? b.volume - a.volume
+                : b.number - a.number;
+            });
+          },
+          error: (err) => console.error('Failed to load journal:', err)
+        });
+      }
+    });
   }
 }

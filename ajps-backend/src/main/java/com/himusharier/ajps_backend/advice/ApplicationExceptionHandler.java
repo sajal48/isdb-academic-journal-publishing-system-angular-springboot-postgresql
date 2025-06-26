@@ -110,4 +110,13 @@ public class ApplicationExceptionHandler {
         return response;
     }
 
+    @ExceptionHandler(JournalOperationException.class)
+    public Map<String, Object> journalOperationException(JournalOperationException ex) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", "error");
+        response.put("code", HttpStatus.BAD_REQUEST.value());
+        response.put("message", ex.getMessage());
+        return response;
+    }
+
 }

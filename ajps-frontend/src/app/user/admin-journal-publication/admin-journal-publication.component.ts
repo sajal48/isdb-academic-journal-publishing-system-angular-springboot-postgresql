@@ -16,7 +16,7 @@ interface Issue {
   volume: number;
   number: number;
   publicationDate: string;
-  status: 'Published' | 'Future';
+  status: 'PUBLISHED' | 'FUTURE';
   papers: Paper[];
   volumeNote?: string;
   issueNote?: string;
@@ -81,7 +81,8 @@ export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
   }
 
   capitalize(str: string): string {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    // return str.charAt(0).toUpperCase() + str.slice(1);
+    return str.toUpperCase();
   }
 
   openAddIssueModal() {

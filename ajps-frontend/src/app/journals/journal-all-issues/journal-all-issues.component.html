@@ -1,18 +1,17 @@
-<article class="container my-5" *ngIf="issues.length > 0">
-  <h2 class="mb-4">All Issues of {{ journal?.journalName }}</h2>
+<article class="container my-3" *ngIf="issues.length > 0">
+  <h3 class="volume-info"><i class="bi bi-journal-bookmark-fill"></i> All Issues of {{ journal?.journalName }}
+  </h3>
   <div class="row">
     <div class="col-md-4 col-sm-6 mb-4" *ngFor="let issue of issues">
       <div class="card">
         <div class="card-body">
-          <h5 class="issue-title">
-            Volume {{ issue.volume }}, Issue {{ issue.number }}
-          </h5>
-          <p class="issue-meta mb-2">
+          <h3 class="issue-title">
+            <a>Volume {{ issue.volume }}, Issue {{ issue.number }}</a>
+          </h3>
+          <p class="issue-meta">
             <span>Published: {{ issue.publicationDate | date:'MMMM d, y' }}</span><br>
-            <span>Status: {{ issue.status }}</span>
           </p>
-          <a class="btn btn-primary"
-             [routerLink]="['../vol' + issue.volume + 'issue' + issue.number]">
+          <a class="btn btn-primary" [routerLink]="['../vol' + issue.volume + 'issue' + issue.number]">
             View Issue
           </a>
         </div>

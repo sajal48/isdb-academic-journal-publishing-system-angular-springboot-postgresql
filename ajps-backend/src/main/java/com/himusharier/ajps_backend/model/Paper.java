@@ -2,6 +2,7 @@ package com.himusharier.ajps_backend.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,11 @@ public class Paper {
     // Optional: If you want to keep a direct link to Submission:
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submission_id")
-    @JsonIgnoreProperties({"papers"})
+//    @JsonIgnoreProperties({"papers"})
+//    @JsonBackReference
+//    @JsonManagedReference
+//    @JsonIgnoreProperties({"papers", "authors", "files", "submissionReviewers"})
+    @JsonIgnoreProperties({"papers", "files", "submissionReviewers", "profile"})
     private Submission submission;
 
     // File upload details (assuming file upload belongs to paper)

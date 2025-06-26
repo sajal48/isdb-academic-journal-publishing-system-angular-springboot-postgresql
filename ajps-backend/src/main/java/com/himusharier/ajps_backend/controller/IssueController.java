@@ -1,5 +1,7 @@
 package com.himusharier.ajps_backend.controller;
 
+import com.himusharier.ajps_backend.constants.IssueStatus;
+import com.himusharier.ajps_backend.exception.JournalOperationException;
 import com.himusharier.ajps_backend.model.Issue;
 import com.himusharier.ajps_backend.model.Journal;
 import com.himusharier.ajps_backend.repository.IssueRepository;
@@ -7,6 +9,7 @@ import com.himusharier.ajps_backend.repository.JournalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -41,4 +44,23 @@ public class IssueController {
 
     @DeleteMapping("/issues/{id}")
     public void deleteIssue(@PathVariable Long id) { issues.deleteById(id); }
+
+    @GetMapping("/journal/get-journal/{journalUrl}/issues")
+    public List<Issue> getIssuesByJournalUrl(@PathVariable String journalUrl) {
+        Journal journal = journals.findByJournalUrl(journalUrl)
+                .orElseThrow(() -> new JournalOperationException("Journal not found"));
+        return issues.findByJournalId(journal.getId());
+    }
+
+    @GetMapping("/journal/get-journal/{journalUrl}/current-issue")
+    public Issue getCurrentIssue(@PathVariable String journalUrl) {
+        Journal journal = journals.findByJournalUrl(journalUrl)
+                .orElseThrow(() -> new JournalOperationException("Journal not found"));
+
+        return issues.findByJournalId(journal.getId()).stream()
+                .filter(issue -> issue.getStatus() == IssueStatus.PUBLISHED)
+                .max(Comparator.comparing(Issue::getPublicationDate))
+                .orElseThrow(() -> new JournalOperationException("No published issues found"));
+    }
+
 }

@@ -3,12 +3,41 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 
+// paper.model.ts
+export interface Author {
+  id: number;
+  name: string;
+  email: string;
+  institution: string;
+  corresponding: boolean;
+}
+
+export interface Paper {
+  id: number;
+  submission: {
+    id: number;
+    submissionNumber: number;
+    manuscriptTitle: string;
+    manuscriptCategory: string;
+    abstractContent: string;
+    manuscriptKeywords: string;
+    submissionStatus: string;
+    createdAt: string;
+    authors: Author[];
+  };
+  fileUpload: {
+    fileUrl: string;
+  };
+}
+
+// issue.model.ts
 export interface Issue {
   id: number;
-  number: number;
   volume: number;
+  number: number;
+  publicationDate: string;
   status: string;
-  publicationDate: string; // or Date if you'll parse it
+  papers: Paper[];
 }
 
 export interface AdminJournalDto {
@@ -39,11 +68,15 @@ export class JournalDetailsService {
   }
 
   // journal.service.ts
-  getJournalByCode(journalCode: string): Observable<AdminJournalDto> {
+  getJournalByJournalUrl(journalCode: string): Observable<AdminJournalDto> {
     if (!journalCode) {
       throw new Error('Journal code is required');
     }
     return this.http.get<AdminJournalDto>(`${this.apiUrl}/get-journal/${journalCode}`);
+  }
+
+   getIssuesByJournalUrl(journalUrl: string): Observable<Issue[]> {
+    return this.http.get<Issue[]>(`${this.apiUrl}/get-journal/${journalUrl}/issues`);
   }
 
 }
