@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AdminJournalDto, Issue, JournalDetailsService } from '../../site-settings/services/journal-details.service';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-journal-all-issues',
@@ -16,7 +17,7 @@ export class JournalAllIssuesComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private journalService: JournalDetailsService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
@@ -25,12 +26,14 @@ export class JournalAllIssuesComponent implements OnInit {
         this.journalService.getJournalByJournalUrl(journalUrl).subscribe({
           next: (data) => {
             this.journal = data;
-            this.issues = data.issues.sort((a, b) => {
-              // Sort by volume DESC, then number DESC
-              return b.volume !== a.volume
-                ? b.volume - a.volume
-                : b.number - a.number;
-            });
+            this.issues = data.issues
+              .filter(issue => issue.status === 'PUBLISHED') // 🔥 Only keep published issues
+              .sort((a, b) => {
+                // Sort by volume DESC, then issue number DESC
+                return b.volume !== a.volume
+                  ? b.volume - a.volume
+                  : b.number - a.number;
+              });
           },
           error: (err) => console.error('Failed to load journal:', err)
         });
