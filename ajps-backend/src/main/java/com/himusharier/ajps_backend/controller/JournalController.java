@@ -25,12 +25,13 @@ public class JournalController {
         return ResponseEntity.ok(journalService.getAllJournals());
     }
 
-    @GetMapping("/get-journal/{journalCode}")
-    public ResponseEntity<AdminJournalDto> getJournalByCode(@PathVariable String journalCode) {
-        if (journalCode == null || journalCode.isEmpty() || journalCode.equals("undefined")) {
+    @GetMapping("/get-journal/{journalUrl}")
+    public ResponseEntity<AdminJournalDto> getJournalByCode(@PathVariable String journalUrl) {
+        journalUrl = journalUrl.toLowerCase();
+        if (journalUrl == null || journalUrl.isEmpty() || journalUrl.equals("undefined")) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(journalService.getJournalByCode(journalCode));
+        return ResponseEntity.ok(journalService.getJournalByCode(journalUrl));
     }
 
     @PostMapping(value = "/create-journal", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

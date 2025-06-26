@@ -20,15 +20,15 @@ export class JournalHomepageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const journalCode = params.get('journalCode');
-      if (journalCode) {
-        this.loadJournalDetails(journalCode);
-      } else {
-        this.error = 'Journal code is missing from URL';
-        this.isLoading = false;
-      }
-    });
+    this.route.parent?.paramMap.subscribe(params => {
+    const journalUrl = params.get('journalUrl');
+    if (journalUrl) {
+      this.loadJournalDetails(journalUrl);
+    } else {
+      this.error = 'Journal url is missing from URL';
+      this.isLoading = false;
+    }
+  });
   }
 
   loadJournalDetails(journalCode: string): void {

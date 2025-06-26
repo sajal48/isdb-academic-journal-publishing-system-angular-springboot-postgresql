@@ -269,14 +269,14 @@ public class JournalService {
     // - convertToDtoWithFullImageUrl (functionality moved to mapJournalToAdminJournalDto)
     // - deleteOldImageIfExists (replaced with deleteImageByUrl)
 
-    public AdminJournalDto getJournalByCode(String journalCode) {
-        if (journalCode == null || journalCode.isEmpty() || journalCode.equals("undefined")) {
+    public AdminJournalDto getJournalByCode(String journalUrl) {
+        if (journalUrl == null || journalUrl.isEmpty() || journalUrl.equals("undefined")) {
             throw new IllegalArgumentException("Journal code is required");
         }
 
-        return journalRepository.findByJournalCode(journalCode)
+        return journalRepository.findByJournalUrl(journalUrl)
                 .map(this::mapJournalToAdminJournalDto)
-                .orElseThrow(() -> new IllegalArgumentException("Journal not found with code: " + journalCode));
+                .orElseThrow(() -> new IllegalArgumentException("Journal not found with code: " + journalUrl));
     }
 
 }
