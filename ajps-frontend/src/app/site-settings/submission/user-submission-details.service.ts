@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { SubmissionList } from '../interfaces/submission-list-interface';
 import { AuthLoginRegisterService } from '../auth/auth-login-register.service';
 import { apiConfig } from '../configs/api-config';
+import { SubmissionListAll } from '../../user/editor-submissions-new/editor-submissions-new.component';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,10 @@ export class UserSubmissionDetailsService {
   }
 
   // getting submissions:
+  getSubmissionListAll(): Observable<{status: string, code: number, data: SubmissionListAll[]}> {
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+    return this.http.get<{status: string, code: number, data: SubmissionListAll[]}>(`${apiConfig.apiBaseUrl}/user/submission/list/all`, {headers});
+  }
   getSubmissionList(): Observable<{status: string, code: number, data: SubmissionList[]}> {
     const headers = new HttpHeaders({'Content-Type': 'application/json'});
     const userId = this.authLoginRegisterService.getUserID();

@@ -43,6 +43,9 @@ export class ManuscriptPublicationComponent implements OnInit {
   // For Modals
   confirmationMessage: string = '';
   currentAction: string = '';
+  private othersUserId: number = 0;
+  private loggedUserId: number = 0;
+  currentUserRole: string = '';
 
   constructor(
     private http: HttpClient,
@@ -54,7 +57,16 @@ export class ManuscriptPublicationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
+    this.loggedUserId = this.authLoginRegisterService.getUserID();
+    
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');

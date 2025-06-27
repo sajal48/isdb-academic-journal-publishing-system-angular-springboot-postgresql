@@ -131,6 +131,7 @@ export class UserManuscriptComponent implements OnInit {
   // IMPORTANT: Replace with a dynamic userId from authentication or user session
   // For now, hardcode a placeholder or get from route if you have a /user/:userId/manuscript/:manuscriptId route
   private currentUserId: number = 0; // <<--- SET A VALID USER ID HERE (e.g., from logged-in user)
+  othersUserId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -139,7 +140,12 @@ export class UserManuscriptComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
 
     this.route.paramMap.pipe(
       switchMap(params => {

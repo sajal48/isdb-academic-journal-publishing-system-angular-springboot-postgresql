@@ -38,6 +38,9 @@ export class ManuscriptProductionComponent implements OnInit {
 
   private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT;
   selectedPublicationFileId: number | null = null;
+  private othersUserId: number = 0;
+  private loggedUserId: number = 0;
+  currentUserRole: string = '';
 
   constructor(
     private http: HttpClient,
@@ -46,10 +49,19 @@ export class ManuscriptProductionComponent implements OnInit {
     private userManuscriptService: UserManuscriptService,
     private authLoginRegisterService: AuthLoginRegisterService,
     private userToastNotificationService: UserToastNotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
+    this.loggedUserId = this.authLoginRegisterService.getUserID();
+
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');
@@ -76,12 +88,12 @@ export class ManuscriptProductionComponent implements OnInit {
     if (this.manuscript) {
       // Copy edited files are those marked as isCopyEditingFile or with COPY_EDIT origin
       this.copyEditedFiles = this.manuscript.files?.filter(file => file.isProductionFile) || [];
-      
+
       // Production ready files are those marked as isProductionFile or with PRODUCTION origin
-      this.productionReadyFiles = this.manuscript.files?.filter(file => 
+      this.productionReadyFiles = this.manuscript.files?.filter(file =>
         file.isPublicationFile || file.fileOrigin === 'PRODUCTION') || [];
-      
-      this.productionDiscussions = this.manuscript.discussions?.filter(discussion => 
+
+      this.productionDiscussions = this.manuscript.discussions?.filter(discussion =>
         discussion.origin === DiscussionOrigin.PRODUCTION) || [];
     }
   }
@@ -166,7 +178,7 @@ export class ManuscriptProductionComponent implements OnInit {
     if (!this.manuscript?.id) return;
 
     // this.userToastNotificationService.showToast('Info', 'Marking file as final version...', 'info');
-    
+
     this.userManuscriptService.selectFileForProduction(Number(this.manuscript.id), file.id).subscribe({
       next: (response) => {
         if (response?.code === 200) {
@@ -199,7 +211,7 @@ export class ManuscriptProductionComponent implements OnInit {
     if (this.newProductionDiscussionTitle && this.newProductionDiscussionMessage && this.manuscript?.id) {
       this.userManuscriptService.createDiscussion(
         Number(this.manuscript.id),
-        this.currentUserId,
+        this.loggedUserId,
         this.newProductionDiscussionTitle,
         this.newProductionDiscussionMessage,
         this.discussionOrigin = DiscussionOrigin.PRODUCTION
@@ -229,20 +241,20 @@ export class ManuscriptProductionComponent implements OnInit {
   }
 
   // Modify the existing openProductionActionModal method
-openProductionActionModal(action: string): void {
+  openProductionActionModal(action: string): void {
     this.currentAction = action;
     switch (action) {
-        case 'scheduleForPublication':
-            this.openSelectPublicationFileModal();
-            return;
-        case 'declineSubmission':
-            this.confirmationMessage = 'Are you sure you want to decline this submission?';
-            break;
-        default:
-            this.confirmationMessage = 'Are you sure you want to proceed?';
+      case 'scheduleForPublication':
+        this.openSelectPublicationFileModal();
+        return;
+      case 'declineSubmission':
+        this.confirmationMessage = 'Are you sure you want to decline this submission?';
+        break;
+      default:
+        this.confirmationMessage = 'Are you sure you want to proceed?';
     }
     this.openModal('productionConfirmationModal');
-}
+  }
 
   confirmProductionAction(): void {
     if (!this.manuscript?.id) {
@@ -278,8 +290,13 @@ openProductionActionModal(action: string): void {
         this.closeModal('productionConfirmationModal');
         // this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
         if (navigateToRoute) {
+          // this.router.navigate([navigateToRoute]);
+          if (this.othersUserId == null) {
             this.router.navigate([navigateToRoute]);
+          } else {
+            this.router.navigate([navigateToRoute], { queryParams: { userId: this.othersUserId } });
           }
+        }
       },
       error: (err) => {
         console.error('Production action error:', err);
@@ -307,16 +324,16 @@ openProductionActionModal(action: string): void {
   }
 
   // Add this method to open the file selection modal
-openSelectPublicationFileModal(): void {
+  openSelectPublicationFileModal(): void {
     this.selectedPublicationFileId = null; // Reset selection
     this.openModal('selectPublicationFileModal');
-}
+  }
 
-// Add this method to handle the confirmation with file selection
-confirmScheduleForPublication(): void {
+  // Add this method to handle the confirmation with file selection
+  confirmScheduleForPublication(): void {
     if (!this.manuscript?.id || this.selectedPublicationFileId === null) {
-        this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
-        return;
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
+      return;
     }
 
     const manuscriptId = Number(this.manuscript.id);
@@ -326,31 +343,36 @@ confirmScheduleForPublication(): void {
 
     // Make two API calls: one to update status and another to select the publication file
     forkJoin([
-        this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PUBLICATION'),
-        this.userManuscriptService.selectFileForPublication(manuscriptId, fileIdForPublication)
+      this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PUBLICATION'),
+      this.userManuscriptService.selectFileForPublication(manuscriptId, fileIdForPublication)
     ]).subscribe({
-        next: ([statusResponse, fileSelectionResponse]) => {
-            // Update local manuscript status
-            this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PUBLICATION';
-            
-            // Update local file data to reflect the publication file status
-            if (this.manuscript.files) {
-                this.manuscript.files.forEach(file => {
-                    file.isPublicationFile = (file.id === fileIdForPublication);
-                });
-            }
+      next: ([statusResponse, fileSelectionResponse]) => {
+        // Update local manuscript status
+        this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PUBLICATION';
 
-            this.userToastNotificationService.showToast('Success', 'Manuscript scheduled for publication!', 'success');
-            this.closeModal('selectPublicationFileModal');
-            this.selectedPublicationFileId = null;
-            this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
-        },
-        error: (error) => {
-            console.error('Error during publication scheduling:', error);
-            this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to schedule for publication.', 'danger');
+        // Update local file data to reflect the publication file status
+        if (this.manuscript.files) {
+          this.manuscript.files.forEach(file => {
+            file.isPublicationFile = (file.id === fileIdForPublication);
+          });
         }
+
+        this.userToastNotificationService.showToast('Success', 'Manuscript scheduled for publication!', 'success');
+        this.closeModal('selectPublicationFileModal');
+        this.selectedPublicationFileId = null;
+        this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
+        if (this.othersUserId == null) {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`]);
+        } else {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/publication`], { queryParams: { userId: this.othersUserId } });
+        }
+      },
+      error: (error) => {
+        console.error('Error during publication scheduling:', error);
+        this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to schedule for publication.', 'danger');
+      }
     });
-}
+  }
 
 
 }

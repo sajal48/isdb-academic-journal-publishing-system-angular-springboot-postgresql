@@ -131,6 +131,7 @@
         </div>
 
         <!-- Production Actions -->
+        @if (currentUserRole == 'editor' || currentUserRole == 'admin') {
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
                 <!-- <button class="btn btn-success" style="font-size: 14px;" (click)="openCopyeditingActionModal('completeCopyediting')"
@@ -151,6 +152,7 @@
                 </button>
             </div>
         </div>
+        }
     </div>
 </div>
 

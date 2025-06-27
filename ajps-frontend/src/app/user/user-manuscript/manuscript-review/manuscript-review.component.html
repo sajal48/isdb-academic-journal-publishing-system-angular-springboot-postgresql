@@ -11,7 +11,7 @@
                         <div>
                             <div class="fw-semibold">{{ file.name }}</div>
                             <small class="text-muted">{{ (file.size / 1024).toFixed(2) }} KB</small>
-                            </div>
+                        </div>
                         <button type="button" class="btn btn-sm btn-outline-primary"
                             (click)="downloadFile(file.url, file.name)">
                             <i class="bi bi-download"></i> Download
@@ -73,14 +73,15 @@
                     <tbody>
                         <tr *ngFor="let discussion of reviewDiscussions">
                             <td>
-                                <a style="cursor: pointer;" (click)="viewDiscussionContent(discussion); $event.preventDefault();"
+                                <a style="cursor: pointer;"
+                                    (click)="viewDiscussionContent(discussion); $event.preventDefault();"
                                     class="text-decoration-none text-primary">
                                     <i class="bi bi-chat-dots"></i> {{ discussion.title }}
                                 </a>
                             </td>
                             <td>{{ discussion.creatorName }}</td>
                             <td style="white-space: nowrap;">{{ discussion.createdAt | date:'longDate' }}</td>
-                            </tr>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -141,11 +142,10 @@
             <a><i class="bi bi-check-circle-fill"></i> Submission Accepted</a>
         </div> -->
 
-
+        @if (currentUserRole == 'editor' || currentUserRole == 'admin') {
         <div class="card mb-4">
             <div class="card-body d-flex flex-column gap-2">
-                <button class="btn btn-primary" style="font-size: 14px;"
-                    (click)="openSelectCopyEditingFileModal()">
+                <button class="btn btn-primary" style="font-size: 14px;" (click)="openSelectCopyEditingFileModal()">
                     <!-- [disabled]="manuscript.submissionStatus !== 'UNDER_REVIEW' && manuscript.submissionStatus !== 'REVISION_REQUIRED'"> -->
                     Accept Revision
                 </button>
@@ -154,8 +154,9 @@
                     [disabled]="manuscript.submissionStatus === 'REJECTED'">
                     Decline Submission
                 </button>
-                </div>
+            </div>
         </div>
+        }
     </div>
 </div>
 
@@ -205,7 +206,7 @@
                     <textarea class="form-control" id="reviewDiscussionMessage" rows="3"
                         [(ngModel)]="newReviewDiscussionMessage" required></textarea>
                 </div>
-                </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" (click)="confirmAddReviewDiscussion()"
@@ -275,8 +276,8 @@
     </div>
 </div>
 
-<div class="modal fade" id="selectCopyEditingFileModal" tabindex="-1"
-    aria-labelledby="selectCopyEditingFileModalLabel" aria-hidden="true">
+<div class="modal fade" id="selectCopyEditingFileModal" tabindex="-1" aria-labelledby="selectCopyEditingFileModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">

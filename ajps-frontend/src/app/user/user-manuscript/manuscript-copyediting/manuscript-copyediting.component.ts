@@ -43,6 +43,9 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   private discussionOrigin: DiscussionOrigin = DiscussionOrigin.COPY_EDIT; // Or a more specific COPY_EDIT if you create one
 
   selectedProductionFileId: number | null = null;
+  private othersUserId: number = 0;
+  private loggedUserId: number = 0;
+  currentUserRole: string = '';
 
   constructor(
     private http: HttpClient,
@@ -54,7 +57,16 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
+    this.loggedUserId = this.authLoginRegisterService.getUserID();
+
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');
@@ -214,7 +226,7 @@ export class ManuscriptCopyeditingComponent implements OnInit {
       // this.userToastNotificationService.showToast('Info', 'Adding discussion...', 'info');
       this.userManuscriptService.createDiscussion(
         Number(this.manuscript.id),
-        this.currentUserId,
+        this.loggedUserId,
         this.newCopyeditingDiscussionTitle,
         this.newCopyeditingDiscussionMessage,
         this.discussionOrigin = DiscussionOrigin.COPY_EDIT // Use the pre-defined origin for copy-editing discussions
@@ -322,8 +334,14 @@ export class ManuscriptCopyeditingComponent implements OnInit {
           this.manuscript.submissionStatus = response.data?.submissionStatus || statusToUpdate;
           this.closeModal('copyeditingConfirmationModal');
           if (navigateToRoute) {
-            this.router.navigate([navigateToRoute]);
+            // this.router.navigate([navigateToRoute]);
+            if (this.othersUserId == null) {
+              this.router.navigate([navigateToRoute]);
+            } else {
+              this.router.navigate([navigateToRoute], { queryParams: { userId: this.othersUserId } });
+            }
           }
+
         },
         error: (err) => {
           console.error('Copyediting action error:', err);
@@ -353,16 +371,16 @@ export class ManuscriptCopyeditingComponent implements OnInit {
   }
 
   // Add this method to open the file selection modal
-openSelectProductionFileModal(): void {
+  openSelectProductionFileModal(): void {
     this.selectedProductionFileId = null; // Reset selection
     this.openModal('selectProductionFileModal');
-}
+  }
 
-// Add this method to handle the confirmation with file selection
-confirmCompleteCopyeditingWithFile(): void {
+  // Add this method to handle the confirmation with file selection
+  confirmCompleteCopyeditingWithFile(): void {
     if (!this.manuscript?.id || this.selectedProductionFileId === null) {
-        this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
-        return;
+      this.userToastNotificationService.showToast('Error', 'Manuscript ID or selected file missing.', 'danger');
+      return;
     }
 
     const manuscriptId = Number(this.manuscript.id);
@@ -372,42 +390,47 @@ confirmCompleteCopyeditingWithFile(): void {
 
     // Make two API calls: one to update status and another to select the production file
     forkJoin([
-        this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PRODUCTION'),
-        this.userManuscriptService.selectFileForProduction(manuscriptId, fileIdForProduction)
+      this.userManuscriptService.updateSubmissionStatus(manuscriptId, 'PRODUCTION'),
+      this.userManuscriptService.selectFileForProduction(manuscriptId, fileIdForProduction)
     ]).subscribe({
-        next: ([statusResponse, fileSelectionResponse]) => {
-            // Update local manuscript status
-            this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PRODUCTION';
-            
-            // Update local file data to reflect the production file status
-            if (this.manuscript.files) {
-                this.manuscript.files.forEach(file => {
-                    file.isProductionFile = (file.id === fileIdForProduction);
-                });
-            }
+      next: ([statusResponse, fileSelectionResponse]) => {
+        // Update local manuscript status
+        this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'PRODUCTION';
 
-            this.userToastNotificationService.showToast('Success', 'Copyediting completed and file sent for production!', 'success');
-            this.closeModal('selectProductionFileModal');
-            this.selectedProductionFileId = null;
-            
-            // Navigate to production page
-            this.router.navigate([`/user/manuscript/${manuscriptId}/production`]);
-        },
-        error: (error) => {
-            console.error('Error during complete copyediting and file selection:', error);
-            this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to complete copyediting or select file for production.', 'danger');
+        // Update local file data to reflect the production file status
+        if (this.manuscript.files) {
+          this.manuscript.files.forEach(file => {
+            file.isProductionFile = (file.id === fileIdForProduction);
+          });
         }
-    });
-}
 
-// Modify the existing completeCopyediting method to use the new file selection
-completeCopyediting(): void {
+        this.userToastNotificationService.showToast('Success', 'Copyediting completed and file sent for production!', 'success');
+        this.closeModal('selectProductionFileModal');
+        this.selectedProductionFileId = null;
+
+        // Navigate to production page
+        // this.router.navigate([`/user/manuscript/${manuscriptId}/production`]);
+        if (this.othersUserId == null) {
+          this.router.navigate([`/user/manuscript/${manuscriptId}/production`]);
+        } else {
+          this.router.navigate([`/user/manuscript/${manuscriptId}/production`], { queryParams: { userId: this.othersUserId } });
+        }
+      },
+      error: (error) => {
+        console.error('Error during complete copyediting and file selection:', error);
+        this.userToastNotificationService.showToast('Error', error.error?.message || 'Failed to complete copyediting or select file for production.', 'danger');
+      }
+    });
+  }
+
+  // Modify the existing completeCopyediting method to use the new file selection
+  completeCopyediting(): void {
     // if (this.hasCopyeditedFiles()) {
     //     this.openSelectProductionFileModal();
     // } else {
     //     this.openCopyeditingActionModal('completeCopyediting');
     // }
     this.openSelectProductionFileModal()
-}
+  }
 
 }

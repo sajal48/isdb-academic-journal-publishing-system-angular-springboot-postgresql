@@ -43,6 +43,9 @@ export class ManuscriptReviewComponent implements OnInit {
   selectedCopyEditingFileId: number | null = null;
 
   DiscussionOrigin = DiscussionOrigin;
+  private othersUserId: number = 0;
+  private loggedUserId: number = 0;
+  currentUserRole: string = '';
 
   constructor(
     private http: HttpClient,
@@ -51,10 +54,19 @@ export class ManuscriptReviewComponent implements OnInit {
     private userManuscriptService: UserManuscriptService,
     private authLoginRegisterService: AuthLoginRegisterService,
     private userToastNotificationService: UserToastNotificationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
+    this.loggedUserId = this.authLoginRegisterService.getUserID();
+
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');
@@ -177,7 +189,7 @@ export class ManuscriptReviewComponent implements OnInit {
     if (this.newReviewDiscussionTitle && this.newReviewDiscussionMessage && this.manuscript?.id && this.newReviewDiscussionOrigin) {
       this.userManuscriptService.createDiscussion(
         Number(this.manuscript.id),
-        this.currentUserId,
+        this.loggedUserId,
         this.newReviewDiscussionTitle,
         this.newReviewDiscussionMessage,
         this.newReviewDiscussionOrigin
@@ -245,7 +257,12 @@ export class ManuscriptReviewComponent implements OnInit {
         this.userToastNotificationService.showToast('Success', 'Manuscript accepted and file sent for copy-editing!', 'success');
         this.closeModal('selectCopyEditingFileModal'); // Close the file selection modal
         this.selectedCopyEditingFileId = null; // Clear selected file
-        this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+        // this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+        if (this.othersUserId == null) {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+        } else {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`], { queryParams: { userId: this.othersUserId } });
+        }
       },
       error: (error) => {
         console.error('Error during accept and file selection:', error);
@@ -313,6 +330,11 @@ export class ManuscriptReviewComponent implements OnInit {
         this.manuscript.isEditable = response.data?.isEditable ?? (statusToUpdate === 'REVISION_REQUIRED');
         this.closeModal('reviewConfirmationModal');
         // this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+        if (this.othersUserId == null) {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/submission`]);
+        } else {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/submission`], { queryParams: { userId: this.othersUserId } });
+        }
       },
       error: (err) => {
         console.error('Review action error:', err);

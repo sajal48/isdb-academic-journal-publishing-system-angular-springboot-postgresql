@@ -36,6 +36,27 @@ public class SubmissionController {
         this.profileService = profileService;
     }
 
+    @GetMapping("/list/all")
+    public ResponseEntity<?> returnSubmissionListAll() {
+        try {
+            List<SubmissionListResponse> submissionList = submissionService.getAllSubmissions().stream()
+                    .map(UserSubmissionListMapperUtil::submissionListResponseFromSubmission)
+                    .toList();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("code", HttpStatus.OK.value());
+            response.put("data", submissionList);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("code", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            errorResponse.put("message", "Failed to retrieve submissions: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/list/{userId}")
     public ResponseEntity<?> returnSubmissionList(@PathVariable Long userId) {
         Profile profile = profileService.userProfileDetailsByUserId(userId);

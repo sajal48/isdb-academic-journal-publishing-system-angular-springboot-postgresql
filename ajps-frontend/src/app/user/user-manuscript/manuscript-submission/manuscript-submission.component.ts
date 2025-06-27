@@ -35,6 +35,8 @@ export class ManuscriptSubmissionComponent implements OnInit {
   selectedFileForCopyEditingId: number | null = null;
   filesForCopyEditing: SubmissionFile[] = [];
   DiscussionOrigin = DiscussionOrigin;
+  private othersUserId: number = 0;
+  private loggedUserId: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -43,11 +45,19 @@ export class ManuscriptSubmissionComponent implements OnInit {
     private http: HttpClient,
     private userToastNotificationService: UserToastNotificationService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.currentUserRole = this.authLoginRegisterService.getUserRole();
-    this.currentUserId = this.authLoginRegisterService.getUserID();
+    this.loggedUserId = this.authLoginRegisterService.getUserID();
+
+    this.othersUserId = this.route.snapshot.queryParams['userId'];
+    if (this.othersUserId == null) {
+      this.currentUserId = this.authLoginRegisterService.getUserID();
+    } else {
+      this.currentUserId = this.othersUserId;
+    }
+
     this.route.parent?.paramMap.pipe(
       switchMap(params => {
         const manuscriptId = params.get('manuscriptId');
@@ -150,15 +160,17 @@ export class ManuscriptSubmissionComponent implements OnInit {
 
   confirmAddDiscussion(): void {
     if (this.newDiscussionTitle && this.newDiscussionMessage && this.manuscript?.id) {
+      // const creatorId = this.othersUserId !== 0 ? this.othersUserId : this.currentUserId;
+
       this.manuscriptService.createDiscussion(
         Number(this.manuscript.id),
-        this.currentUserId,
+        this.loggedUserId,
         this.newDiscussionTitle,
         this.newDiscussionMessage,
         this.newDiscussionOrigin = DiscussionOrigin.PRE_REVIEW
       ).subscribe({
         next: (newDisc) => {
-          this.userToastNotificationService.showToast('Success', 'Discussion added!', 'success');
+          this.userToastNotificationService.showToast('Success', 'Discussion added.', 'success');
           this.loadDiscussions(Number(this.manuscript.id));
           const modal = bootstrap.Modal.getInstance(document.getElementById('addDiscussionModal'));
           if (modal) modal.hide();
@@ -243,7 +255,12 @@ export class ManuscriptSubmissionComponent implements OnInit {
         this.manuscriptService.addReviewFileReference(Number(this.manuscript.id), fileId).subscribe({
           next: (fileResponse) => {
             this.userToastNotificationService.showToast('Success', fileResponse.message, 'success');
-            this.router.navigate([`/user/manuscript/${this.manuscript.id}/review`]);
+            // this.router.navigate([`/user/manuscript/${this.manuscript.id}/review`]);
+            if (this.othersUserId == null) {
+              this.router.navigate([`/user/manuscript/${this.manuscript.id}/review`]);
+            } else {
+              this.router.navigate([`/user/manuscript/${this.manuscript.id}/review`], { queryParams: { userId: this.othersUserId } });
+            }
           },
           error: (err) => {
             this.userToastNotificationService.showToast('Error', err.error?.message || 'Review file failed.', 'danger');
@@ -283,7 +300,12 @@ export class ManuscriptSubmissionComponent implements OnInit {
             copyEditing: 'N/A', production: 'N/A', publication: 'N/A'
           });
         }
-        document.location.reload();
+        // document.location.reload();
+        if (this.othersUserId == null) {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/submission`]);
+        } else {
+          this.router.navigate([`/user/manuscript/${this.manuscript.id}/submission`], { queryParams: { userId: this.othersUserId } });
+        }
       },
       error: () => {
         this.userToastNotificationService.showToast('Error', 'Decline failed.', 'danger');
@@ -330,7 +352,12 @@ export class ManuscriptSubmissionComponent implements OnInit {
             next: (statusResponse) => {
               this.manuscript.submissionStatus = statusResponse.data?.submissionStatus || 'COPY_EDITING';
               bootstrap.Modal.getInstance(document.getElementById('selectCopyEditingFileModal'))?.hide();
-              this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+              // this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+              if (this.othersUserId == null) {
+                this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`]);
+              } else {
+                this.router.navigate([`/user/manuscript/${this.manuscript.id}/copyediting`], { queryParams: { userId: this.othersUserId } });
+              }
             },
             error: (err) => {
               this.userToastNotificationService.showToast('Error', err.error?.message || 'Status update failed.', 'danger');
