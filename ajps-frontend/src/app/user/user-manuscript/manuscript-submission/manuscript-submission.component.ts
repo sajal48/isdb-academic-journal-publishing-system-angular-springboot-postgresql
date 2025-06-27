@@ -29,6 +29,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
   assignedParticipantName: string = '';
   selectedDiscussion: Discussion | null = null;
   currentUserId: number = 0;
+  currentUserRole: string = '';
   selectedFileForReviewId: number | null = null;
   filesForReview: SubmissionFile[] = [];
   selectedFileForCopyEditingId: number | null = null;
@@ -45,6 +46,7 @@ export class ManuscriptSubmissionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
     this.currentUserId = this.authLoginRegisterService.getUserID();
     this.route.parent?.paramMap.pipe(
       switchMap(params => {

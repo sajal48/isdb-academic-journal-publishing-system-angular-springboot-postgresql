@@ -82,6 +82,7 @@ export class UserManuscriptService {
             lastUpdate: new Date(backendData.updatedAt || backendData.submittedAt),
             submissionStatus: backendData.submissionStatus,
             manuscriptKeywords: backendData.manuscriptKeywords,
+            manuscriptCategory: backendData.manuscriptCategory,
             abstract: backendData.abstractContent,
             files: files,
             status: {

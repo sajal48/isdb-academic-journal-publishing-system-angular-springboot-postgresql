@@ -24,6 +24,7 @@ export interface Manuscript {
   lastUpdate: Date;
   submissionStatus: string;
   manuscriptKeywords?: string;
+  manuscriptCategory: string;
   abstract?: string;
   files?: SubmissionFile[];
   status?: {
@@ -132,10 +133,10 @@ export class UserManuscriptComponent implements OnInit {
   private currentUserId: number = 0; // <<--- SET A VALID USER ID HERE (e.g., from logged-in user)
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private manuscriptService: UserManuscriptService,
     private authLoginRegisterService: AuthLoginRegisterService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.currentUserId = this.authLoginRegisterService.getUserID();
@@ -159,4 +160,15 @@ export class UserManuscriptComponent implements OnInit {
       }
     });
   }
+
+  getArticleType(category: string): string {
+    const types: Record<string, string> = {
+      research: 'Research Article',
+      review: 'Review Article',
+      short: 'Short Communication',
+      editorial: 'Editorial'
+    };
+    return types[category] || 'Article';
+  }
+
 }

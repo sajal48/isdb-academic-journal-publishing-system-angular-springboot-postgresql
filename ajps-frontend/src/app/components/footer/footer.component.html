@@ -22,7 +22,8 @@
                     Dhanmondi, Dhaka - 1205.<br />
                     Bangladesh<br />
                     Phone: <span class="text-muted">Not Available</span><br />
-                    Mail: <a href="mailto:info@example.com" class="text-decoration-none text-dark">info&#64;example.com</a>
+                    Mail: <a href="mailto:info@example.com"
+                        class="text-decoration-none text-dark">info&#64;example.com</a>
                 </address>
             </div>
 
@@ -31,18 +32,24 @@
                 <h6>Popular Journals:</h6>
                 <ul class="list-unstyled">
                     <ng-container *ngIf="!isLoading; else loading">
-                        <li *ngFor="let journal of journals">
-                            <a [routerLink]="'/journal/' + journal.journalUrl" 
-                               class="text-decoration-none text-dark">
-                                {{ journal.journalName }}
-                            </a>
-                        </li>
+                        <ng-container *ngIf="journals.length > 0; else noJournals">
+                            <li *ngFor="let journal of journals">
+                                <a [routerLink]="'/journal/' + journal.journalUrl"
+                                    class="text-decoration-none text-dark">
+                                    {{ journal.journalName }}
+                                </a>
+                            </li>
+                        </ng-container>
+                        <ng-template #noJournals>
+                            <li class="text-muted">No journal published yet.</li>
+                        </ng-template>
                     </ng-container>
                     <ng-template #loading>
                         <li>Loading journals...</li>
                     </ng-template>
                 </ul>
             </div>
+
 
             <!-- Useful Links -->
             <div class="col-md-3 mb-4">

@@ -77,6 +77,6 @@ table > tbody > tr > td> button:first-child {
     text-decoration: none;
     color: inherit;
 }
-.manuscript-name:hover {
+/* .manuscript-name:hover {
     text-decoration: underline;
-}
+} */

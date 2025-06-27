@@ -85,6 +85,7 @@ export class JournalCurrentIssueComponent implements OnInit {
       case 'research': return 'Research Articles';
       case 'review': return 'Review Articles';
       case 'short': return 'Short Communications';
+      case 'editorial': return 'Editorial';
       default: return 'Articles';
     }
   }

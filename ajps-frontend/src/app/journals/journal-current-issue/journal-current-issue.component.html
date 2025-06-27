@@ -49,8 +49,11 @@
         <div class="spinner-border text-primary" role="status" *ngIf="isLoading">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <div class="alert alert-danger" *ngIf="error">
+        <!-- <div class="alert alert-danger" *ngIf="error">
             {{error}}
+        </div> -->
+        <div class="text-center my-5" *ngIf="error">
+            <p>{{error}}</p>
         </div>
     </div>
 </ng-template>

@@ -402,11 +402,12 @@ confirmCompleteCopyeditingWithFile(): void {
 
 // Modify the existing completeCopyediting method to use the new file selection
 completeCopyediting(): void {
-    if (this.hasCopyeditedFiles()) {
-        this.openSelectProductionFileModal();
-    } else {
-        this.openCopyeditingActionModal('completeCopyediting');
-    }
+    // if (this.hasCopyeditedFiles()) {
+    //     this.openSelectProductionFileModal();
+    // } else {
+    //     this.openCopyeditingActionModal('completeCopyediting');
+    // }
+    this.openSelectProductionFileModal()
 }
 
 }

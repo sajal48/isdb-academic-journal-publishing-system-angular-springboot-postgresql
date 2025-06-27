@@ -4,7 +4,7 @@
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4 px-2">
+<!-- <div class="row mb-4 px-2">
     <div class="col-md-3">
         <div class="stat-card">
             <h6>Total Manuscripts</h6>
@@ -39,7 +39,7 @@
             <small>Action needed</small>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- My Submissions Table -->
 <div class="card mb-4">
@@ -58,7 +58,8 @@
                     <!-- Row 1: Submission Info -->
                     <tr style="border: 1px solid #fff;">
                         <td>
-                            <a routerLink="/user/manuscript-details" class="manuscript-name">{{ submission.manuscriptTitle }}</a>
+                            <!-- <a routerLink="/user/manuscript-details" class="manuscript-name">{{ submission.manuscriptTitle }}</a> -->
+                            <a class="manuscript-name">{{ submission.manuscriptTitle }}</a>
                             <br>
                             <span class="journal-name">{{ submission.journalName }}</span>
                         </td>
@@ -69,12 +70,13 @@
                     <!-- Row 2: Action Buttons -->
                     <tr>
                         <td colspan="2">
-                            <button *ngIf="submission.editable" (click)="editManuscript(submission.id)" class="btn btn-sm btn-link"><i class="bi bi-pencil"></i> Edit Manuscript</button>
+                            <!-- <button *ngIf="submission.editable" (click)="editManuscript(submission.id)" class="btn btn-sm btn-link"><i class="bi bi-pencil"></i> Edit Manuscript</button> -->
+                            <button (click)="editManuscript(submission.id)" class="btn btn-sm btn-link"><i class="bi bi-pencil"></i> Edit Submission</button>
                             <button (click)="viewManuscript(submission.id)" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> View Submission</button>
                             @if (submission.submissionStatus != 'SAVED') {
                             <button *ngIf="submission.paymentDue" routerLink="/user/submission/submission-view" class="btn btn-sm btn-link"><i class="bi bi-cash-coin"></i> Make Payment</button>
                             <button [routerLink]="['/user/manuscript', submission.id]" class="btn btn-sm btn-link"><i class="bi bi-eye"></i> Editorial Workflow</button>
-                            <button *ngIf="submission.submissionStatus == 'PUBLISHED'" class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button>
+                            <!-- <button *ngIf="submission.submissionStatus == 'PUBLISHED'" class="btn btn-sm btn-link"><i class="bi bi-box-arrow-up-right"></i> View Publication</button> -->
                             <!-- <button class="btn btn-sm btn-link"><i class="bi bi-chat-text"></i> Discussion Panel</button> -->
                             <!-- <button class="btn btn-sm btn-link"><i class="bi bi-clock-history"></i> History Log</button> -->
                             }                            
