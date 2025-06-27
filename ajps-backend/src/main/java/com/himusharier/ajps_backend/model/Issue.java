@@ -40,11 +40,11 @@ public class Issue {
     // Many-to-One relationship with Journal
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal_id", nullable = false)
-    @JsonBackReference // To prevent infinite recursion in JSON serialization
+    @JsonBackReference("journal-issue") // To prevent infinite recursion in JSON serialization
     private Journal journal;
 
     @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("issue-paper")
     private List<Paper> papers = new ArrayList<>();
 
 //    @ManyToOne

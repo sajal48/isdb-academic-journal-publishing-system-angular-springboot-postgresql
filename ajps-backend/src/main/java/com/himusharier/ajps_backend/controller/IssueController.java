@@ -1,6 +1,7 @@
 package com.himusharier.ajps_backend.controller;
 
 import com.himusharier.ajps_backend.constants.IssueStatus;
+import com.himusharier.ajps_backend.dto.request.IssueDto;
 import com.himusharier.ajps_backend.exception.JournalOperationException;
 import com.himusharier.ajps_backend.model.Issue;
 import com.himusharier.ajps_backend.model.Journal;
@@ -24,14 +25,26 @@ public class IssueController {
         return issues.findByJournalId(jid);
     }
 
-    @PostMapping("/journals/{jid}/issues")
+    /*@PostMapping("/journals/{jid}/issues")
     public Issue addIssue(@PathVariable Long jid, @RequestBody Issue issue) {
         Journal j = journals.findById(jid).orElseThrow();
         issue.setJournal(j);
         return issues.save(issue);
+    }*/
+    @PostMapping("/journals/{jid}/issues")
+    public Issue addIssue(@PathVariable Long jid, @RequestBody IssueDto issueDto) {
+        Journal journal = journals.findById(jid).orElseThrow();
+        Issue issue = Issue.builder()
+                .volume(issueDto.getVolume())
+                .number(issueDto.getNumber())
+                .publicationDate(issueDto.getPublicationDate())
+                .status(IssueStatus.valueOf(issueDto.getStatus()))
+                .journal(journal)
+                .build();
+        return issues.save(issue);
     }
 
-    @PutMapping("/issues/{id}")
+    /*@PutMapping("/issues/{id}")
     public Issue updateIssue(@PathVariable Long id, @RequestBody Issue u) {
         return issues.findById(id).map(i -> {
             i.setVolume(u.getVolume());
@@ -39,6 +52,16 @@ public class IssueController {
             i.setPublicationDate(u.getPublicationDate());
             i.setStatus(u.getStatus());
             return issues.save(i);
+        }).orElseThrow();
+    }*/
+    @PutMapping("/issues/{id}")
+    public Issue updateIssue(@PathVariable Long id, @RequestBody IssueDto issueDto) {
+        return issues.findById(id).map(issue -> {
+            issue.setVolume(issueDto.getVolume());
+            issue.setNumber(issueDto.getNumber());
+            issue.setPublicationDate(issueDto.getPublicationDate());
+            issue.setStatus(IssueStatus.valueOf(issueDto.getStatus()));
+            return issues.save(issue);
         }).orElseThrow();
     }
 

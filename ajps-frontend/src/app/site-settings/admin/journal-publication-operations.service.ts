@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { apiConfig } from '../configs/api-config';
+import { IssueRequest } from '../../user/admin-journal-publication/admin-journal-publication.component';
 
 export interface Journal {
   id: number;
@@ -51,7 +52,7 @@ export class JournalPublicationOperationsService {
     return this.http.post<Issue>(`${apiConfig.apiBaseUrl}/journals/${journalId}/issues`, issue);
   }
 
-  updateIssue(issue: Issue): Observable<Issue> {
+  updateIssue(issue: IssueRequest): Observable<Issue> {
     return this.http.put<Issue>(`${apiConfig.apiBaseUrl}/issues/${issue.id}`, issue);
   }
 

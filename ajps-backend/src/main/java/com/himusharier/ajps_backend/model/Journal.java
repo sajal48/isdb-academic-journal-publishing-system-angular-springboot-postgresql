@@ -57,6 +57,6 @@ public class Journal {
 
     // NEW: One-to-Many relationship with Issue
     @OneToMany(mappedBy = "journal", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference("journal-issue")
     private List<Issue> issues = new ArrayList<>();
 }

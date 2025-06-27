@@ -21,7 +21,7 @@ public class Paper {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issue_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference("issue-paper")
     private Issue issue;
 
     // Optional: If you want to keep a direct link to Submission:

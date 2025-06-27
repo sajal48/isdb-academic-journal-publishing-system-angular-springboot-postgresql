@@ -18,8 +18,15 @@ interface Issue {
   publicationDate: string;
   status: 'PUBLISHED' | 'FUTURE';
   papers: Paper[];
-  volumeNote?: string;
-  issueNote?: string;
+  // volumeNote?: string;
+  // issueNote?: string;
+}
+export interface IssueRequest {
+  id?: number;
+  volume: number;
+  number: number;
+  publicationDate: string;
+  status: 'PUBLISHED' | 'FUTURE';
 }
 
 interface Paper {
@@ -106,27 +113,29 @@ export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
 
   submitNewIssue() {
     if (this.selectedJournal && this.isIssueFormValid()) {
+      const issueRequest: IssueRequest = {
+        id: this.newIssue.id!,
+        volume: this.newIssue.volume!,
+        number: this.newIssue.number!,
+        publicationDate: this.newIssue.publicationDate!,
+        status: this.newIssue.status!
+      };
+
       const operation = this.isEditingIssue && this.newIssue.id
-        ? this.journalService.updateIssue(this.newIssue as Issue)
-        : this.journalService.addIssue(this.selectedJournal, this.newIssue);
+        ? this.journalService.updateIssue(issueRequest)
+        : this.journalService.addIssue(this.selectedJournal, issueRequest);
 
       operation.subscribe({
         next: () => {
           this.loadIssues();
-
-          // Hide modal
           if (this.addIssueModalInstance) {
             this.addIssueModalInstance.hide();
           }
-
-          // Toast
           this.toast.showToast(
             this.isEditingIssue ? 'Updated' : 'Created',
             this.isEditingIssue ? 'Issue updated successfully.' : 'Issue added successfully.',
             'success'
           );
-
-          // Reset modal state
           this.resetIssueForm();
         },
         error: () => {
@@ -201,13 +210,14 @@ export class AdminJournalPublicationComponent implements OnInit, AfterViewInit {
 
   private getEmptyIssue(): Partial<Issue> {
     return {
+      id: undefined,
       volume: undefined,
       number: undefined,
       publicationDate: '',
       status: undefined,
-      papers: [],
-      volumeNote: '',
-      issueNote: ''
+      // papers: [],
+      // volumeNote: '',
+      // issueNote: ''
     };
   }
 }
