@@ -63,6 +63,8 @@ import { ManuscriptProductionComponent } from './user/user-manuscript/manuscript
 import { ManuscriptPublicationComponent } from './user/user-manuscript/manuscript-publication/manuscript-publication.component';
 import { AdminEditorManagementComponent } from './user/admin-editor-management/admin-editor-management.component';
 import { SubmissionViewComponent } from './user/user-submission/submission-view/submission-view.component';
+import { ReviewerDashboardNewComponent } from './user/reviewer-dashboard-new/reviewer-dashboard-new.component';
+import { EditorSubmissionsNewComponent } from './user/editor-submissions-new/editor-submissions-new.component';
 
 export const routes: Routes = [
     // publisher site:
@@ -137,6 +139,7 @@ export const routes: Routes = [
             
             // editorial panel:
             {path: 'journal-overview', component: EditorOverviewComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Overview - ScholarPress'},
+            {path: 'journal-submissions', component: EditorSubmissionsNewComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Overview - ScholarPress'},
             {path: 'journal-submissions',
                 canActivate: [authGuardUserGuard], 
                 data: {roles: ['editor']},
@@ -152,7 +155,8 @@ export const routes: Routes = [
             {path: 'journal-editorial-board', component: EditorEditorialBoardComponent, canActivate: [authGuardUserGuard], data: {roles: ['editor']}, title: 'Journal Settings - ScholarPress'},
             
             // reviewer panel:
-            {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Dashboard - ScholarPress'},
+            // {path: 'reviewer-dashboard', component: ReviewerDashboardComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Dashboard - ScholarPress'},
+            {path: 'reviewer-dashboard', component: ReviewerDashboardNewComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Dashboard - ScholarPress'},
             {path: 'reviewer-manuscripts', component: ReviewerAssignedManuscriptsComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Assigned Manuscripts - ScholarPress'},
             {path: 'reviewer-reviews', component: ReviewerSubmittedReviewsComponent, canActivate: [authGuardUserGuard], data: {roles: ['reviewer']}, title: 'Reviewer Submitted Reviews - ScholarPress'},
             

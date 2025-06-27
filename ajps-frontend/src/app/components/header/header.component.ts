@@ -21,7 +21,7 @@ export class HeaderComponent implements OnInit {
     private authLoginRegisterService: AuthLoginRegisterService,
     private router: Router
 
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.authLoginRegisterService.isAuthenticated().subscribe({
@@ -47,10 +47,10 @@ export class HeaderComponent implements OnInit {
 
   onSearch() {
     if (this.searchQuery.trim()) {
-     
+
       console.log(`External search for: ${this.searchQuery}`);
       // Example: window.location.href = `https://scholar.google.com/scholar?q=${encodeURIComponent(this.searchQuery)}`;
-      
+
     }
   }
 
