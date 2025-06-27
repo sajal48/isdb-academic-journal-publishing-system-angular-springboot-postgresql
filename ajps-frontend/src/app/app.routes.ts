@@ -91,7 +91,7 @@ export const routes: Routes = [
             {path: 'processing-charge', component: JournalProcessingChargeComponent, title: 'Article Processing Charge - ScholarPress'},
             {path: 'online-submission', component: JournalSubmissionComponent, title: 'Online Submission - ScholarPress'},
             {path: ':issueNumber', component: JournalIssueArticlesComponent, title: 'Article List - ScholarPress'},
-            {path: ':issueNumber/article/:articleNumber', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'},
+            {path: ':issueNumber/article/:id', component: JournalArticlePageComponent, title: 'Article Page - ScholarPress'},
             {path: '', redirectTo: 'homepage', pathMatch: 'full'},
         ]        
     },

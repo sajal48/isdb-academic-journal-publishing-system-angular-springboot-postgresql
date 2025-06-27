@@ -23,6 +23,7 @@ export interface Paper {
     manuscriptKeywords: string;
     submissionStatus: string;
     createdAt: string;
+    submittedAt: string;
     authors: Author[];
   };
   fileUpload: {
@@ -75,7 +76,7 @@ export class JournalDetailsService {
     return this.http.get<AdminJournalDto>(`${this.apiUrl}/get-journal/${journalCode}`);
   }
 
-   getIssuesByJournalUrl(journalUrl: string): Observable<Issue[]> {
+  getIssuesByJournalUrl(journalUrl: string): Observable<Issue[]> {
     return this.http.get<Issue[]>(`${this.apiUrl}/get-journal/${journalUrl}/issues`);
   }
 

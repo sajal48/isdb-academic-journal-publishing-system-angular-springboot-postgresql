@@ -1,8 +1,8 @@
 <!-- journal-current-issue.component.html -->
 <article class="container my-4" *ngIf="!isLoading && currentIssue; else loading">
     <h3 class="volume-info">
-        <i class="bi bi-journal-bookmark-fill"></i> 
-        Volume {{currentIssue.volume}}, Issue {{currentIssue.number}} 
+        <i class="bi bi-journal-bookmark-fill"></i>
+        Volume {{currentIssue.volume}}, Issue {{currentIssue.number}}
         (Published: {{formatDate(currentIssue.publicationDate)}})
     </h3>
     <hr>
@@ -16,7 +16,7 @@
     <ng-container *ngFor="let group of groupPapersByCategory() | keyvalue">
         <section *ngIf="group.value.length > 0">
             <h2>{{group.key}}</h2>
-            
+
             <div class="card mb-3" *ngFor="let paper of group.value">
                 <div class="card-body">
                     <h3 class="article-title">
@@ -24,7 +24,7 @@
                             {{paper.submission.manuscriptTitle}}
                         </a>
                     </h3>
-                     <p class="article-author">
+                    <p class="article-author">
                         {{formatAuthors(paper.submission.authors)}}
                     </p>
                     <div class="article-buttons">

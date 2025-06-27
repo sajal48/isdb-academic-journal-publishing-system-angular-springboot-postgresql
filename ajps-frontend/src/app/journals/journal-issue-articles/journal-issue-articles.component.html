@@ -1,144 +1,45 @@
 <article class="container my-4">
-    <h3 class="volume-info"><i class="bi bi-journal-bookmark-fill"></i> Volume 1, Issue 1, Published: October 10, 2021</h3>
-    <hr>
+    <ng-container *ngIf="isLoading">
+        <div class="text-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </ng-container>
 
-    <!-- Editorial Section -->
-    <section>
-        <h2>Editorial</h2>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10011">Application of Artificial Intelligence (AI) in Plant Sciences Research</a>
-                </h3>
-                <p class="article-author">Chandrika Nanayakkara</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6662" target="_blank">https://doi.org/10.54479/pae.v1i01.6662</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10011">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10011">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10011" download>Download PDF</a>
-                </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1249</strong></span>
-                    <span>Pages: <strong>1-2</strong></span>
-                </p>
-            </div>
-        </div>
-    </section>
+    <ng-container *ngIf="error">
+        <div class="alert alert-danger">{{ error }}</div>
+    </ng-container>
 
-    <!-- Research Articles Section -->
-    <section>
-        <h2>Research Articles</h2>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10012">Performance Test of Three Supporting Media during Outdoor Hydroponic Farming of Onion</a>
-                </h3>
-                <p class="article-author">Irani Khatun, Ishita Haider, Subroto K Das, Riyad Hossen</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6663" target="_blank">https://doi.org/10.54479/pae.v1i01.6663</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10012">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10012">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10012" download>Download PDF</a>
-                </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1091</strong></span>
-                    <span>Pages: <strong>3-8</strong></span>
-                </p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10013">Genetic Divergence among Populations of Invasive Alien Species <i>Lantana camara</i> L. from Selected Areas of Bangladesh</a>
-                </h3>
-                <p class="article-author">Saila Kabir, Md Abul Kashem, Mohammad Zabed Hossain</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6664" target="_blank">https://doi.org/10.54479/pae.v1i01.6664</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10013">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10013">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10013" download>Download PDF</a>
-                </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1025</strong></span>
-                    <span>Pages: <strong>9-14</strong></span>
-                </p>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10015">Traditional Practices, Formulations and Dosages of Medicinal Plants: A Survey in Faridpur District of Bangladesh</a>
-                </h3>
-                <p class="article-author">Rachana Sikder</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6665" target="_blank">https://doi.org/10.54479/pae.v1i01.6665</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10015">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10015">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10015" download>Download PDF</a>
-                </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1023</strong></span>
-                    <span>Pages: <strong>21-26</strong></span>
-                </p>
-            </div>
-        </div>
-    </section>
+    <ng-container *ngIf="issue && !isLoading">
+        <h3 class="volume-info">
+            <i class="bi bi-journal-bookmark-fill"></i> 
+            Volume {{ issue.volume }}, Issue {{ issue.number }}, 
+            Published: {{ formatDate(issue.publicationDate) }}
+        </h3>
+        <hr>
 
-    <!-- Review Articles Section -->
-    <section>
-        <h2>Review Articles</h2>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10014">A Mini Review on Microalgae Biomass Production: Recent Progress in Cultivation Systems</a>
-                </h3>
-                <p class="article-author">Ismail Rasel, Saydul Karim</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6666" target="_blank">https://doi.org/10.54479/pae.v1i01.6666</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10014">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10014">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10014" download>Download PDF</a>
-                </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1016</strong></span>
-                    <span>Pages: <strong>15-20</strong></span>
-                </p>
-            </div>
-        </div>
-    </section>
+        <ng-container *ngIf="papers.length === 0">
+            <div class="alert alert-info">No articles found in this issue.</div>
+        </ng-container>
 
-    <!-- Short Communication Section -->
-    <section>
-        <h2>Short Communication</h2>
-        <div class="card">
-            <div class="card-body">
-                <h3 class="article-title">
-                    <a routerLink="article/10016">Temperature Effect on Seed Germination Performance of a Local Variety of Onion in Bangladesh</a>
-                </h3>
-                <p class="article-author">Irani Khatun, Riyad Hossen</p>
-                <p class="article-doi">
-                    <strong>DOI: </strong><a href="https://doi.org/10.54479/pae.v1i01.6667" target="_blank">https://doi.org/10.54479/pae.v1i01.6667</a>
-                </p>
-                <div class="article-buttons">
-                    <a class="btn btn-primary" routerLink="article/10016">Abstract</a>
-                    <a class="btn btn-primary pdf-window" data-viewid="10016">View PDF</a>
-                    <a class="btn btn-secondary" href="../../pdf-downloader/1001/vol1issue1/article/10016" download>Download PDF</a>
+        <ng-container *ngFor="let group of groupPapersByCategory() | keyvalue">
+            <section *ngIf="group.value.length > 0">
+                <h2>{{ group.key }}</h2>
+                <div class="card mb-3" *ngFor="let paper of group.value">
+                    <div class="card-body">
+                        <h3 class="article-title">
+                            <a [routerLink]="getRouterLink(paper)">{{ paper.submission.manuscriptTitle }}</a>
+                        </h3>
+                        <p class="article-author">{{ formatAuthors(paper.submission.authors) }}</p>
+                        <div class="article-buttons">
+                            <a class="btn btn-primary" [routerLink]="getRouterLink(paper)">Abstract</a>
+                            <a class="btn btn-primary" [href]="getDownloadLink(paper)" target="_blank">View PDF</a>
+                            <a class="btn btn-secondary" [href]="getDownloadLink(paper)" download>Download PDF</a>
+                        </div>
+                    </div>
                 </div>
-                <p class="article-meta">
-                    <span class="me-3">Views: <strong>1055</strong></span>
-                    <span>Pages: <strong>27-30</strong></span>
-                </p>
-            </div>
-        </div>
-    </section>
+            </section>
+        </ng-container>
+    </ng-container>
 </article>
