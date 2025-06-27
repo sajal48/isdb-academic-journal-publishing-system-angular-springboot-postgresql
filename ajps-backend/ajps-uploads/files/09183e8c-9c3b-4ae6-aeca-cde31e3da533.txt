@@ -1,0 +1,92 @@
+Table users {
+  user_id int [pk, increment]
+  full_name varchar(100)
+  email varchar(100) [unique, not null]
+  password_hash text [not null]
+  affiliation text
+  role varchar(20) [note: 'author, editor, reviewer, admin']
+  is_active boolean [default: true]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table journals {
+  journal_id int [pk, increment]
+  title varchar(255) [not null]
+  scope text
+  submission_guidelines text
+  editorial_board text
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table issues {
+  issue_id int [pk, increment]
+  journal_id int [ref: > journals.journal_id]
+  volume int
+  number int
+  publication_date date
+  status varchar(20) [note: 'scheduled, published', default: 'scheduled']
+}
+
+Table articles {
+  article_id int [pk, increment]
+  title varchar(255)
+  abstract text
+  current_version_id int
+  author_id int [ref: > users.user_id]
+  journal_id int [ref: > journals.journal_id]
+  issue_id int [ref: > issues.issue_id]
+  status varchar(30) [note: 'submitted, under_review, revision, accepted, rejected, published']
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table article_versions {
+  version_id int [pk, increment]
+  article_id int [ref: > articles.article_id]
+  file_path text
+  version_number int
+  submitted_at timestamp [default: `CURRENT_TIMESTAMP`]
+  comments text
+}
+
+Table reviews {
+  review_id int [pk, increment]
+  version_id int [ref: > article_versions.version_id]
+  reviewer_id int [ref: > users.user_id]
+  comments text
+  recommendation varchar(20) [note: 'accept, minor_revision, major_revision, reject']
+  reviewed_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table article_editors {
+  article_id int [ref: > articles.article_id]
+  editor_id int [ref: > users.user_id]
+  assigned_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Primary Key (article_id, editor_id)
+}
+
+Table article_reviewers {
+  article_id int [ref: > articles.article_id]
+  reviewer_id int [ref: > users.user_id]
+  assigned_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Primary Key (article_id, reviewer_id)
+}
+
+Table messages {
+  message_id int [pk, increment]
+  sender_id int [ref: > users.user_id]
+  receiver_id int [ref: > users.user_id]
+  article_id int [ref: > articles.article_id]
+  content text
+  sent_at timestamp [default: `CURRENT_TIMESTAMP`]
+}
+
+Table payments {
+  payment_id int [pk, increment]
+  article_id int [ref: > articles.article_id]
+  user_id int [ref: > users.user_id]
+  amount decimal(10,2)
+  status varchar(20) [note: 'pending, completed, failed']
+  payment_date timestamp [default: `CURRENT_TIMESTAMP`]
+}

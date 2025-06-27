@@ -1,5 +1,6 @@
 package com.himusharier.ajps_backend.service;
 
+import com.himusharier.ajps_backend.constants.SubmissionStatus;
 import com.himusharier.ajps_backend.dto.response.SuccessResponseModelPublication;
 import com.himusharier.ajps_backend.model.FileUpload;
 import com.himusharier.ajps_backend.model.Issue;
@@ -78,17 +79,20 @@ public class PublicationService {
 
         Paper paperToDelete = optionalPaper.get();
 
-        // If Paper model has @OneToOne(cascade = CascadeType.ALL) with FileUpload,
-        // deleting the Paper will also delete the associated FileUpload record.
-        // If the actual file on the disk needs to be managed (e.g., removed or flagged differently),
-        // that logic would be handled by a FileUploadService, which would be called here.
-        // For this specific request, we assume cascade handles the database record deletion for FileUpload.
+        // Detach the file from the paper before deletion
+        FileUpload fileUpload = paperToDelete.getFileUpload();
+        paperToDelete.setFileUpload(null); // Remove the association
 
+        // Delete the paper record
         paperRepository.delete(paperToDelete);
+
+        // Reset the submission status if needed
+        submission.setSubmissionStatus(SubmissionStatus.PRODUCTION); // Or whatever status makes sense
+        submissionRepository.save(submission);
 
         return new SuccessResponseModelPublication<>(
                 HttpStatus.OK.value(),
-                "Article unpublished and paper record deleted successfully.",
+                "Article unpublished successfully. The file remains in storage.",
                 null
         );
     }
