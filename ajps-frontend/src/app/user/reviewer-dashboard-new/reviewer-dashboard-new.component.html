@@ -1,1 +1,56 @@
-<p>reviewer-dashboard-new works!</p>
+<!-- editor-submissions-new.component.html -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title" style="color: #2e7d32;">All Submissions</h5>
+
+        <div *ngIf="isLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading submissions...</p>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+
+        <table class="table" *ngIf="!isLoading && submissions.length > 0; else noSubmissions">
+            <thead>
+                <tr>
+                    <th style="width: 60%;">Manuscript Title</th>
+                    <th style="width: 20%;">Journal</th>
+                    <th style="width: 20%;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let submission of submissions">
+                    <!-- Row 1: Submission Info -->
+                    <tr>
+                        <td>
+                            <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                                {{ submission.manuscriptTitle }}
+                            </a>
+                            <br>
+                            <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                        </td>
+                        <td>
+                            <span class="journal-name">{{ submission.journalName }}</span>
+                        </td>
+                        <td>
+                            <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                                {{ submission.submissionStatus | titlecase }}
+                            </span>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+
+        <ng-template #noSubmissions>
+            <div *ngIf="!isLoading" class="text-center py-4">
+                <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+                <p style="color: #858484; font-style: italic;">No submissions found</p>
+            </div>
+        </ng-template>
+    </div>
+</div>

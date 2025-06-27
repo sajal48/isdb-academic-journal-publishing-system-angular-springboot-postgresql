@@ -132,6 +132,7 @@ export class UserManuscriptComponent implements OnInit {
   // For now, hardcode a placeholder or get from route if you have a /user/:userId/manuscript/:manuscriptId route
   private currentUserId: number = 0; // <<--- SET A VALID USER ID HERE (e.g., from logged-in user)
   othersUserId: number = 0;
+  currentUserRole: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -140,6 +141,8 @@ export class UserManuscriptComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.currentUserRole = this.authLoginRegisterService.getUserRole();
+    
     this.othersUserId = this.route.snapshot.queryParams['userId'];
     if (this.othersUserId == null) {
       this.currentUserId = this.authLoginRegisterService.getUserID();
