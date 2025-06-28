@@ -1,6 +1,6 @@
 <div class="px-2">
   <h4 class="page-title mb-4" style="color: #2e7d32; margin-top: 10px">
-    User Submission
+    User Submissions
   </h4>
 </div>
 <div class="container-fluid">
@@ -9,10 +9,6 @@
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="new-submission-tab" data-bs-toggle="tab" data-bs-target="#new-submission"
         type="button" role="tab" aria-controls="new-submission" aria-selected="true">New Submission</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="assigned-submission-tab" data-bs-toggle="tab" data-bs-target="#assigned-submission"
-        type="button" role="tab" aria-controls="assigned-submission" aria-selected="false">Assigned Submission</button>
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="in-review-tab" data-bs-toggle="tab" data-bs-target="#in-review" type="button"
@@ -27,8 +23,8 @@
         role="tab" aria-controls="production" aria-selected="false">Production</button>
     </li>
     <li class="nav-item" role="presentation">
-      <button class="nav-link" id="publication-tab" data-bs-toggle="tab" data-bs-target="#publication" type="button"
-        role="tab" aria-controls="publication" aria-selected="false">Publication</button>
+      <button class="nav-link" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button"
+        role="tab" aria-controls="published" aria-selected="false">Published</button>
     </li>
   </ul>
 
@@ -36,210 +32,246 @@
   <div class="tab-content" id="submissionTabsContent">
     <!-- New Submission Tab -->
     <div class="tab-pane fade show active" id="new-submission" role="tabpanel" aria-labelledby="new-submission-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">Newly Submitted Manuscripts</div>
+      <div class="card mb-4">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('New')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
-                  <td style="white-space: nowrap;">
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-success" (click)="assignSubmission(sub.id)">
-                      <i class="bi bi-person-check"></i> Assign Editor
-                    </button>
-                  </td>
-                </tr>
-                <tr *ngIf="getSubmissionsByStatus('New').length === 0">
-                  <td colspan="5" class="text-center text-muted">No new submissions.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+          <h5 class="card-title" style="color: #2e7d32;">New Submissions</h5>
 
-    <!-- Assigned Submission Tab -->
-    <div class="tab-pane fade" id="assigned-submission" role="tabpanel" aria-labelledby="assigned-submission-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">Assigned Submissions</div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+          <div *ngIf="isLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading submissions...</p>
+          </div>
+
+          <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+
+          <table class="table" *ngIf="!isLoading && getSubmissionsByStatus('SUBMITTED').length > 0; else noNewSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('SUBMITTED')">
                 <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('Assigned')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
                   </td>
                 </tr>
-                <tr *ngIf="getSubmissionsByStatus('Assigned').length === 0">
-                  <td colspan="6" class="text-center text-muted">No assigned submissions.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noNewSubmissions>
+            <div *ngIf="!isLoading" class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No new submissions found</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
 
     <!-- In Review Tab -->
     <div class="tab-pane fade" id="in-review" role="tabpanel" aria-labelledby="in-review-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">In Review Submissions</div>
+      <div class="card mb-4">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+          <h5 class="card-title" style="color: #2e7d32;">Submissions In Review</h5>
+
+          <table class="table" *ngIf="getSubmissionsByStatus('UNDER_REVIEW').length > 0; else noInReviewSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('UNDER_REVIEW')">
                 <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('In Review')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
                   </td>
                 </tr>
-                <tr *ngIf="getSubmissionsByStatus('In Review').length === 0">
-                  <td colspan="6" class="text-center text-muted">No submissions in review.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noInReviewSubmissions>
+            <div class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No submissions in review</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
 
     <!-- In Copy Edit Tab -->
     <div class="tab-pane fade" id="copy-edit" role="tabpanel" aria-labelledby="copy-edit-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">In Copy Edit Submissions</div>
+      <div class="card mb-4">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+          <h5 class="card-title" style="color: #2e7d32;">Submissions In Copyediting</h5>
+
+          <table class="table" *ngIf="getSubmissionsByStatus('COPY_EDITING').length > 0; else noCopyEditSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('COPY_EDITING')">
                 <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('In Copy Edit')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
                   </td>
                 </tr>
-                <tr *ngIf="getSubmissionsByStatus('In Copy Edit').length === 0">
-                  <td colspan="6" class="text-center text-muted">No submissions in copy edit.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noCopyEditSubmissions>
+            <div class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No submissions in copy editing</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
 
     <!-- Production Tab -->
     <div class="tab-pane fade" id="production" role="tabpanel" aria-labelledby="production-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">Production Submissions</div>
+      <div class="card mb-4">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+          <h5 class="card-title" style="color: #2e7d32;">Submissions In Production</h5>
+
+          <table class="table" *ngIf="getSubmissionsByStatus('PUBLICATION').length > 0; else noProductionSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('PUBLICATION')">
                 <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('Production')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
                   </td>
                 </tr>
-                <tr *ngIf="getSubmissionsByStatus('Production').length === 0">
-                  <td colspan="6" class="text-center text-muted">No submissions in production.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noProductionSubmissions>
+            <div class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No submissions in production</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
 
-    <!-- Publication Tab -->
-    <div class="tab-pane fade" id="publication" role="tabpanel" aria-labelledby="publication-tab">
-      <div class="card shadow-sm">
-        <div class="card-header">Published Submissions</div>
+    <!-- Published Tab -->
+    <div class="tab-pane fade" id="published" role="tabpanel" aria-labelledby="published-tab">
+      <div class="card mb-4">
         <div class="card-body">
-          <div class="table-responsive">
-            <table class="table">
-              <thead>
+          <h5 class="card-title" style="color: #2e7d32;">Published Submissions</h5>
+
+          <table class="table" *ngIf="getSubmissionsByStatus('PUBLISHED').length > 0; else noPublishedSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('PUBLISHED')">
                 <tr>
-                  <th>Title</th>
-                  <th>Journal</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let sub of getSubmissionsByStatus('Publication')">
-                  <td>{{ sub.title }}</td>
-                  <td style="white-space: nowrap;">{{ getJournalName(sub.journalId) }}</td>
-                  <td style="white-space: nowrap;">
-                    <button class="btn btn-sm btn-outline-primary me-2" (click)="viewSubmission(sub.id)">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-success">
-                      <i class="bi bi-box-arrow-up-right"></i> Read Article
-                    </button>
+                  <td>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
                   </td>
                 </tr>
-                <tr *ngIf="getSubmissionsByStatus('Publication').length === 0">
-                  <td colspan="5" class="text-center text-muted">No published submissions.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noPublishedSubmissions>
+            <div class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No published submissions</p>
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>
