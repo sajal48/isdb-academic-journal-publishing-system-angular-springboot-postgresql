@@ -26,6 +26,10 @@
       <button class="nav-link" id="published-tab" data-bs-toggle="tab" data-bs-target="#published" type="button"
         role="tab" aria-controls="published" aria-selected="false">Published</button>
     </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected" type="button"
+        role="tab" aria-controls="rejected" aria-selected="false">Rejected</button>
+    </li>
   </ul>
 
   <!-- Tab Content -->
@@ -270,6 +274,53 @@
             <div class="text-center py-4">
               <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
               <p style="color: #858484; font-style: italic;">No published submissions</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rejected Tab -->
+    <div class="tab-pane fade" id="rejected" role="tabpanel" aria-labelledby="rejected-tab">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title" style="color: #2e7d32;">Rejected Submissions</h5>
+
+          <table class="table" *ngIf="getSubmissionsByStatus('REJECTED').length > 0; else noRejectedSubmissions">
+            <thead>
+              <tr>
+                <th style="width: 60%;">Manuscript Title</th>
+                <th style="width: 20%;">Journal</th>
+                <th style="width: 20%;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let submission of getSubmissionsByStatus('REJECTED')">
+                <tr>
+                  <td>
+                    <a class="manuscript-name" (click)="viewSubmission(submission)" style="cursor: pointer;">
+                      {{ submission.manuscriptTitle }}
+                    </a>
+                    <br>
+                    <small class="text-muted">ID: {{ submission.submissionNumber }}</small>
+                  </td>
+                  <td>
+                    <span class="journal-name">{{ submission.journalName }}</span>
+                  </td>
+                  <td>
+                    <span class="badge" [ngStyle]="getSubmissionStatusColor(submission.submissionStatus)">
+                      {{ submission.submissionStatus | titlecase }}
+                    </span>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+
+          <ng-template #noRejectedSubmissions>
+            <div class="text-center py-4">
+              <i class="bi bi-exclamation-circle" style="font-size: 2rem; color: #ccc;"></i>
+              <p style="color: #858484; font-style: italic;">No rejected submissions</p>
             </div>
           </ng-template>
         </div>
