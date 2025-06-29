@@ -7,6 +7,7 @@
     /* transition: transform 0.3s, border-color 0.3s; */
     padding: 10px 0 0 0;
 }
+
 /* .card:hover {
     transform: translateY(-5px);
     border-color: #2dd4bf;
@@ -14,22 +15,26 @@
 .card-body {
     padding: 0px;
 }
+
 .btn-turquoise {
     background-color: #2dd4bf;
     border: none;
     color: #ffffff;
     /* transition: background-color 0.3s, transform 0.3s; */
 }
+
 .btn-turquoise:hover {
     background-color: #22a397;
     /* transform: scale(1.05); */
 }
+
 .filter-container {
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 .table-responsive {
     overflow-x: auto;
 }
@@ -40,6 +45,7 @@
     background: #ffffff;
     /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); */
 }
+
 .table th {
     background: #f8f9fa;
     font-weight: 600;
@@ -47,18 +53,20 @@
     /* padding: 1rem; */
     font-size: 14px;
 }
+
 .table td {
     vertical-align: middle;
     /* padding: 1rem; */
     font-size: 14px;
 }
+
 /* .table tr {
     transition: background 0.2s ease;
 }
 .table tr:hover {
     background: #f1f9ff;
 } */
-table > tbody > tr > td > button {
+table>tbody>tr>td>button {
     margin-right: 5px;
     margin-bottom: 5px;
 }
@@ -68,14 +76,32 @@ table > tbody > tr > td > button {
     display: inline-block;
     padding-bottom: 10px;
 }
+
 .page-title::after {
     content: '';
     position: absolute;
     left: 0;
     bottom: 0;
-    width: 60px; /* Fixed length for the underline */
+    width: 60px;
+    /* Fixed length for the underline */
     height: 3px;
     background: linear-gradient(to right, #2e7d32, #4caf50);
     transition: transform 0.3s ease;
     transform-origin: left;
+}
+
+/* Add any custom styles if needed */
+.btn-turquoise {
+    background-color: #40e0d0;
+    color: white;
+}
+
+.btn-turquoise:hover {
+    background-color: #30c0b0;
+    color: white;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
 }

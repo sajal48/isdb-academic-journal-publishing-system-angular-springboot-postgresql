@@ -10,4 +10,6 @@ import java.util.List;
 public interface EditorAssignmentRepository extends JpaRepository<EditorAssignment, Long> {
     void deleteByProfileIdAndJournalId(Long profileId, Long journalId);
     List<EditorAssignment> findByProfileId(Long profileId);
+
+    List<EditorAssignment> findByJournalId(Long journalId); // Add this new method
 }

@@ -5,51 +5,42 @@
         <h3 class="page-title" style="color: #2e7d32;">Editorial Board</h3>
         <div class="card-body">
             <form id="editorialBoardForm">
-                <div id="editorialBoardError" class="alert alert-danger d-none mb-3" role="alert"></div>
-                <div class="mb-3">
+                <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
+                    {{ errorMessage }}
+                </div>
+
+                <div *ngIf="isLoading" class="text-center py-4">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading editorial board...</p>
+                </div>
+
+                <div *ngIf="!isLoading" class="mb-3">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Affiliation</th>
+                                    <th scope="col">Email</th>
                                     <th scope="col">Role</th>
-                                    <th scope="col">Actions</th>
+                                    <!-- <th scope="col">Actions</th> -->
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Dr. Susan White</td>
-                                    <td>University of Science</td>
-                                    <td>Editor-in-Chief</td>
-                                    <td>
-                                        <button type="button" class="btn btn-turquoise btn-sm me-1">
+                                <tr *ngFor="let member of editorialBoard">
+                                    <td>{{ getFullName(member) }}</td>
+                                    <td>{{ member.email }}</td>
+                                    <td>{{ member.designation }}</td>
+                                    <!-- <td>
+                                        <a [routerLink]="['/profile', member.profileId]"
+                                            class="btn btn-turquoise btn-sm me-1">
                                             <i class="bi bi-person-lines-fill"></i> View Profile
-                                        </button>
-                                        <!-- <button type="button" class="btn btn-danger btn-sm">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </button> -->
-                                    </td>
+                                        </a>
+                                    </td> -->
                                 </tr>
-                                <tr>
-                                    <td>Prof. Mark Green</td>
-                                    <td>Tech Institute</td>
-                                    <td>Associate Editor</td>
-                                    <td>
-                                        <button type="button" class="btn btn-turquoise btn-sm me-1">
-                                            <i class="bi bi-person-lines-fill"></i> View Profile
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Dr. Lisa Brown</td>
-                                    <td>Global University</td>
-                                    <td>Editorial Board Member</td>
-                                    <td>
-                                        <button type="button" class="btn btn-turquoise btn-sm me-1">
-                                            <i class="bi bi-person-lines-fill"></i> View Profile
-                                        </button>
-                                    </td>
+                                <tr *ngIf="editorialBoard.length === 0 && !isLoading">
+                                    <td colspan="4" class="text-center">No editorial board members found</td>
                                 </tr>
                             </tbody>
                         </table>

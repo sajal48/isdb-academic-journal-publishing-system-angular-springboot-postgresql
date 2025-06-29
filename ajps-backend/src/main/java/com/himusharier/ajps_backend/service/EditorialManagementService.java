@@ -4,6 +4,8 @@ import com.himusharier.ajps_backend.constants.UserRole;
 import com.himusharier.ajps_backend.dto.editorial.AssignRequest;
 import com.himusharier.ajps_backend.dto.editorial.AssignmentDto;
 import com.himusharier.ajps_backend.dto.editorial.EditorDto;
+import com.himusharier.ajps_backend.dto.request.EditorialBoardMemberDTO;
+import com.himusharier.ajps_backend.model.Auth;
 import com.himusharier.ajps_backend.model.EditorAssignment;
 import com.himusharier.ajps_backend.model.Journal;
 import com.himusharier.ajps_backend.model.Profile;
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,4 +68,37 @@ public class EditorialManagementService {
     public void removeEditor(Long profileId, Long journalId) {
         assignmentRepo.deleteByProfileIdAndJournalId(profileId, journalId);
     }
+
+
+    // Add this method to EditorialManagementService
+    public List<EditorialBoardMemberDTO> getEditorialBoardForJournal(Long journalId) {
+        List<EditorAssignment> assignments = assignmentRepo.findByJournalId(journalId);
+
+        return assignments.stream()
+                .map(assignment -> {
+                    Profile profile = assignment.getProfile();
+                    Auth auth = profile.getAuth();
+
+                    return EditorialBoardMemberDTO.builder()
+                            .profileId(profile.getId())
+                            .firstName(profile.getFirstName())
+                            .middleName(profile.getMiddleName())
+                            .lastName(profile.getLastName())
+                            .email(auth.getEmail())
+                            .designation(assignment.getDesignation())
+                            .build();
+                })
+                .toList();
+    }
+
+    // In EditorialManagementService
+    /*public Map<Long, List<EditorialBoardMemberDTO>> getAllEditorialBoards() {
+        List<Journal> journals = journalRepo.findAll();
+        return journals.stream()
+                .collect(Collectors.toMap(
+                        Journal::getId,
+                        journal -> getEditorialBoardForJournal(journal.getId())
+                );
+    }*/
+
 }
