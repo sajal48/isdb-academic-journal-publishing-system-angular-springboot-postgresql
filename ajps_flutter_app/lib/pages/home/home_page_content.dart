@@ -14,7 +14,7 @@ class HomePageContent extends StatelessWidget {
           // Homepage banner image.
           // IMPORTANT: Replace this Image.network with Image.asset if using local image.
           // Make sure your pubspec.yaml is updated to include the asset path.
-          Image.network(
+          /*Image.network(
             'assets/images/homepage-banner.jpg',
             fit: BoxFit.fill, // Ensures the image covers the available width.
             height: 200, // Fixed height for the banner.
@@ -39,7 +39,8 @@ class HomePageContent extends StatelessWidget {
                 ),
               );
             },
-          ),
+          ),*/
+          Image.asset('assets/images/homepage-banner.jpg'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
             child: Column(
