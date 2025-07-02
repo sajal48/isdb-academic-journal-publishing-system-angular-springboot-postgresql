@@ -83,7 +83,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 //        configuration.setAllowedOrigins(List.of("http://localhost:4500")); // Angular origin
-        configuration.setAllowedOriginPatterns(List.of("*")); // Angular origin
+//        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://192.168.*.*"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // allow Authorization cookie/header etc.
