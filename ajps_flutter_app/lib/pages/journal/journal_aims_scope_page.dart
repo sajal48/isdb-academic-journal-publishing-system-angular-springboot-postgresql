@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:ajps_flutter_app/models/journal.dart';
+
+class JournalAimsScopePage extends StatelessWidget {
+  final Journal journal;
+
+  const JournalAimsScopePage({super.key, required this.journal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Aims & Scope of ${journal.journalName}',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'This page will display the aims and scope for ${journal.journalName}.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            // Add actual aims & scope content here
+          ],
+        ),
+      ),
+    );
+  }
+}
