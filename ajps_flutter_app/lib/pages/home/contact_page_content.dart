@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 /// Widget for the Contact Us page.
-class ContactUsPage extends StatelessWidget {
-  const ContactUsPage({super.key});
+class ContactPage extends StatelessWidget {
+  const ContactPage({super.key});
 
   // Helper method to build a section with a heading and an email link
   Widget _buildEmailContactSection(BuildContext context, String heading, String email) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0), // Equivalent to py-2
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -15,13 +15,13 @@ class ContactUsPage extends StatelessWidget {
             heading,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20.0), // h4 styling
           ),
-          const SizedBox(height: 4.0), // Small spacing below heading
+          const SizedBox(height: 4.0),
           GestureDetector( // Makes the entire text span tappable
             // onTap: () => _launchEmail(context, email),
             child: Text(
               email,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.primary, // Custom link color
+                color: Theme.of(context).colorScheme.primary, 
                 decoration: TextDecoration.underline,
                 fontWeight: FontWeight.bold,
               ),
@@ -34,43 +34,30 @@ class ContactUsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Allows the content to scroll if it exceeds screen height
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0), // Container padding
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Stretch children horizontally
-          children: [
-            // Page title: "Contact Us"
-            /*Padding(
-              padding: const EdgeInsets.only(bottom: 40.0), // Equivalent to mb-5
-              child: Text(
-                'Contact Us',
-                style: Theme.of(context).textTheme.headlineLarge, // Using headlineLarge for main title
-                textAlign: TextAlign.center,
-              ),
-            ),*/
-
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [         
             // Introductory paragraph section
             Padding(
-              padding: const EdgeInsets.only(bottom: 32.0), // Equivalent to mb-4
+              padding: const EdgeInsets.only(bottom: 32.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0), // Equivalent to py-2
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
                       'ScholarPress is a leading open-access publishing platform for journals and books. We are committed to supporting authors and readers with any issues they encounter. Feel free to reach out to our team via email, and our professional staff will respond promptly to assist you.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black), // text-muted color
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black), 
                       textAlign: TextAlign.justify,
                     ),
                   ),
                 ],
               ),
             ),
-
-            // Two-column layout for contact details and form
-            // Equivalent to <div class="row g-4">
-            Wrap( // Using Wrap for responsive two-column layout
+            Wrap( 
               spacing: 16.0, // horizontal spacing between items
               runSpacing: 16.0, // vertical spacing between lines of items
               children: [
@@ -89,15 +76,15 @@ class ContactUsPage extends StatelessWidget {
 
                       // Postal Address
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0), // Equivalent to py-2
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Postal Address',
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20.0), // h4 styling
+                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20.0),
                             ),
-                            const SizedBox(height: 4.0), // Small spacing
+                            const SizedBox(height: 4.0),
                             Text(
                               'Momtaz Plaza 3rd Floor\n'
                                   'House #7, Road #4,\n'

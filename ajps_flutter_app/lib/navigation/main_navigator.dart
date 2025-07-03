@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/sections/home_section.dart';
-import 'package:ajps_flutter_app/pages/journal/journal_page.dart';
+import 'package:ajps_flutter_app/pages/journal/journal_main_page.dart';
 import 'package:ajps_flutter_app/pages/user/user_page.dart';
 
-/// MainNavigator manages the bottom navigation bar for the primary app sections.
 class MainNavigator extends StatefulWidget {
   const MainNavigator({super.key});
 
@@ -12,30 +11,48 @@ class MainNavigator extends StatefulWidget {
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
-  int _selectedIndex = 0; // Tracks the currently selected bottom navigation tab
+  int _selectedIndex = 0;
+  final PageController _pageController = PageController();
 
-  // List of widgets corresponding to each bottom navigation tab.
-  // Each tab has its own Scaffold to manage its AppBar and potential drawers.
-  final List<Widget> _pages = <Widget>[
-    const HomeSection(), // The Home section with its own internal navigation (left drawer)
-    const JournalPage(), // Placeholder for Journal content
-    const UserPage(), // Placeholder for User content
-  ];
+  // GlobalKey to control the HomeSection state
+  final GlobalKey<HomeSectionState> _homeSectionKey = GlobalKey();
 
-  /// Handles tap events on the bottom navigation bar items.
+  final List<Widget> _pages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _pages.addAll([
+      HomeSection(key: _homeSectionKey),
+      const JournalPage(),
+      const UserPage(),
+    ]);
+  }
+
   void _onItemTapped(int index) {
+    // If tapping the currently selected Home tab, reset it
+    if (_selectedIndex == index && index == 0) {
+      _homeSectionKey.currentState?.reset();
+    }
+
     setState(() {
       _selectedIndex = index;
     });
+    _pageController.jumpToPage(index);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // IndexedStack is used to preserve the state of the pages when switching tabs,
-      // preventing them from rebuilding every time.
-      body: IndexedStack(
-        index: _selectedIndex,
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(), // Disable swipe
         children: _pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -53,9 +70,9 @@ class _MainNavigatorState extends State<MainNavigator> {
             label: 'User',
           ),
         ],
-        currentIndex: _selectedIndex, // The currently selected tab
-        selectedItemColor: Theme.of(context).colorScheme.primary, // Color for selected icon/label
-        onTap: _onItemTapped, // Callback when a tab is tapped
+        currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        onTap: _onItemTapped,
       ),
     );
   }

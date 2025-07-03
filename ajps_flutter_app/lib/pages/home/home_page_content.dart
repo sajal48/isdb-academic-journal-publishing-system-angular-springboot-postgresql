@@ -7,45 +7,28 @@ class HomePageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      // Makes the content scrollable if it exceeds screen height.
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch, // Stretches children to fill width.
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // Homepage banner image.
-          // IMPORTANT: Replace this Image.network with Image.asset if using local image.
-          // Make sure your pubspec.yaml is updated to include the asset path.
-          /*Image.network(
-            'assets/images/homepage-banner.jpg',
-            fit: BoxFit.fill, // Ensures the image covers the available width.
-            height: 200, // Fixed height for the banner.
-            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-              // Shows a loading indicator while the image is fetching.
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-              // Displays an error message if the image fails to load.
-              return Container(
-                height: 200,
-                color: Colors.grey[300],
-                child: const Center(
-                  child: Text('Image failed to load', style: TextStyle(color: Colors.red)),
-                ),
-              );
-            },
-          ),*/
-          Image.asset('assets/images/homepage-banner.jpg'),
+          // Image.asset('assets/images/homepage-banner.jpg'),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+            padding: const EdgeInsets.all(16.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
+              child: Image.asset(
+                'assets/images/homepage-banner.jpg',
+                height: 200,
+                fit: BoxFit.fitHeight,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 24.0,
+            ),
             child: Column(
               children: <Widget>[
-                // Main heading "Welcome".
                 Padding(
                   padding: const EdgeInsets.only(bottom: 24.0),
                   child: Text(
@@ -54,12 +37,12 @@ class HomePageContent extends StatelessWidget {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                // First paragraph with bold text using Text.rich.
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text.rich(
                     TextSpan(
-                      text: 'ScholarPress is committed to prioritizing quality over quantity in its publications. Our open-access platform ensures researchers worldwide can freely access newly published findings. All submissions undergo plagiarism screening using tools like ',
+                      text:
+                          'ScholarPress is committed to prioritizing quality over quantity in its publications. Our open-access platform ensures researchers worldwide can freely access newly published findings. All submissions undergo plagiarism screening using tools like ',
                       children: <TextSpan>[
                         TextSpan(
                           text: 'CrossCheck',
@@ -70,19 +53,22 @@ class HomePageContent extends StatelessWidget {
                           text: 'Dupli Checker',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const TextSpan(text: '. If significant similarities are found, particularly in the results or discussion sections, the manuscript will be returned to the author(s). Please refer to our plagiarism policy available in our journals for detailed guidelines.'),
+                        const TextSpan(
+                          text:
+                              '. If significant similarities are found, particularly in the results or discussion sections, the manuscript will be returned to the author(s). Please refer to our plagiarism policy available in our journals for detailed guidelines.',
+                        ),
                       ],
                     ),
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                // Second paragraph with bold text.
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text.rich(
                     TextSpan(
-                      text: 'In addition to journals, ScholarPress also publishes books in the fields of ',
+                      text:
+                          'In addition to journals, ScholarPress also publishes books in the fields of ',
                       children: <TextSpan>[
                         TextSpan(
                           text: 'BioSciences',
@@ -93,14 +79,16 @@ class HomePageContent extends StatelessWidget {
                           text: 'Environmental Sciences',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        const TextSpan(text: ', under open-access or hybrid models. These books are distributed globally through both online and offline channels. We do not publish theses or project reports in our journals. All materials are evaluated in line with our plagiarism policy. We encourage authors to ensure their work contains minimal or no similarity before submission.'),
+                        const TextSpan(
+                          text:
+                              ', under open-access or hybrid models. These books are distributed globally through both online and offline channels. We do not publish theses or project reports in our journals. All materials are evaluated in line with our plagiarism policy. We encourage authors to ensure their work contains minimal or no similarity before submission.',
+                        ),
                       ],
                     ),
                     style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                // Third paragraph.
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: Text(
@@ -109,7 +97,6 @@ class HomePageContent extends StatelessWidget {
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                // Fourth paragraph.
                 Padding(
                   padding: const EdgeInsets.only(bottom: 32.0),
                   child: Text(
@@ -118,7 +105,6 @@ class HomePageContent extends StatelessWidget {
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                // Sub-heading.
                 Text(
                   'Stay with ScholarPress — Stay with Quality Publishing',
                   style: Theme.of(context).textTheme.headlineMedium,
