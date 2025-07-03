@@ -27,7 +27,7 @@ class _JournalPageState extends State<JournalPage> {
   void initState() {
     super.initState();
     _fetchJournals();
-    
+
     // Initialize pages (we'll update the journals page after data loads)
     _journalPages.addAll([
       const Center(child: CircularProgressIndicator()), // Temporary placeholder
@@ -41,7 +41,9 @@ class _JournalPageState extends State<JournalPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final ModalRoute<dynamic>? parentRoute = ModalRoute.of(context);
-    if (parentRoute is PageRoute && parentRoute.isCurrent && _journalMenuIndex == 0) {
+    if (parentRoute is PageRoute &&
+        parentRoute.isCurrent &&
+        _journalMenuIndex == 0) {
       _fetchJournals();
     }
   }
@@ -55,25 +57,34 @@ class _JournalPageState extends State<JournalPage> {
     });
 
     try {
-      final response = await http.get(Uri.parse('http://192.168.0.79:8090/api/journal/get-all-journals'));
+      final response = await http.get(
+        Uri.parse('http://192.168.0.155:8090/api/journal/get-all-journals'),
+      );
 
       if (response.statusCode == 200) {
         List<dynamic> jsonResponse = jsonDecode(response.body);
         setState(() {
-          _journals = jsonResponse.map((data) => Journal(
-            journalName: data['journalName'] ?? 'N/A',
-            issn: data['issn'] ?? 'N/A',
-            frequency: data['frequency'] ?? 'N/A',
-            journalType: data['journalType'] ?? 'N/A',
-            coverImageUrl: data['coverImageUrl'] ?? 'https://placehold.co/150x200/E0E0E0/000000?text=No+Image',
-            journalUrl: data['journalUrl'] ?? 'no-url',
-          )).toList();
+          _journals = jsonResponse
+              .map(
+                (data) => Journal(
+                  journalName: data['journalName'] ?? 'N/A',
+                  issn: data['issn'] ?? 'N/A',
+                  frequency: data['frequency'] ?? 'N/A',
+                  journalType: data['journalType'] ?? 'N/A',
+                  coverImageUrl:
+                      data['coverImageUrl'] ??
+                      'https://placehold.co/150x200/E0E0E0/000000?text=No+Image',
+                  journalUrl: data['journalUrl'] ?? 'no-url',
+                ),
+              )
+              .toList();
 
           // Update the journals page in our pages list
           _journalPages[0] = _buildJournalsContent();
         });
       } else {
-        _errorMessage = 'Failed to load journals: Server responded with status code ${response.statusCode}';
+        _errorMessage =
+            'Failed to load journals: Server responded with status code ${response.statusCode}';
         debugPrint('API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
@@ -123,10 +134,7 @@ class _JournalPageState extends State<JournalPage> {
             ),
             child: const Text(
               'Journal Menu',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
           ListTile(
@@ -188,11 +196,17 @@ class _JournalPageState extends State<JournalPage> {
                   padding: const EdgeInsets.symmetric(vertical: 50.0),
                   child: Column(
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 40,
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         _errorMessage!,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.red),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.copyWith(color: Colors.red),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 20),
@@ -209,7 +223,9 @@ class _JournalPageState extends State<JournalPage> {
                 padding: const EdgeInsets.symmetric(vertical: 50.0),
                 child: Text(
                   'No journal published yet.',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black54),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
               )
@@ -255,32 +271,46 @@ class _JournalPageState extends State<JournalPage> {
                                         journal.coverImageUrl,
                                         fit: BoxFit.cover,
                                         loadingBuilder: (context, child, loadingProgress) {
-                                          if (loadingProgress == null) return child;
+                                          if (loadingProgress == null)
+                                            return child;
                                           return Center(
                                             child: CircularProgressIndicator(
-                                              value: loadingProgress.expectedTotalBytes != null
-                                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                              value:
+                                                  loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
                                                   : null,
                                             ),
                                           );
                                         },
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey[200],
-                                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
-                                          );
-                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return Container(
+                                                color: Colors.grey[200],
+                                                child: const Icon(
+                                                  Icons.image_not_supported,
+                                                  color: Colors.grey,
+                                                ),
+                                              );
+                                            },
                                       ),
                                     ),
                                   ),
                                   const SizedBox(width: 12.0),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           journal.journalName,
-                                          style: Theme.of(context).textTheme.headlineSmall,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.headlineSmall,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -288,11 +318,18 @@ class _JournalPageState extends State<JournalPage> {
                                         Text.rich(
                                           TextSpan(
                                             text: 'ISSN: ',
-                                            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                             children: [
                                               TextSpan(
                                                 text: journal.issn,
-                                                style: Theme.of(context).textTheme.bodySmall,
+                                                style: Theme.of(
+                                                  context,
+                                                ).textTheme.bodySmall,
                                               ),
                                             ],
                                           ),
@@ -300,12 +337,16 @@ class _JournalPageState extends State<JournalPage> {
                                         const SizedBox(height: 2.0),
                                         Text(
                                           'Frequency: ${journal.frequency}',
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall,
                                         ),
                                         const SizedBox(height: 2.0),
                                         Text(
                                           journal.journalType,
-                                          style: Theme.of(context).textTheme.bodySmall,
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.bodySmall,
                                         ),
                                       ],
                                     ),
@@ -330,12 +371,17 @@ class _JournalPageState extends State<JournalPage> {
                                   icon: const Icon(Icons.link, size: 18),
                                   label: const Text('Visit This Journal'),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
                                     textStyle: const TextStyle(fontSize: 14),
                                   ),
                                 ),
