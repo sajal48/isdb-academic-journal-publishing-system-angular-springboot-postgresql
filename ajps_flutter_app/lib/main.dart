@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ajps_flutter_app/navigation/main_navigator.dart'; 
+import 'package:ajps_flutter_app/navigation/main_navigator.dart';
 
 void main() {
   runApp(const MyApp());

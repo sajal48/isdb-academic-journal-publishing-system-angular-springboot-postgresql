@@ -1,4 +1,5 @@
 import 'package:ajps_flutter_app/sections/journal_section.dart';
+import 'package:ajps_flutter_app/settings/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
 import 'package:http/http.dart' as http;
@@ -28,9 +29,11 @@ class _JournalPageState extends State<JournalPage> {
       _errorMessage = null;
     });
 
+    final baseUrl = AppConfig.getBaseUrl();
+
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.0.118:8090/api/journal/get-all-journals'),
+        Uri.parse('$baseUrl/api/journal/get-all-journals'),
       );
 
       if (response.statusCode == 200) {
@@ -47,6 +50,8 @@ class _JournalPageState extends State<JournalPage> {
                       data['coverImageUrl'] ??
                       'https://placehold.co/150x200/E0E0E0/000000?text=No+Image',
                   journalUrl: data['journalUrl'] ?? 'no-url',
+                  aboutJournal: data['aboutJournal'] ?? 'N/A',
+                  aimsScopes: data['aimsScopes'] ?? 'N/A',
                 ),
               )
               .toList();

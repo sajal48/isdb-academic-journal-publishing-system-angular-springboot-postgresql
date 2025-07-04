@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
 
-class JournalAimsScopePage extends StatelessWidget {
+class JournalCurrentIssuePage extends StatelessWidget {
   final Journal journal;
 
-  const JournalAimsScopePage({super.key, required this.journal});
+  const JournalCurrentIssuePage({super.key, required this.journal});
 
   @override
   Widget build(BuildContext context) {

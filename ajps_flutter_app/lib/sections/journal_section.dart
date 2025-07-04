@@ -1,5 +1,5 @@
-import 'package:ajps_flutter_app/pages/journal/journal_aims_scope_page.dart';
-import 'package:ajps_flutter_app/pages/journal/journal_archives_page.dart';
+import 'package:ajps_flutter_app/pages/journal/journal_current_issue_page.dart';
+import 'package:ajps_flutter_app/pages/journal/journal_all_issue_page.dart';
 import 'package:ajps_flutter_app/pages/journal/journal_editorial_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
@@ -29,8 +29,8 @@ class _JournalSectionPageState extends State<JournalSectionPage> {
         journal: widget.journal, // Pass the full journal object if needed
       ),
       JournalEditorialPage(journal: widget.journal),
-      JournalAimsScopePage(journal: widget.journal),
-      JournalArchivesPage(journal: widget.journal),
+      JournalCurrentIssuePage(journal: widget.journal),
+      JournalAllIssuePage(journal: widget.journal),
     ];
   }
 
@@ -83,6 +83,12 @@ class _JournalSectionPageState extends State<JournalSectionPage> {
               context,
             ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
           ),
+          Text(
+            widget.journal.journalType,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+          ),
         ],
       ),
     );
@@ -93,7 +99,7 @@ class _JournalSectionPageState extends State<JournalSectionPage> {
       children: [
         ListTile(
           leading: const Icon(Icons.info),
-          title: const Text('Journal Details'),
+          title: const Text('Homepage'),
           selected: _selectedIndex == 0,
           onTap: () => _onItemTapped(0),
         ),
@@ -105,13 +111,13 @@ class _JournalSectionPageState extends State<JournalSectionPage> {
         ),
         ListTile(
           leading: const Icon(Icons.description),
-          title: const Text('Aims & Scope'),
+          title: const Text('Current Issue'),
           selected: _selectedIndex == 2,
           onTap: () => _onItemTapped(2),
         ),
         ListTile(
           leading: const Icon(Icons.archive),
-          title: const Text('Archives'),
+          title: const Text('All Issue'),
           selected: _selectedIndex == 3,
           onTap: () => _onItemTapped(3),
         ),
