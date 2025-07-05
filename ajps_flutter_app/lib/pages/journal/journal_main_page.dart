@@ -29,7 +29,7 @@ class _JournalPageState extends State<JournalPage> {
       _errorMessage = null;
     });
 
-    final baseUrl = AppConfig.getBaseUrl();
+    final baseUrl = AppConfig.getBaseUrl;
 
     try {
       final response = await http.get(
