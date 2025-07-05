@@ -4,7 +4,7 @@ import 'package:ajps_flutter_app/models/issue.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
 
 class JournalService {
-  static const String _baseUrl = 'http://192.168.100.31:8090/api/journal';
+  static const String _baseUrl = 'http://192.168.0.79:8090/api/journal';
 
   Future<List<Journal>> getAllJournals() async {
     final response = await http.get(Uri.parse('$_baseUrl/get-all-journals'));

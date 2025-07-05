@@ -1,3 +1,5 @@
+import 'package:ajps_flutter_app/models/issue.dart';
+
 class Journal {
   final String? id;
   final String journalName;
@@ -8,6 +10,7 @@ class Journal {
   final String coverImageUrl;
   final String aboutJournal;
   final String aimsScopes;
+  final Issue? issues;
 
   Journal({
     this.id,
@@ -19,6 +22,7 @@ class Journal {
     required this.coverImageUrl,
     required this.aboutJournal,
     required this.aimsScopes,
+    this.issues,
   });
 
   factory Journal.fromJson(Map<String, dynamic> json) {
@@ -32,6 +36,7 @@ class Journal {
       coverImageUrl: json['coverImageUrl'],
       aboutJournal: json['aboutJournal'],
       aimsScopes: json['aimsScopes'],
+      issues: json['issues'],
     );
   }
 }

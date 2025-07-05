@@ -1,5 +1,5 @@
 class AppConfig {
   static String getBaseUrl() {
-    return 'http://192.168.100.31:8090';
+    return 'http://192.168.0.79:8090';
   }
 }
