@@ -8,6 +8,7 @@ import 'package:ajps_flutter_app/pages/login_register/login_screen.dart'; // Imp
 import 'package:ajps_flutter_app/pages/login_register/register_screen.dart'; // Import RegisterScreen
 import 'package:ajps_flutter_app/pages/user/user_home_screen.dart';
 import 'package:provider/provider.dart'; // Import HomeScreen (for general user)
+import 'package:ajps_flutter_app/navigation/navigation_provider.dart';
 
 void main() {
   runApp(
@@ -15,6 +16,7 @@ void main() {
       providers: [
         // Provide AuthService globally
         Provider<AuthService>(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
       ],
       child: const MyApp(),
     ),

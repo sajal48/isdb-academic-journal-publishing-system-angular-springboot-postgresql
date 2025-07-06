@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ajps_flutter_app/models/user.dart'; // Updated import path
-import 'package:ajps_flutter_app/services/auth_service.dart'; // Updated import path
+import 'package:ajps_flutter_app/models/user.dart';
+import 'package:ajps_flutter_app/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // For SVG image
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:ajps_flutter_app/navigation/navigation_provider.dart';
+
+// import 'package:ajps_flutter_app/navigation/main_navigator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,6 +15,60 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _checkingAuth = true;
+  // ignore: unused_field
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
+  }
+
+  Future<void> _checkAuthStatus() async {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final isLoggedIn = await authService.isAuthenticated();
+    setState(() {
+      _checkingAuth = false;
+      _isLoggedIn = isLoggedIn;
+    });
+    if (isLoggedIn) {
+      // Redirect to user home (dashboard)
+      // ignore: use_build_context_synchronously
+      Provider.of<NavigationProvider>(context, listen: false).setTab(2);
+      // Optionally, you can also pop the login screen if it was pushed
+    }
+  }
+
+  void _onLoginSuccess(BuildContext context) {
+    // Set the User tab as selected after login
+    Provider.of<NavigationProvider>(context, listen: false).setTab(2);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_checkingAuth) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    // If user is logged in, do not show login page (redirect handled in _checkAuthStatus)
+    if (_isLoggedIn) {
+      return const SizedBox.shrink(); // Prevents showing login UI after redirect
+    }
+    // If not logged in, show login content (bottom navigation handled by MainNavigator)
+    return _LoginScreenContent(onLoginSuccess: () => _onLoginSuccess(context));
+  }
+}
+
+class _LoginScreenContent extends StatefulWidget {
+  final VoidCallback? onLoginSuccess;
+  // ignore: use_super_parameters
+  const _LoginScreenContent({Key? key, this.onLoginSuccess}) : super(key: key);
+
+  @override
+  State<_LoginScreenContent> createState() => _LoginScreenContentState();
+}
+
+class _LoginScreenContentState extends State<_LoginScreenContent> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _serverError;
@@ -58,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Navigate based on role after a short delay for the message to show
       Future.delayed(const Duration(seconds: 1), () {
         final userRole = authService.getUserRole();
+        // ignore: unused_local_variable
         String route = '/user'; // Default route
 
         switch (userRole) {
@@ -74,8 +132,14 @@ class _LoginScreenState extends State<LoginScreen> {
             route = '/user';
             break;
         }
-        // Use pushReplacementNamed to navigate and remove the login screen from the stack
-        Navigator.of(context).pushReplacementNamed(route);
+        if (widget.onLoginSuccess != null) {
+          widget.onLoginSuccess!();
+        }
+        // Instead of pushReplacementNamed, switch to the User tab
+        // ignore: use_build_context_synchronously
+        Provider.of<NavigationProvider>(context, listen: false).setTab(2);
+        // Optionally, you can also pop the login screen if it was pushed
+        // Navigator.of(context).popUntil((route) => route.isFirst);
       });
     } else {
       setState(() {
@@ -89,8 +153,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
+    return Container(
+      color: Colors.white,
+      child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: LayoutBuilder(
@@ -147,6 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               padding: const EdgeInsets.all(10),
                               margin: const EdgeInsets.only(bottom: 15),
                               decoration: BoxDecoration(
+                                // ignore: deprecated_member_use
                                 color: Colors.red.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: Colors.red),
@@ -176,6 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               padding: const EdgeInsets.all(10),
                               margin: const EdgeInsets.only(bottom: 15),
                               decoration: BoxDecoration(
+                                // ignore: deprecated_member_use
                                 color: Colors.green.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: Colors.green),
@@ -229,6 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: TextButton(
                               onPressed: () {
                                 // Handle forgot password navigation
+                                // ignore: avoid_print
                                 print('Forgot Password?');
                               },
                               child: Text(

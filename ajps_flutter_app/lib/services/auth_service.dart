@@ -32,6 +32,7 @@ class AuthService {
       _userEmail = payload['email']?.toLowerCase();
       _userId = payload['id'] as int?;
     } catch (e) {
+      // ignore: avoid_print
       print('Error decoding token: $e');
       _userRole = null;
       _userEmail = null;
@@ -56,12 +57,9 @@ class AuthService {
   }
 
   Future<AuthResponse> login(AuthRegisterLoginRequest loginRequest) async {
-    final url = AppConfig.getBaseUrl + "/api/auth/login";
+    final url = "${AppConfig.getBaseUrl}/api/auth/login";
     final uri = Uri.parse(url);
     try {
-      print("login called!");
-      print(loginRequest.email);
-      print(loginRequest.password);
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
@@ -102,6 +100,7 @@ class AuthService {
       // Assuming your validate-token endpoint returns a boolean true/false
       return response.statusCode == 200 && jsonDecode(response.body) == true;
     } catch (e) {
+      // ignore: avoid_print
       print('Error validating token: $e');
       return false;
     }
@@ -128,8 +127,8 @@ class AuthService {
     _userRole = null;
     _userEmail = null;
     _userId = null;
-    // Use Navigator to push and remove all previous routes
-    Navigator.of(context).pushNamedAndRemoveUntil(targetUrl, (route) => false);
+    // Do NOT navigate here. Navigation should be handled by the UI (e.g., switch tab)
+    // If you need to notify listeners, add notifyListeners() if using ChangeNotifier
   }
 
   Future<void> deleteToken() async {
@@ -139,4 +138,7 @@ class AuthService {
     _userEmail = null;
     _userId = null;
   }
+
+  // Returns true if a user is considered logged in (based on cached user data)
+  bool get isLoggedIn => _userRole != null && _userRole!.isNotEmpty;
 }

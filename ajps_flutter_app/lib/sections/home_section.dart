@@ -13,7 +13,7 @@ class HomeSection extends StatefulWidget {
 
 class HomeSectionState extends State<HomeSection> {
   int _homePageIndex = 0;
-  
+
   final List<Widget> _homePages = <Widget>[
     const HomePageContent(),
     const AboutPage(),
@@ -30,11 +30,16 @@ class HomeSectionState extends State<HomeSection> {
 
   String _getHomePageTitle(int index) {
     switch (index) {
-      case 0: return 'Welcome to ScholarPress';
-      case 1: return 'About Us';
-      case 2: return 'Services';
-      case 3: return 'Contact Us';
-      default: return 'Home';
+      case 0:
+        return 'Welcome to ScholarPress';
+      case 1:
+        return 'About Us';
+      case 2:
+        return 'Services';
+      case 3:
+        return 'Contact Us';
+      default:
+        return 'Home';
     }
   }
 
@@ -42,7 +47,8 @@ class HomeSectionState extends State<HomeSection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
         title: Text(_getHomePageTitle(_homePageIndex)),
         centerTitle: true,
       ),
@@ -62,14 +68,12 @@ class HomeSectionState extends State<HomeSection> {
                   height: 10,
                 ),
               ),*/
-              child: Image.asset(
-                'assets/images/logo.png',
-                ),
+              child: Image.asset('assets/images/logo.png'),
             ),
             ListTile(
               leading: const Icon(Icons.article),
               title: const Text('Home'),
-              selected: _homePageIndex == 0, 
+              selected: _homePageIndex == 0,
               onTap: () {
                 setState(() => _homePageIndex = 0);
                 Navigator.pop(context);
@@ -98,7 +102,7 @@ class HomeSectionState extends State<HomeSection> {
               title: const Text('Contact Us'),
               selected: _homePageIndex == 3,
               onTap: () {
-                setState(() => _homePageIndex = 3); 
+                setState(() => _homePageIndex = 3);
                 Navigator.pop(context);
               },
             ),

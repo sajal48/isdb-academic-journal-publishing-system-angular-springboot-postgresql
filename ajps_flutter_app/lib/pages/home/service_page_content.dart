@@ -6,11 +6,16 @@ class ServicesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Allows the content to scroll if it exceeds screen height
+    return SingleChildScrollView(
+      // Allows the content to scroll if it exceeds screen height
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0), // Padding for the entire page content
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 24.0,
+        ), // Padding for the entire page content
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Makes children stretch horizontally
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch, // Makes children stretch horizontally
           children: [
             // Page title: "Our Services"
             /*Padding(
@@ -35,7 +40,8 @@ class ServicesPage extends StatelessWidget {
               'Services for Authors',
               [
                 TextSpan(
-                  text: 'ScholarPress offers professional editing services to enhance your manuscript. Our team of English language experts corrects grammar, refines syntax, and restructures sentences to make your work clear and engaging. We provide plagiarism checks with suggestions to ensure originality, but we do not support manuscripts with similarities in data, results, or figures. Our services include:',
+                  text:
+                      'ScholarPress offers professional editing services to enhance your manuscript. Our team of English language experts corrects grammar, refines syntax, and restructures sentences to make your work clear and engaging. We provide plagiarism checks with suggestions to ensure originality, but we do not support manuscripts with similarities in data, results, or figures. Our services include:',
                 ),
               ],
               numberedList: [
@@ -79,12 +85,12 @@ class ServicesPage extends StatelessWidget {
 
   // Helper method to build consistent service sections
   Widget _buildServiceSection(
-      BuildContext context,
-      String heading,
-      dynamic content, { // Can be a String or List<TextSpan>
-        List<String>? numberedList,
-        List<TextSpan>? additionalParagraphs,
-      }) {
+    BuildContext context,
+    String heading,
+    dynamic content, { // Can be a String or List<TextSpan>
+    List<String>? numberedList,
+    List<TextSpan>? additionalParagraphs,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 32.0), // Spacing between sections
       child: Column(
@@ -94,42 +100,57 @@ class ServicesPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               heading,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 20.0), // Smaller heading for sections
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: 20.0,
+              ), // Smaller heading for sections
             ),
           ),
           if (content is String) // If content is a single string
             Text(
               content,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black), // text-muted color
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.black,
+              ), // text-muted color
               textAlign: TextAlign.justify,
             )
-          else if (content is List<TextSpan>) // If content is a list of TextSpans
+          else if (content
+              is List<TextSpan>) // If content is a list of TextSpans
             Text.rich(
               TextSpan(children: content),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: Colors.black),
               textAlign: TextAlign.justify,
             ),
           if (numberedList != null && numberedList.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(left: 20.0, top: 10.0), // Indent for the list
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                top: 10.0,
+              ), // Indent for the list
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: numberedList.asMap().entries.map((entry) {
                   int index = entry.key + 1; // 1-based numbering
                   String item = entry.value;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0), // Spacing between list items
+                    padding: const EdgeInsets.only(
+                      bottom: 4.0,
+                    ), // Spacing between list items
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           '$index. ',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                          style: Theme.of(
+                            context,
+                          ).textTheme.bodyLarge?.copyWith(color: Colors.black),
                         ),
                         Expanded(
                           child: Text(
                             item,
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: Colors.black),
                           ),
                         ),
                       ],
@@ -139,14 +160,20 @@ class ServicesPage extends StatelessWidget {
               ),
             ),
           if (additionalParagraphs != null && additionalParagraphs.isNotEmpty)
-            ...additionalParagraphs.map((span) => Padding(
-              padding: const EdgeInsets.only(top: 10.0), // Margin top for additional paragraphs
-              child: Text.rich(
-                span,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
-                textAlign: TextAlign.justify,
+            ...additionalParagraphs.map(
+              (span) => Padding(
+                padding: const EdgeInsets.only(
+                  top: 10.0,
+                ), // Margin top for additional paragraphs
+                child: Text.rich(
+                  span,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                  textAlign: TextAlign.justify,
+                ),
               ),
-            )).toList(),
+            ),
         ],
       ),
     );

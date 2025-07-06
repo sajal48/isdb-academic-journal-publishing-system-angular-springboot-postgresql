@@ -44,7 +44,11 @@ class _JournalSectionPageState extends State<JournalSectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.journal.journalName)),
+      appBar: AppBar(
+        title: Text(widget.journal.journalName),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
       drawer: _buildDrawer(),
       body: _pages[_selectedIndex],
     );

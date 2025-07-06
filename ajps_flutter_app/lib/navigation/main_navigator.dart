@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/sections/home_section.dart';
 import 'package:ajps_flutter_app/pages/journal/journal_main_page.dart';
-import 'package:ajps_flutter_app/pages/user/user_auth_wrapper.dart'; // Use the new wrapper
+import 'package:ajps_flutter_app/sections/user_section.dart';
+import 'package:ajps_flutter_app/pages/user/admin_dashboard_screen.dart';
+import 'package:ajps_flutter_app/pages/user/journal_submissions_screen.dart';
+import 'package:ajps_flutter_app/pages/user/reviewer_dashboard_screen.dart';
+import 'package:ajps_flutter_app/pages/login_register/login_screen.dart';
+import 'package:ajps_flutter_app/services/auth_service.dart';
+import 'package:ajps_flutter_app/navigation/navigation_provider.dart';
+import 'package:provider/provider.dart';
 
 class MainNavigator extends StatefulWidget {
   const MainNavigator({super.key});
@@ -11,49 +18,45 @@ class MainNavigator extends StatefulWidget {
 }
 
 class _MainNavigatorState extends State<MainNavigator> {
-  int _selectedIndex = 0;
   final PageController _pageController = PageController();
-
-  // GlobalKey to control the HomeSection state
   final GlobalKey<HomeSectionState> _homeSectionKey = GlobalKey();
-
-  late final List<Widget> _pages;
-
-  @override
-  void initState() {
-    super.initState();
-    _pages = [
-      HomeSection(key: _homeSectionKey),
-      const JournalPage(),
-      const UserAuthWrapper(), // Use UserAuthWrapper for the User tab
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    // If tapping the currently selected Home tab, reset it
-    if (_selectedIndex == index && index == 0) {
-      _homeSectionKey.currentState?.reset();
-    }
-
-    setState(() {
-      _selectedIndex = index;
-    });
-    _pageController.jumpToPage(index);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final navigationProvider = Provider.of<NavigationProvider>(context);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    Widget userTab;
+
+    if (!authService.isLoggedIn) {
+      // Show login screen if not authenticated
+      userTab = const LoginScreen();
+    } else {
+      final userRole = authService.getUserRole();
+      switch (userRole) {
+        case 'admin':
+          userTab = const AdminDashboardScreen();
+          break;
+        case 'editor':
+          userTab = const JournalSubmissionsScreen();
+          break;
+        case 'reviewer':
+          userTab = const ReviewerDashboardScreen();
+          break;
+        default:
+          userTab = const UserSectionPage();
+      }
+    }
+
+    final pages = [
+      HomeSection(key: _homeSectionKey),
+      const JournalPage(),
+      userTab,
+    ];
     return Scaffold(
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(), // Disable swipe
-        children: _pages,
+        children: pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -64,9 +67,17 @@ class _MainNavigatorState extends State<MainNavigator> {
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'User'),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: navigationProvider.selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        onTap: _onItemTapped,
+        onTap: (index) {
+          // If tapping the currently selected Home tab, reset it
+          if (navigationProvider.selectedIndex == index && index == 0) {
+            _homeSectionKey.currentState?.reset();
+          }
+
+          navigationProvider.setTab(index);
+          _pageController.jumpToPage(index);
+        },
       ),
     );
   }

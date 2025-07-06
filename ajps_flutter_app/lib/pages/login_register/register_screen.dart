@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/models/user.dart'; // Updated import path
 import 'package:ajps_flutter_app/services/auth_service.dart'; // Updated import path
 import 'package:provider/provider.dart';
+import 'package:ajps_flutter_app/navigation/navigation_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,6 +12,22 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  @override
+  Widget build(BuildContext context) {
+    // Show only the register content, bottom navigation is managed by MainNavigator
+    return const _RegisterScreenContent();
+  }
+}
+
+class _RegisterScreenContent extends StatefulWidget {
+  // ignore: use_super_parameters
+  const _RegisterScreenContent({Key? key}) : super(key: key);
+
+  @override
+  State<_RegisterScreenContent> createState() => _RegisterScreenContentState();
+}
+
+class _RegisterScreenContentState extends State<_RegisterScreenContent> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   String? _serverError;
@@ -55,7 +72,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
       // Optionally navigate to login screen after successful registration
       Future.delayed(const Duration(seconds: 2), () {
-        Navigator.of(context).pushReplacementNamed('/login');
+        // ignore: use_build_context_synchronously
+        Provider.of<NavigationProvider>(context, listen: false).setTab(2);
       });
     } else {
       setState(() {
@@ -104,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: const EdgeInsets.all(10),
                       margin: const EdgeInsets.only(bottom: 15),
                       decoration: BoxDecoration(
+                        // ignore: deprecated_member_use
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.red),
@@ -133,6 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       padding: const EdgeInsets.all(10),
                       margin: const EdgeInsets.only(bottom: 15),
                       decoration: BoxDecoration(
+                        // ignore: deprecated_member_use
                         color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.green),
@@ -214,7 +234,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed('/login');
+                          Provider.of<NavigationProvider>(
+                            context,
+                            listen: false,
+                          ).setTab(2);
                         },
                         child: Text(
                           'Login Here',
