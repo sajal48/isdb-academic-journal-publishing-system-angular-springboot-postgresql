@@ -22,11 +22,11 @@ public class JournalController {
     @Autowired
     private final JournalService journalService;
 
-    @GetMapping("/get-all-journals")
+    /*@GetMapping("/get-all-journals")
     public ResponseEntity<List<AdminJournalDto>> getAllJournals() {
         return ResponseEntity.ok(journalService.getAllJournals());
-    }
-    /*@GetMapping("/get-all-journals")
+    }*/
+    @GetMapping("/get-all-journals")
     public ResponseEntity<List<AdminJournalDto>> getAllJournals(HttpServletRequest request) {
         // Get base URL from the request
         String baseUrl = UriComponentsBuilder.fromHttpUrl(request.getRequestURL().toString())
@@ -35,7 +35,7 @@ public class JournalController {
                 .toUriString();
 
         return ResponseEntity.ok(journalService.getAllJournals(baseUrl));
-    }*/
+    }
 
     @GetMapping("/get-journal/{journalUrl}")
     public ResponseEntity<AdminJournalDto> getJournalByCode(@PathVariable String journalUrl) {

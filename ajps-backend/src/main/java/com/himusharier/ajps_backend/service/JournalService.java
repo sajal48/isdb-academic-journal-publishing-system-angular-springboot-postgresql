@@ -31,22 +31,39 @@ public class JournalService {
     @Value("${upload.journal.directory}")
     private String uploadDirectory; // e.g. "ajps-uploads/journals"
 
-    private String getLocalBaseUrl() {
+    @Value("${server.port}")
+    private int serverPort;
+
+    @Value("${app.base-url:#{null}}")
+    private String configuredBaseUrl;
+
+    private String getEffectiveBaseUrl(String requestBaseUrl) {
+        // 1. Priority to request base URL if provided
+        if (requestBaseUrl != null && !requestBaseUrl.isBlank()) {
+            return requestBaseUrl;
+        }
+
+        // 2. Use configured base URL if available
+        if (configuredBaseUrl != null && !configuredBaseUrl.isBlank()) {
+            return configuredBaseUrl;
+        }
+
+        // 3. Fallback to server address
         try {
-            String ip = InetAddress.getLocalHost().getHostAddress();
-            return "http://" + ip + ":8090";
+            String hostAddress = InetAddress.getLocalHost().getHostAddress();
+            return "http://" + hostAddress + ":" + serverPort;
         } catch (UnknownHostException e) {
-            return "http://localhost:8090"; // fallback
+            return "http://localhost:" + serverPort;
         }
     }
 
-    public List<AdminJournalDto> getAllJournals() {
+    public List<AdminJournalDto> getAllJournals(String requestBaseUrl) {
         return journalRepository.findAllWithIssues().stream()
-                .map(this::mapJournalToAdminJournalDto)
+                .map(journal -> mapJournalToAdminJournalDto(journal, requestBaseUrl))
                 .collect(Collectors.toList());
     }
 
-    private AdminJournalDto mapJournalToAdminJournalDto(Journal journal) {
+    private AdminJournalDto mapJournalToAdminJournalDto(Journal journal, String baseUrl) {
         List<IssueDto> issueDtos = journal.getIssues() != null ?
                 journal.getIssues().stream()
                         .sorted((i1, i2) -> {
@@ -57,6 +74,8 @@ public class JournalService {
                         .map(this::mapIssueToIssueDto)
                         .collect(Collectors.toList()) :
                 List.of();
+
+        String coverImageUrl = buildFullImageUrl(journal.getCoverImageUrl(), baseUrl);
 
         return AdminJournalDto.builder()
                 .id(journal.getId())
@@ -69,7 +88,7 @@ public class JournalService {
                 .journalUrl(journal.getJournalUrl())
                 .aimsScopes(journal.getAimsScopes())
                 .aboutJournal(journal.getAboutJournal())
-                .coverImageUrl(buildFullImageUrl(journal.getCoverImageUrl()))
+                .coverImageUrl(coverImageUrl)
                 .issues(issueDtos)
                 .build();
     }
@@ -96,12 +115,11 @@ public class JournalService {
 
         if (coverImage != null && !coverImage.isEmpty()) {
             String fileName = saveImageToInternalStorage(coverImage, journal.getJournalCode());
-            String fullImageUrl = buildFullImageUrl(fileName);
-            journal.setCoverImageUrl(fullImageUrl);
+            journal.setCoverImageUrl(fileName);
         }
 
         Journal savedJournal = journalRepository.save(journal);
-        return mapJournalToAdminJournalDto(savedJournal);
+        return mapJournalToAdminJournalDto(savedJournal, null);
     }
 
     public AdminJournalDto updateJournal(Long id, AdminJournalDto dto, MultipartFile coverImage) {
@@ -115,14 +133,13 @@ public class JournalService {
         if (coverImage != null && !coverImage.isEmpty()) {
             deleteImageByUrl(oldImageUrl);
             String fileName = saveImageToInternalStorage(coverImage, journal.getJournalCode());
-            String fullImageUrl = buildFullImageUrl(fileName);
-            journal.setCoverImageUrl(fullImageUrl);
+            journal.setCoverImageUrl(fileName);
         } else if (oldImageUrl != null) {
             journal.setCoverImageUrl(oldImageUrl);
         }
 
         Journal updatedJournal = journalRepository.save(journal);
-        return mapJournalToAdminJournalDto(updatedJournal);
+        return mapJournalToAdminJournalDto(updatedJournal, null);
     }
 
     public void deleteJournal(Long id) {
@@ -132,16 +149,14 @@ public class JournalService {
         });
     }
 
-    private String buildFullImageUrl(String fileName) {
+    private String buildFullImageUrl(String fileName, String requestBaseUrl) {
         if (fileName == null || fileName.isBlank()) {
             return null;
         }
-
         if (fileName.startsWith("http://") || fileName.startsWith("https://")) {
             return fileName;
         }
-
-        return getLocalBaseUrl() + "/" + uploadDirectory + "/" + fileName;
+        return getEffectiveBaseUrl(requestBaseUrl) + "/" + uploadDirectory + "/" + fileName;
     }
 
     private String extractFileNameFromUrl(String fullUrl) {
@@ -237,7 +252,7 @@ public class JournalService {
         }
 
         return journalRepository.findByJournalUrl(journalUrl)
-                .map(this::mapJournalToAdminJournalDto)
+                .map(journal -> mapJournalToAdminJournalDto(journal, null))
                 .orElseThrow(() -> new IllegalArgumentException("Journal not found with code: " + journalUrl));
     }
 }

@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:ajps_flutter_app/settings/app_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:ajps_flutter_app/models/issue.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
 
 class JournalService {
-  static const String _baseUrl = 'http://192.168.1.100:8090/api/journal';
+  static final String _baseUrl = '${AppConfig.getBaseUrl}/api/journal';
 
   Future<List<Journal>> getAllJournals() async {
     final response = await http.get(Uri.parse('$_baseUrl/get-all-journals'));
