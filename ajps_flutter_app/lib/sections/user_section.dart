@@ -1,3 +1,4 @@
+import 'package:ajps_flutter_app/pages/user/user_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -15,10 +16,20 @@ class _UserSectionPageState extends State<UserSectionPage> {
   late final List<Widget> _pages;
 
   @override
-  void initState() {
+  /*void initState() {
     super.initState();
     _pages = [
       _DashboardPage(),
+      _ProfilePage(),
+      _EditProfilePage(),
+      _OnlineSubmissionPage(),
+      _SettingsPage(),
+    ];
+  }*/
+  void initState() {
+    super.initState();
+    _pages = [
+      const UserDashboardScreen(), // Updated to use the new dashboard
       _ProfilePage(),
       _EditProfilePage(),
       _OnlineSubmissionPage(),
@@ -138,6 +149,7 @@ class _UserSectionPageState extends State<UserSectionPage> {
 // ignore: unused_element
 typedef _PageWidget = Widget;
 
+// ignore: unused_element
 class _DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
