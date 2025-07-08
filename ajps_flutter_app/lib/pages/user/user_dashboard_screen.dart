@@ -5,6 +5,7 @@ import 'package:ajps_flutter_app/widgets/confirmation_dialog.dart';
 import 'package:ajps_flutter_app/widgets/status_badge.dart';
 import 'package:provider/provider.dart';
 import 'package:ajps_flutter_app/services/auth_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserDashboardScreen extends StatefulWidget {
   const UserDashboardScreen({super.key});
@@ -220,24 +221,109 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   }
 
   void _editManuscript(String id) {
-    // Navigate to edit manuscript page
-    Navigator.pushNamed(context, '/user/submission/edit/$id');
+    _showWebVersionDialog(
+      'Edit Manuscript',
+      'To edit your manuscript, please use the web version for the best experience.',
+    );
   }
 
   void _viewManuscript(String id) {
-    // Navigate to view manuscript page
-    Navigator.pushNamed(context, '/user/submission/view/$id');
+    _showWebVersionDialog(
+      'View Manuscript',
+      'To view your manuscript details, please use the web version for the best experience.',
+    );
   }
 
   // ignore: unused_element
   void _makePayment(String id) {
-    // Navigate to payment page
-    Navigator.pushNamed(context, '/user/payment/$id');
+    _showWebVersionDialog(
+      'Make Payment',
+      'To process payment, please use the web version for secure transactions.',
+    );
   }
 
   void _viewWorkflow(String id) {
-    // Navigate to workflow page
-    Navigator.pushNamed(context, '/user/workflow/$id');
+    _showWebVersionDialog(
+      'View Workflow',
+      'To view the manuscript workflow, please use the web version for detailed information.',
+    );
+  }
+
+  void _showWebVersionDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 48,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _openWebVersion();
+              },
+              icon: const Icon(Icons.open_in_new),
+              label: const Text('Use Web Version'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openWebVersion() async {
+    const url = 'http://localhost:4500/user/dashboard';
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Could not launch web browser. Please manually navigate to: http://localhost:4500/user/dashboard',
+              ),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Error opening web version. Please manually navigate to: http://localhost:4500/user/dashboard',
+            ),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _deleteManuscript(String id) async {
