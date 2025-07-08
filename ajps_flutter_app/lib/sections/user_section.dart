@@ -1,4 +1,7 @@
+import 'package:ajps_flutter_app/pages/user/edit_user_profile_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_dashboard_screen.dart';
+import 'package:ajps_flutter_app/pages/user/user_profile_page_screen.dart';
+import 'package:ajps_flutter_app/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:ajps_flutter_app/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -29,9 +32,9 @@ class _UserSectionPageState extends State<UserSectionPage> {
   void initState() {
     super.initState();
     _pages = [
-      const UserDashboardScreen(), // Updated to use the new dashboard
-      _ProfilePage(),
-      _EditProfilePage(),
+      const UserDashboardScreen(),
+      UserProfilePageScreen(),
+      _EditProfileScreenWrapper(),
       _OnlineSubmissionPage(),
       _SettingsPage(),
     ];
@@ -157,17 +160,54 @@ class _DashboardPage extends StatelessWidget {
   }
 }
 
-class _ProfilePage extends StatelessWidget {
+/*class _ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Profile'));
   }
+}*/
+
+// Remove _EditProfilePage and add a wrapper that gets the latest user/profile data from context
+class _EditProfileScreenWrapper extends StatefulWidget {
+  @override
+  State<_EditProfileScreenWrapper> createState() =>
+      _EditProfileScreenWrapperState();
 }
 
-class _EditProfilePage extends StatelessWidget {
+class _EditProfileScreenWrapperState extends State<_EditProfileScreenWrapper> {
+  Map<String, dynamic> _user = const {};
+  String _userEmail = '';
+  bool _loading = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    setState(() => _loading = true);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    try {
+      final response = await ProfileService().getProfile(
+        authService: authService,
+      );
+      setState(() {
+        _user = response['data'] ?? {};
+        _userEmail = authService.getUserEmail();
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('Edit Profile'));
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return EditUserProfileScreen(user: _user, userEmail: _userEmail);
   }
 }
 
