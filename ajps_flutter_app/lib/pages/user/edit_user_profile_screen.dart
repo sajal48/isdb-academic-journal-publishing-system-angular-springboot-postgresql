@@ -154,7 +154,7 @@ class _EditUserProfileScreenState extends State<EditUserProfileScreen> {
         }
 
         setState(() {
-          _selectedImage = null; // Clear the selected image as it's uploaded
+          // _selectedImage = null; // Clear the selected image as it's uploaded
           _profileImageUrl = displayUrl ?? ''; // Update the displayed image URL
         });
 
