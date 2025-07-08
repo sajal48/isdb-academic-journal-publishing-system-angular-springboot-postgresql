@@ -1,8 +1,9 @@
 import 'package:ajps_flutter_app/pages/user/edit_user_profile_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_dashboard_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_profile_page_screen.dart';
+import 'package:ajps_flutter_app/pages/user/user_settings_screen.dart';
 import 'package:ajps_flutter_app/services/profile_service.dart';
-import 'package:ajps_flutter_app/widgets/user_profile_image_widget.dart';
+// import 'package:ajps_flutter_app/widgets/user_profile_image_widget.dart';
 import 'package:ajps_flutter_app/widgets/safe_user_profile_image_widget.dart';
 import 'package:ajps_flutter_app/widgets/error_boundary.dart';
 import 'package:ajps_flutter_app/settings/app_config.dart';
@@ -41,7 +42,7 @@ class _UserSectionPageState extends State<UserSectionPage> {
       UserProfilePageScreen(),
       _EditProfileScreenWrapper(),
       _OnlineSubmissionPage(),
-      _SettingsPage(),
+      const UserSettingsScreen(),
     ];
   }
 
@@ -58,8 +59,10 @@ class _UserSectionPageState extends State<UserSectionPage> {
     });
   }
 
+  // ignore: unused_element
   Widget _buildProfileImage(AuthService authService) {
     return ErrorBoundary(
+      // ignore: sort_child_properties_last
       child: SafeUserProfileImageWidget(
         key: ValueKey(_profileImageRefreshKey),
         radius: 28,
@@ -317,12 +320,5 @@ class _OnlineSubmissionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: Text('Online Submission'));
-  }
-}
-
-class _SettingsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Settings'));
   }
 }
