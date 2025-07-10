@@ -2,6 +2,7 @@ import 'package:ajps_flutter_app/pages/user/edit_user_profile_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_dashboard_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_profile_page_screen.dart';
 import 'package:ajps_flutter_app/pages/user/user_settings_screen.dart';
+import 'package:ajps_flutter_app/pages/submission/online_submission_screen.dart';
 import 'package:ajps_flutter_app/services/profile_service.dart';
 // import 'package:ajps_flutter_app/widgets/user_profile_image_widget.dart';
 import 'package:ajps_flutter_app/widgets/safe_user_profile_image_widget.dart';
@@ -41,7 +42,7 @@ class _UserSectionPageState extends State<UserSectionPage> {
       const UserDashboardScreen(),
       UserProfilePageScreen(),
       _EditProfileScreenWrapper(),
-      _OnlineSubmissionPage(),
+      const OnlineSubmissionScreen(),
       const UserSettingsScreen(),
     ];
   }
@@ -221,8 +222,9 @@ class _UserSectionPageState extends State<UserSectionPage> {
             onTap: () => _onItemTapped(2),
           ),
           ListTile(
-            leading: const Icon(Icons.upload_file),
+            leading: const Icon(Icons.web_outlined),
             title: const Text('Online Submission'),
+            subtitle: const Text('Submit your manuscript via web'),
             selected: _selectedIndex == 3,
             onTap: () => _onItemTapped(3),
           ),
@@ -313,12 +315,5 @@ class _EditProfileScreenWrapperState extends State<_EditProfileScreenWrapper> {
       return const Center(child: CircularProgressIndicator());
     }
     return EditUserProfileScreen(user: _user, userEmail: _userEmail);
-  }
-}
-
-class _OnlineSubmissionPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Online Submission'));
   }
 }

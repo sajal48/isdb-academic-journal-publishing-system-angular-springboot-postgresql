@@ -22,4 +22,14 @@ class Author {
       corresponding: json['corresponding'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'institution': institution,
+      'corresponding': corresponding,
+    };
+  }
 }

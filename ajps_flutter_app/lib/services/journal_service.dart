@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:ajps_flutter_app/settings/app_config.dart';
+import 'package:ajps_flutter_app/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:ajps_flutter_app/models/issue.dart';
 import 'package:ajps_flutter_app/models/journal.dart';
@@ -27,5 +28,9 @@ class JournalService {
     } else {
       throw Exception('Failed to load issues');
     }
+  }
+
+  Future<List<Journal>> getJournals({required AuthService authService}) async {
+    return await getAllJournals();
   }
 }

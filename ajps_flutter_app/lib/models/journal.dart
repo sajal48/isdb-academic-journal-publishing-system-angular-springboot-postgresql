@@ -1,7 +1,7 @@
 import 'package:ajps_flutter_app/models/issue.dart';
 
 class Journal {
-  final String? id;
+  final int? id;
   final String journalName;
   final String journalUrl;
   final String issn;
@@ -27,7 +27,7 @@ class Journal {
 
   factory Journal.fromJson(Map<String, dynamic> json) {
     return Journal(
-      id: json['id'],
+      id: json['id'] is String ? int.tryParse(json['id']) : json['id'],
       journalName: json['journalName'],
       journalUrl: json['journalUrl'],
       issn: json['issn'],
